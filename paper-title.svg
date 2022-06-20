@@ -1,5 +1,6 @@
-<svg version="1.1" width="500" height="295" xmlns="http://www.w3.org/2000/svg">
-	<text x="0" y="15">Heap-like Dynamic Score-Decomposed Tries for Top-<tspan>k</tspan> Autocomplete</text>
+<svg version="1.1" width="480" height="16" viewBox="0 0 480 16" xmlns="http://www.w3.org/2000/svg">
+	<foreignObject width="100%" height="100%">
+	<text x="0" y="12">Heap-like Dynamic Score-Decomposed Tries for Top-<tspan>k</tspan> Autocomplete</text>
 <style>
 
 @font-face {
@@ -24,6 +25,7 @@
 }
 
 svg {
+	font-size: 12pt;
 	font-family: KaTeX_Main;
 }
 
@@ -32,4 +34,5 @@ tspan {
 }
 
 </style>
+</foreignObject>
 </svg>
