@@ -238,8 +238,11 @@
 		(fontSize) + 'px',
 		(edge.active && settings('activeFont')) || settings('font')
 	].join(' ');
-	if (!edge.doNotBack)
-		context.fillText("\u{2588}".repeat(Math.ceil(context.measureText(label).width / context.measureText("\u{2588}").width)), fill_x, fill_y);
+	if (!edge.doNotBack) {
+		const numBackingChars = Math.ceil(context.measureText(label).width / context.measureText("\u{2588}").width)
+		console.log({ numBackingChars })
+		context.fillText("\u{2588}".repeat(numBackingChars), fill_x, fill_y);
+	}
 	context.restore()
 	context.fillStyle = fillStyle;
     context.fillText(label, fill_x, fill_y);
