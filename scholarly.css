@@ -1,17 +1,68 @@
-/*
-  Mostly override colours, plus support the article styling.
-  The latter should be made into a separate CSS at some point, that can just be reused by whoever
-  likes it.
-*/
+html {
+	font-family: sans-serif; /* 1 */
+	-ms-text-size-adjust: 100%; /* 2 */
+	-webkit-text-size-adjust: 100%; /* 2 */
+}
 
-@import url('./normalize.css');
-/* @import url('./katex.css'); */
-/* @import url('./fonts/libre-baskerville/regular.css'); */
-/* @import url('./fonts/libre-baskerville/bold.css'); */
-/* @import url('./fonts/libre-baskerville/italic.css'); */
-/* @import url('./fonts/KaTeX_Math/BoldItalic.css');
-@import url('./fonts/KaTeX_Math/Italic.css');
-@import url('./fonts/KaTeX_Main/Regular.css'); */
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+main,
+menu,
+nav,
+section,
+summary {
+	display: block;
+}
+
+a {
+	background-color: transparent;
+}
+
+a:active,
+a:hover {
+	outline: 0;
+}
+
+b,
+strong {
+	font-weight: bold;
+}
+
+dfn {
+	font-style: italic;
+}
+
+h1 {
+	font-size: 2em;
+	margin: 0.67em 0;
+}
+
+mark {
+	background: #ff0;
+	color: #000;
+}
+
+sub,
+sup {
+	font-size: 75%;
+	line-height: 0;
+	position: relative;
+	vertical-align: baseline;
+}
+
+sup {
+	top: -0.5em;
+}
+
+sub {
+	bottom: -0.25em;
+}
 
 * {
 	padding: 0;
@@ -326,6 +377,17 @@ span.complexity {
 	/* text-align: start; */
 	/* transform: translateY(-22px); */
 }
+
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+td,
+th {
+  padding: 0;
+}
+
 
 table>tbody>tr>td>span.complexity {
 	word-spacing: normal;
@@ -681,6 +743,7 @@ a {
 }
 
 figure img {
+	border: 0;
 	page-break-before: auto;
 	page-break-after: auto;
 	page-break-inside: avoid;
