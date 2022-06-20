@@ -240,7 +240,7 @@
 	].join(' ');
 	if (!edge.doNotBack) {
 		const numBackingChars = Math.ceil(context.measureText(label).width / context.measureText("\u{2588}").width)
-		console.log({ numBackingChars })
+		console.log(context)
 		context.fillText("\u{2588}".repeat(numBackingChars), fill_x, fill_y);
 	}
 	context.restore()
