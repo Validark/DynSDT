@@ -1,17 +1,27 @@
-<link rel="stylesheet" href="./src/sigma.settings.css">
-<link rel="stylesheet" href="./edge-renderers.css">
-<link rel="stylesheet" href="./scholarly.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/katex.min.css" integrity="sha384-ZPe7yZ91iWxYumsBEOn7ieg8q/o+qh/hQpSaPow8T6BwALcXSCS6C6fSRPIAnTQs" crossorigin="anonymous">
-<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
-<link rel="manifest" href="../site.webmanifest">
+<!DOCTYPE html>
+<html lang="en-GB">
 
-<!-- <script src="../node_modules/svgcanvas/utils.js" type="module"></script>
-<script src="../node_modules/svgcanvas/image.js" type="module"></script>
-<script src="../node_modules/svgcanvas/context.js" type="module"></script>
-<script src="../node_modules/svgcanvas/element.js" type="module"></script> -->
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>DynSDT demo</title>
 
+	<link rel="stylesheet" href="./src/sigma.settings.css">
+	<link rel="stylesheet" href="./edge-renderers.css">
+	<link rel="stylesheet" href="./scholarly.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/katex.min.css" integrity="sha384-ZPe7yZ91iWxYumsBEOn7ieg8q/o+qh/hQpSaPow8T6BwALcXSCS6C6fSRPIAnTQs" crossorigin="anonymous">
+	<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+	<link rel="manifest" href="../site.webmanifest">
+
+	<!-- <script src="../node_modules/svgcanvas/utils.js" type="module"></script>
+	<script src="../node_modules/svgcanvas/image.js" type="module"></script>
+	<script src="../node_modules/svgcanvas/context.js" type="module"></script>
+	<script src="../node_modules/svgcanvas/element.js" type="module"></script> -->
+</head>
+
+<body>
 <div id="container">
 	<div id="graph-container"></div>
 
@@ -753,6 +763,7 @@ results.push(node.toString())</code>
 	</div> -->
 
 </div>
+</body>
 <script src="./formatComplexity.js"></script>
 <script>
 	for (const x of document.getElementsByClassName("complexity"))
@@ -825,3 +836,4 @@ results.push(node.toString())</code>
 <!-- <script src="./plugins/sigma.plugins.dragNodes/sigma.plugins.dragNodes.js"></script> -->
 <script src="./trie.js"></script>
 <script src="./edge-renderers.js"></script>
+</html>
