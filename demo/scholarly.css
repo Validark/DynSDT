@@ -1,0 +1,864 @@
+/*
+  Mostly override colours, plus support the article styling.
+  The latter should be made into a separate CSS at some point, that can just be reused by whoever
+  likes it.
+*/
+
+@import url('./normalize.css');
+
+* { padding: 0; margin: 0; }
+
+html {
+	scroll-behavior: smooth;
+}
+
+@media (prefers-color-scheme: dark) {
+	img[src$=".svg"] {
+		filter: invert(1);
+	}
+}
+
+span.times {
+	font-size: 1.1em;
+	line-height: 0;
+	vertical-align: -0.225em;
+}
+
+span.minus {
+	line-height: 0;
+	font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', 'Courier New', Courier, monospace
+}
+
+span.VeryThinSpace:after {
+	/* content: ' '; */
+}
+
+span.invisible {
+	color: rgba(255, 255, 255, 0);
+}
+
+span.invisible:after {
+	content: attr(data-str);
+}
+
+code {
+	font-size: 0.95em;
+	font-family: 'KaTeX_Main';
+}
+
+code var {
+	font-size: 0.95em;
+	letter-spacing: -0.05em;
+}
+
+/* The following makes a space thinner, the above rule gives spacing without adding a space character */
+span.ThinSpace {
+	/* justify-content: ; */
+	text-align: initial;
+	word-spacing: normal;
+	 /* -0.5em; */
+	/* word-spacing: -0.05em; */
+	/* word-spacing: 0.001em; */
+	/* word-spacing: 0; */
+}
+
+span.ThinSpace:after {
+	content: ' '; /* Thin Space */
+	content: ' '; /* Medium space */
+	/* content: ' '; */
+	/* Full space */
+	/* content: ' '; */
+}
+
+article {
+	/* font-size: 1.166666666666667em; */
+	/* font-weight: 300; */
+	line-height: 1.4;
+	/* 1.8; */
+}
+
+em {
+	/* font-style: normal; */
+	font-style: italic;
+}
+
+var {
+	/* 0.833333333333em; */
+	/* font-size: 0.8em; */
+	/* font-family: 'Old Standard TT', "Libre Baskerville", 'Playfair Display', serif; */
+	/* font-size: 1em; */
+	font-family: "KaTeX_Math", serif;
+	font-variant-caps: normal;
+	font-style: italic;
+	font-size: 1.05em;
+	/* vertical-align: 0.025em; */
+	/* font-weight: normal; */
+
+	/* white-space: nowrap; */
+
+	/* padding: 0;
+	margin: 0; */
+	/* padding-top: -10em; */
+	/* height: max-content; */
+	line-height: 0;
+	/* transform: translateY(2.11em); */
+	/* padding-top: 1; */
+	/* font-style: oblique; */
+}
+
+.KaTeX_Main_Normal {
+	font-family: "KaTeX_Main", serif;
+	font-style: normal;
+	font-weight: normal;
+}
+
+.it {
+	font-style: italic;
+	white-space: nowrap;
+	break-inside: avoid;
+}
+
+.nowrap {
+	flex-wrap: nowrap;
+	break-inside: avoid;
+	white-space: nowrap;
+	word-spacing: normal;
+}
+
+span.complexity {
+	font-family: "KaTeX_Main", serif;
+	font-style: normal;
+	font-weight: normal;
+
+	flex-wrap: nowrap;
+	break-inside: avoid;
+	white-space: nowrap;
+	word-spacing: 0.1em;
+
+	/* display: inline-block;
+	margin: 0;
+	padding: 0;
+	margin-left: -1em;
+	vertical-align: 0.08em; */
+	/* padding-top: 400px; */
+	/* padding-top: -1em; */
+	/* text- */
+	/* text-align: start; */
+	/* transform: translateY(-22px); */
+}
+
+table > tbody > tr > td > span.complexity {
+	word-spacing: 0.25em;
+}
+
+.theta, .big-O {
+	font-variant-caps: normal;
+	font-family: serif;
+	line-height: 0;
+	/* display: inline-block; */
+	margin: 0;
+	padding: 0;
+	/* margin-left: 0; */
+	/* text-justify: left;
+	justify-self: left; */
+	/* margin-left: -0.15em; */
+
+	font-size: 1.25em;
+	vertical-align: -0.075em;
+	font-style: italic;
+	/* display: inline-block; */
+	/* margin-left: 0; */
+	/* text-justify: left;
+	justify-self: left; */
+	/* margin-left: -0.15em; */
+	break-after: avoid;
+}
+
+
+/* var::before {
+	content: "";
+	margin-top: -9px;
+	height: 0;
+} */
+/* display: block; */
+
+* {
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+}
+body {
+	/* "Libre Baskerville" */
+  font-family: serif;
+  background: #f7f7f7;
+  color: #282828;
+  background-color: #eee;
+}
+
+.indented {
+	text-indent: 2rem;
+}
+
+@media screen {
+  article {
+		/* the padding is 116px 116px 80px 116px, from which we remove the border */
+		/* padding: 88px 88px 72px 108px; */
+		padding: 1in 1in 1in 1in;
+		background: #fff;
+		/* border-top: 28px solid transparent;
+		border-right: 28px solid transparent;
+		border-bottom: 8px solid transparent;
+		border-left: 4px solid transparent;
+		border-image: url('card-bg.png') 28 28 8 4 repeat; */
+
+		/* Styles for better appearance on screens only -- are reset to defaults in print styles later */
+
+		/* Reflect the paper width in the screen rendering (must match size from @page rule) */
+		width: 21cm;
+		/* Reflect the paper height in the screen rendering (must match size from @page rule) */
+		min-height: 29.7cm;
+
+		/* Reflect the actual page margin/padding on paper in the screen rendering (must match margin from @page rule) */
+		padding-left: 2cm;
+		padding-top: 2cm;
+		padding-right: 2cm;
+		padding-bottom: 2cm;
+	}
+}
+
+
+/* Use CSS Paged Media to switch from continuous documents to sheet-like documents with separate pages */
+@page {
+	/* You can only change the size, margins, orphans, widows and page breaks here */
+
+	/* Paper size and page orientation */
+	size: A4 portrait;
+
+	/* Margin per single side of the page */
+	margin-left: 2cm;
+	margin-top: 2cm;
+	margin-right: 2cm;
+	margin-bottom: 2cm;
+}
+
+p+p {
+	/* Restore the spacing between the paragraphs */
+	/* margin-top: 0.5cm; */
+}
+p {
+  /* Reset the margin so that the text starts and ends at the expected marks */
+  margin: 0;
+  -moz-hyphens: auto;
+  hyphens: auto;
+  /* widows: 2;
+  orphans: 2; */
+  break-inside: avoid;
+  /* margin-top: 0; */
+  /* margin-bottom: 1em; */
+}
+
+section {
+	/* margin: 0; */
+	margin-top: 6em;
+}
+
+/* Wow. section:first-of-type selects the first of type under each tag...... */
+article > section:first-of-type {
+	/* margin: 0; */
+	margin-top: 1em;
+}
+
+section p {
+	text-align: justify;
+	margin-top: 2em;
+	margin-bottom: 2em;
+}
+
+section[id="references"] p {
+	text-align: initial;
+	margin-top: 1em;
+	margin-bottom: 1em;
+}
+
+body > section, article {
+  margin: 0 auto 1em auto;
+  /* max-width: 900px; */
+}
+
+/* section:target h2, section:target h3, article:target h1 {
+  color: #2196f3;
+} */
+
+/* <a class="headerlink" href="#classes" title="Permanent link">¶</a> */
+
+/*
+function auto_id_headings( $content ) {
+	$content = preg_replace_callback( '/(\<h[1-6](.*?))\>(.*)(<\/h[1-6]>)/i', function( $matches ) {
+		if ( ! stripos( $matches[0], 'id=' ) ) :
+			$heading_link = '<a href="#' . sanitize_title( $matches[3] ) . '" class="heading-link"><i class="glyphicon glyphicon-link"></i></a>';
+			$matches[0] = $matches[1] . $matches[2] . ' id="' . sanitize_title( $matches[3] ) . '">' . $heading_link . $matches[3] . $matches[4];
+		endif;
+
+		return $matches[0];
+	}, $content );
+
+    return $content;
+
+}
+add_filter( 'the_content', 'auto_id_headings' );
+*/
+
+a.heading-link {
+	text-decoration: none !important;
+}
+
+a.heading-link > i.glyphicon {
+    position: absolute;
+    transform: translateX(-1em)
+}
+
+h2 a.heading-link > i.glyphicon, h3 a.heading-link > i.glyphicon, h4 a.heading-link > i.glyphicon, h5 a.heading-link > i.glyphicon, h6 a.heading-link > i.glyphicon {
+	opacity: 0;
+	position: absolute;
+	transform: translateX(-1em)
+}
+
+h2:hover a.heading-link > i.glyphicon, h3:hover a.heading-link > i.glyphicon, h4:hover a.heading-link > i.glyphicon, h5:hover a.heading-link > i.glyphicon, h6:hover a.heading-link > i.glyphicon {
+	opacity: 1
+}
+
+i.glyphicon:after {
+	content: " # ";
+}
+
+/* h2:hover::before {
+	content: "#";
+	position: absolute;
+	transform: translateX(-0.75em);
+	justify-content: right;
+} */
+
+/* , h3::before */
+
+h1, h2, h3 {
+/*  text-align: center; */
+  font-weight: 700;
+  break-before: always;
+  break-after: avoid;
+  margin-bottom: 0.5em;
+  line-height: normal;
+  letter-spacing: 1px;
+}
+h1 {
+  font-variant: small-caps;
+  /* font-variant: normal; */
+  padding-top:  1in;
+  padding-bottom: 1em;
+  /* letter-spacing: .75px; */
+  font-size: 2em;
+  text-align: center;
+}
+div.author-info {
+	text-align: center;
+	font-size: larger;
+	color: inherit;
+	padding-bottom: 16px;
+}
+
+div.author-info a, a.citation {
+	font-weight: normal;
+	text-decoration: none !important;
+	letter-spacing: 0.25px;
+}
+div.author-info a:hover, a.citation:hover {
+	text-decoration: underline !important;
+}
+
+h2 {
+  font-variant: small-caps;
+  /* break-before: always; */
+  /* padding-top: 0.75em !important; */
+  /* FIXME:*/
+  padding-bottom: 0;
+  /* padding-bottom: 0.25em; */
+  font-size: 1.666666666666667em;
+}
+
+section[id="abstract"] > h2 {
+	text-align: center;
+}
+
+h3 {
+	/* display: block; */
+	/* margin-top: -3em; */
+	/* padding-top: -3em; */
+	/* top: -3em; */
+	/* padding-bottom: 0.5em; */
+	font-size: 1.25em;
+}
+article:first-child {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+figure:first-child {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+section {
+  /* padding-bottom: 6em; */
+  break-before: always;
+  break-after: always;
+}
+
+dfn {
+	font-style: italic;
+  /* text-decoration: underline; */
+}
+
+abbr {
+	text-decoration: none;
+	border-bottom: 1px dotted currentcolor;
+}
+
+/* a {
+  color: #2196f3;
+} */
+
+a:hover {
+	text-decoration: none !important;
+}
+
+a {
+	text-decoration: underline !important;
+	/* font-style: italic; */
+	/* font-weight: bold; */
+}
+a.citation {
+	font-weight: normal;
+}
+/* a, :link, :visited {
+  text-decoration: none;
+  color: #282828;
+} */
+
+a:active {
+  /* color: #282828; */
+}
+
+a.uncolored, a.citation, a {
+	/* color: #000; */
+	color: inherit;
+}
+
+figure img {
+  max-width: 100%;
+  /* max-height: 90vh; */
+  width: auto;
+  height: auto;
+}
+
+/* figure img { border: 2px dashed currentcolor; }
+article { border: 2px dashed currentcolor;} */
+
+figure {
+  text-align: center;
+}
+
+pre, code, a[property="schema:citation"] {
+  -moz-hyphens: none;
+  hyphens: none;
+}
+code {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 0.3em;
+  margin: 0 0.2em;
+  padding: 0.2em;
+  background: #FDFDFD;
+  display: inline;
+}
+
+code.language-html {
+  color: inherit;
+}
+
+pre code {
+  color: inherit;
+  border: none;
+  padding: 0;
+  background: none;
+}
+
+footer {
+  font-size: 1.083333333333333em;
+  box-shadow: -1px 0px 2px #BCBCBC;
+  background: #BDD5E9;
+  /*border-top: 2px solid #F9EABD;*/
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}
+
+footer p {
+  max-width: 900px;
+  padding: 14px 10px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+footer a:link, footer a:visited {
+  color: white;
+}
+
+footer img {
+  vertical-align: -4px;
+  background: white;
+  border-radius: 3px;
+  padding: 1px;
+  box-sizing: content-box;
+}
+
+/* p + section {
+  margin-top: 2em;
+}
+ul + p {
+  margin-top: 1em;
+} */
+section[typeof='sa:ReferenceList'] dt {
+  float: left;
+  margin-right: 5px;
+}
+section[typeof='sa:ReferenceList'] dt::after {
+  content: ',';
+}
+section[typeof='sa:ReferenceList'] dd {
+  margin-bottom: 16px;
+}
+section[typeof='sa:ReferenceList'] cite::before {
+  content: '«';
+}
+section[typeof='sa:ReferenceList'] cite::after {
+  content: '»';
+}
+
+code {
+  overflow: visible;
+  white-space: pre-wrap;
+}
+/* pre {
+  border: solid 1px #DFDFDF;
+  border-left: solid #358CCB 10px;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin:0;
+  padding-left: 1em;
+} */
+meta {
+  display:none;
+}
+figure {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  overflow: auto;
+  margin: 2em auto;
+  padding: 0;
+}
+figure pre,
+figure table {
+  flex: auto;
+  overflow: auto;
+}
+figure figcaption {
+  flex: none;
+}
+
+table {
+  break-inside: avoid;
+  break-before: avoid;
+  /* width: auto; */
+  margin: 2em auto;
+  margin-top: 4em;
+  margin-bottom: 4em;
+  /* font-family: sans-serif; */
+  /* letter-spacing: .25px; */
+  border-collapse: collapse;
+  box-sizing: border-box;
+  background: #fff;
+  /* Avoid page breaks inside */
+  page-break-inside: avoid;
+  align-self: center;
+
+  /* border: 1px solid lightgray; */
+}
+
+table th {
+	font-weight: bold;
+  /* padding: 8px 16px 8px 16px; */
+  /* white-space: nowrap; */
+  /* border-bottom: 0px;
+  border-top: 0px; */
+  /* letter-spacing: .5px; */
+  /* line-height: 15px; */
+  /* text-align: center;
+  padding: 0;
+  vertical-align: baseline; */
+}
+
+table.trie-node-table {
+}
+
+table.trie-node-table tr > td:first-of-type::after,
+table.trie-node-table tr > th:first-of-type::after {
+	content: ":";
+}
+
+
+table.trie-node-table tr > td,
+table.trie-node-table tr > th {
+	padding-right: 0em;
+}
+
+table.trie-node-branch-points {
+
+}
+
+table.complexity-table tr > td:first-of-type, table.complexity-table tr > th:first-of-type {
+  text-align: right;
+  padding: 0;
+  margin: 0;
+  /* padding-left: 1em; */
+  padding-right: 0.5em;
+  /* text-indent: 1em; */
+  /* padding: 12px; */
+  border-right: 1px solid lightgray;
+  /* line-height: 18px; */
+  vertical-align: baseline;
+  /* font-weight: 300; */
+}
+
+table.complexity-table tr > td:last-of-type, table.complexity-table tr > th:last-of-type {
+	padding-left: 0.5em;
+	text-align: right;
+	/* padding-right: 0.5em; */
+}
+
+table.complexity-table tbody > tr {
+	border-top: 1px solid lightgray;
+}
+
+/* table tr > th:first-of-type {
+	border-right: 1px solid black;
+} */
+
+table.complexity-table thead {
+	border-bottom: 1px solid black;
+	border-bottom: 1px solid lightgray;
+	/* border: 1px solid black; */
+}
+
+table.complexity-table tbody > tr:first-of-type {
+	border-top: none;
+}
+
+/**************************************************/
+
+table.complexity-table2 tr > td:first-of-type {
+  text-align: right;
+  padding: 0;
+  margin: 0;
+  /* padding-left: 1em; */
+  padding-right: 0.5em;
+  /* text-indent: 1em; */
+  /* padding: 12px; */
+  /* border-right: 1px solid lightgray; */
+  /* line-height: 18px; */
+  vertical-align: baseline;
+
+  /* font-weight: 300; */
+}
+
+table.complexity-table2 tr > td, table.complexity-table2 tr > th {
+	padding-left: 0.5em;
+	padding-right: 0.5em;
+	border-left: 1px solid lightgray;
+	/* text-align: right; */
+	/* padding-right: 0.5em; */
+}
+
+table.complexity-table2 tbody > tr > td {
+	border-top: 1px solid lightgray;
+	text-align: left;
+}
+
+table.complexity-table2 tr > td:first-of-type, table.complexity-table2 tr > th:first-of-type {
+	/* font-style: italic; */
+	font-weight: bold;
+	border-left: none;
+	/* border-top: none; */
+}
+
+/* table tr > th:first-of-type {
+	border-right: 1px solid black;
+} */
+
+/* table.complexity-table2 thead { */
+	/* border-bottom: 1px solid black; */
+	/* border-bottom: 1px solid lightgray; */
+	/* border: 1px solid black; */
+/* } */
+
+/* table.complexity-table2 tbody > tr:first-of-type {
+	border-top: none;
+} */
+
+caption {
+	/* "Libre Baskerville", Times,  */
+  font-family: serif;
+  text-align: left;
+  padding: 16px;
+  margin-top: 16px;
+  width: 100%;
+  box-sizing: border-box;
+  caption-side: bottom;
+  font-style: italic;
+  /* we're removing the border (28+4=32) + horizontal padding (88+108=196px) = 228px */
+  max-width: calc(100vw - 228px)
+}
+
+figcaption {
+  text-align: center;
+  /* text-align: justify; */
+  color: #9E9E9E;
+  /* margin: 24px 0px 0 0px; */
+  padding: 1.25em 0 0em 0;
+  /* padding: 0 0 1.25em 0; */
+  /* letter-spacing: .35px; */
+  /* border-bottom: 1px solid #ccc; */
+  /* font-style: italic; */
+  /* hyphens: auto; */
+  /* padding-bottom: 8px; */
+  /* border-left: 1px solid #ccc;
+  border-right: 1px solid #ccc; */
+}
+
+/* section[typeof='sa:Abstract'] > h2:first-of-type {
+	margin-top: 2em;
+}
+
+section[typeof='sa:Abstract'] p {
+	margin: 0;
+	margin-bottom: 6em;
+} */
+
+/* have less vertical space in structured abstracts */
+/* section[typeof='sa:Abstract'] p {
+  margin: 0;
+  margin-bottom: 0.5em;
+}
+section[typeof='sa:Abstract'] p:first-of-type {
+  margin: 0;
+  margin-bottom: 2em;
+} */
+/* section[typeof='sa:Abstract'] > section > h2 {
+  display: inline;
+  font-variant: small-caps;
+  float: left;
+  font-size: inherit;
+  line-height: inherit;
+  margin: 0;
+  padding: 16px 8px 0 0;
+  color: #9E9E9E;
+} */
+
+aside {
+  /* margin: 1em 0; */
+  /* font-style: italic; */
+  background: #F0F6FA;
+  padding: 0.25in 0.25in;
+}
+aside p:last-child {
+  margin: 0;
+}
+
+/* wide screen */
+/* @media screen and (min-width: 1900px) {
+	article {
+		max-width: 1200px;
+		font-size: 1.333333333333333em;
+		line-height: 30px;
+	}
+} */
+/* @media screen and (min-width: 1900px) { */
+  article {
+    /* max-width: 1200px;
+    font-size: 1.333333333333333em; */
+    /* line-height: 30px; */
+  }
+  /* header p.title, header p.subtitle, footer p {
+    max-width: 1200px;
+  } */
+  /* footer {
+    font-size: 1.333333333333333em;
+  } */
+/* } */
+/* @media screen and (max-width: 979px) {
+  article {
+    width: 100%;
+    padding: 115px 116px 79px 116px;
+    border-top: 1px solid #E0E0E0;
+    border-bottom: 1px solid #E0E0E0;
+    border-left: none;
+    border-right: none;
+  }
+  caption { */
+    /* we're removing the horizontal padding (116px*2 = 232px) */
+    /* max-width: calc(100vw - 232px)
+  }
+} */
+/* @media screen and (max-width: 799px) {
+  article {
+    padding: 57px 58px 39px 58px;
+  }
+  caption { */
+    /* we're removing the horizontal padding (58px*2 = 116px) */
+    /* max-width: calc(100vw - 116px)
+  }
+} */
+/* @media screen and (max-width: 399px) {
+  article {
+    padding: 28px 29px 19px 29px;
+  }
+  caption {
+    max-width: calc(100vw - 58px)
+  }
+  footer {
+    font-size: 0.8333333333333333em;
+  }
+  article > section:first-of-type ol::before {
+    float: none;
+    width: auto;
+    margin-left: 0;
+  }
+  article > section:first-of-type ol {
+    margin-left: 0;
+    padding: 0;
+  }
+  section[typeof="sa:Abstract"] {
+    margin-top: 30px;
+  }
+} */
+@media print {
+  header {
+    display: none;
+  }
+  footer {
+    position: absolute;
+  }
+  article {
+    border: none;
+  }
+
+  a {
+	  text-decoration: none;
+	  color: inherit;
+  }
+}
