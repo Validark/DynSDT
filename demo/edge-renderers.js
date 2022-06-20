@@ -2103,7 +2103,7 @@ setTimeout(function() {
 //   console.log(event);
 // });
 
-function resize(ev) {
+function resize() {
 	var h = this.window.innerHeight
 	var w = this.window.innerWidth
 	// console.log({h,w})
@@ -2127,7 +2127,7 @@ function resize(ev) {
 	const defaultEdgeLabelSize2 = Math.max(16, Math.min(defaultEdgeLabelSize, r * defaultEdgeLabelSize * 1.25))
 	s.settings("defaultLabelSize", fontSize)
 	s.settings("defaultEdgeLabelSize", defaultEdgeLabelSize2)
-	if (ev) s.refresh();
+	s.refresh();
 }
 
 window.onresize = resize;
