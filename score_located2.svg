@@ -1,0 +1,154 @@
+<svg version="1.1" width="500" height="350" xmlns="http://www.w3.org/2000/svg" viewBox="0 3 500 348">
+	<!-- <rect x="0" y="0" width="100%" height="100%" fill="#fff" /> -->
+
+<text x="0" class='T'>
+<tspan x='0' dy='12'>(1, "<tspan class="S">t</tspan>ownship", 16894)</tspan>
+<tspan class="Italic" style="font-weight: 900" x='0' dy='12'>(2, "<tspan class="S" style="font-weight:900">te</tspan>nnis academy", 9001)</tspan>
+
+	<tspan fill="red" x='40' dy='12'>(2, "<tspan class="S">te</tspan>xas", 8909)</tspan>
+		<tspan fill="blue" x='80' dy='12'>(2, "<tspan class="S">te</tspan>levision", 4673)</tspan>
+		<tspan x='80' dy='12'>(5, "<tspan class="S">texas</tspan> state", 510)</tspan>
+		<tspan x='80' dy='12'>(3, "<tspan class="S">tex</tspan>t", 290)</tspan>
+		<tspan x='80' dy='12'>(4, "<tspan class="S">texa</tspan>na", 93)</tspan>
+	<tspan fill="red" x='40' dy='12'>(6, "<tspan class="S">tennis</tspan>", 5826)</tspan>
+		<tspan fill="blue" x='80' dy='12'>( 6, "<tspan class="S">tennis</tspan>trophy", 75)</tspan>
+	<tspan fill="red" x='40' dy='12'>(4, "<tspan class="S">tenn</tspan>essee", 3461)</tspan>
+	<tspan fill="red" x='40' dy='12'>(3, "<tspan class="S">ten</tspan>", 1452)</tspan>
+	<tspan fill="red" x='40' dy='12'>(7, "<tspan class="S">tennis </tspan>championships", 1218)</tspan>
+		<tspan x='80' dy='12'>( 8, "<tspan class="S">tennis c</tspan>lassic", 267)</tspan>
+		<tspan fill="blue" x='80' dy='12'>( 7, "<tspan class="S">tennis </tspan>tournament", 190)</tspan>
+		<tspan x='80' dy='12'>(10, "<tspan class="S">tennis cha</tspan>llenge", 75)</tspan>
+		<tspan x='80' dy='12'>(19, "<tspan class="S">tennis championship</tspan>", 52)</tspan>
+		<tspan x='80' dy='12'>(16, "<tspan class="S">tennis champions</tspan>", 7)</tspan>
+		<tspan x='80' dy='12'>(15, "<tspan class="S">tennis champion</tspan>", 1)</tspan>
+		<tspan x='80' dy='12'>( 9, "<tspan class="S">tennis ch</tspan>umps", 1)</tspan>
+	<tspan fill="red" x='40' dy='12'>(8, "<tspan class="S">tennis a</tspan>t", 845)</tspan>
+		<tspan x='80' dy='12'>(8, "<tspan class="S">tennis a</tspan>ssociation", 37)</tspan>
+			<tspan x='120' dy='12'>( 8, "<tspan class="S">tennis a</tspan>nd", 9)</tspan>
+				<tspan fill="blue" x='160' dy='12'>(8, "<tspan class="S">tennis a</tspan>bruzzo", 7)</tspan>
+			<tspan x='120' dy='12'>(18, "<tspan class="S">tennis association</tspan>s", 1)</tspan>
+		<tspan x='80' dy='12'>(9, "<tspan class="S">tennis at</tspan>hletes", 1)</tspan>
+	<tspan fill="red" x='40' dy='12'>(5, "<tspan class="S">tenni</tspan>lle", 13)</tspan>
+	<tspan fill="red" x='40' dy='12'>(9, "<tspan class="S">tennis ac</tspan>es", 1)</tspan>
+
+
+<tspan x='0' dy='12'>(4, "<tspan class="S">team</tspan> in", 1232)</tspan>
+<tspan x='0' dy='12'>(3, "<tspan class="S">tea</tspan>", 641)</tspan>
+</text>
+
+	<defs>
+		<path id="arrow" stroke-width="1" d="M 0 -4 L 0 0 L -5 -2 Z" stroke="red" fill="red"/>
+	</defs>
+
+
+  <style>
+tspan.S {
+	text-decoration: underline;
+	font-weight: bold;
+}
+
+text.N {
+	font-size: 9px;
+	font-family: "JetBrains Mono", monospace;
+}
+
+text.Q {
+	font-size: 9px;
+	font-family: "JetBrains Mono", monospace;
+}
+
+text.T {
+  font-size: 10px;
+  font-family: "JetBrains Mono", monospace;
+}
+
+text.Italic, tspan.Italic {
+  font-style: italic;
+}
+
+text.Bold, tspan.Bold {
+  font-weight: bold;
+}
+
+text.Medium, tspan.Medium {
+	font-weight: 700;
+}
+
+text.Bold, tspan.Bold {
+	font-weight: bold;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff2/JetBrainsMono-Bold-Italic.woff2') format('woff2'),
+    url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff/JetBrainsMono-Bold-Italic.woff') format('woff');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff2/JetBrainsMono-Bold.woff2') format('woff2'),
+    url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff/JetBrainsMono-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff2/JetBrainsMono-ExtraBold-Italic.woff2') format('woff2'),
+    url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff/JetBrainsMono-ExtraBold-Italic.woff') format('woff');
+  font-weight: 800;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff2/JetBrainsMono-ExtraBold.woff2') format('woff2'),
+    url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff/JetBrainsMono-ExtraBold.woff') format('woff');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff2/JetBrainsMono-Italic.woff2') format('woff2'),
+    url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff/JetBrainsMono-Italic.woff') format('woff');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff2/JetBrainsMono-Medium-Italic.woff2') format('woff2'),
+    url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff/JetBrainsMono-Medium-Italic.woff') format('woff');
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff2/JetBrainsMono-Medium.woff2') format('woff2'),
+    url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff/JetBrainsMono-Medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff2/JetBrainsMono-Regular.woff2') format('woff2'),
+    url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff/JetBrainsMono-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+  </style>
+</svg>

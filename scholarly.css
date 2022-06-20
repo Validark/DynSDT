@@ -1,0 +1,1311 @@
+/*
+  Mostly override colours, plus support the article styling.
+  The latter should be made into a separate CSS at some point, that can just be reused by whoever
+  likes it.
+*/
+
+@import url('./normalize.css');
+/* @import url('./katex.css'); */
+/* @import url('./fonts/libre-baskerville/regular.css'); */
+/* @import url('./fonts/libre-baskerville/bold.css'); */
+/* @import url('./fonts/libre-baskerville/italic.css'); */
+/* @import url('./fonts/KaTeX_Math/BoldItalic.css');
+@import url('./fonts/KaTeX_Math/Italic.css');
+@import url('./fonts/KaTeX_Main/Regular.css'); */
+
+* {
+	padding: 0;
+	margin: 0;
+}
+
+html {
+	scroll-behavior: smooth;
+	font-size: 12pt;
+}
+
+.bb-axis-x-label, .bb-axis-y-label {
+	font-family: KaTeX_Main, Times, 'Times New Roman', serif !important;
+	letter-spacing: -1px;
+	word-spacing: 2px;
+}
+
+.bb-axis-x-label {
+	transform: translateY(-0.5em);
+}
+
+.bb svg {
+	font-family: KaTeX_Main, Times, 'Times New Roman', serif !important;
+	font-size: 1.1em !important;
+}
+
+body {
+	font-family: KaTeX_Main, Times, 'Times New Roman', serif;
+	/* font-family: "Libre Baskerville",  Times, 'Times New Roman', serif;
+	font-size: smaller; */
+	/* background: #f7f7f7; */
+	color: #282828;
+	line-height: 1.5;
+
+	background-color: #eee;
+	letter-spacing: -0.375px;
+}
+
+[style*="font-style: italic"], em, i, dfn:not(.funcname), cite, .it, caption {
+	letter-spacing: -0.75px;
+	letter-spacing: -1px;
+	/* margin-left: 0.75px; */
+	margin-right: 0.25px;
+	line-height: 0;
+}
+
+
+
+div.pseudocode i {
+	font-family: KaTeX_Main;
+}
+
+/* h1, div.author-info, i, dfn:not(.funcname), a {
+	font-family: "Libre Baskerville";
+	font-size: smaller;
+} */
+
+article {
+	/* font-size: 1.166666666666667em; */
+	/* font-weight: 300; */
+	/* 1.8; */
+}
+
+/* body {
+	counter-reset: section subsection subsubsection figure figure_prev -1;
+}
+
+figure {
+	counter-increment: figure figure_prev;
+}
+
+figure > figcaption::before {
+	content: "Figure " counter(figure) ".";
+	font-weight: bold;
+}
+
+a.previous_figure::before {
+	content: "Figure " counter(figure_prev) "";
+}
+
+a.current_figure::before {
+	content: "Figure " counter(figure) "";
+}
+
+section:not([id="abstract"]) > h2::before
+{
+	counter-increment: section;
+    content: counter(section) ".  ";
+    counter-set: subsection 0 subsubsection 0;
+	word-spacing: 0.5em;
+}
+
+section > h3::before
+{
+	counter-increment: subsection;
+    content: counter(section) "." counter(subsection) " ";
+    counter-set: subsubsection 0;
+	word-spacing: 0.5em;
+}
+
+section > h4::before
+{
+	counter-increment: subsubsection;
+    content: counter(section) "." counter(subsection) "." counter(subsubsection) " ";
+	word-spacing: 0.5em;
+} */
+
+a.invisible-link {
+	font-weight: inherit;
+	text-decoration: inherit;
+}
+
+a.internal-link {
+	font-weight: bold;
+}
+
+a.heading-link,
+a.internal-link {
+	text-decoration: none;
+}
+
+a.heading-link:hover,
+a.internal-link:hover,
+a.invisible-link:hover {
+	text-decoration: underline;
+}
+
+/* a.heading-link > a.glyphicon {
+    position: absolute;
+    transform: translateX(-1em)
+} */
+
+h2 a.glyphicon,
+h3 a.glyphicon,
+h4 a.glyphicon {
+	opacity: 0;
+	position: absolute;
+	transform: translateX(0.25em);
+
+	text-decoration: none;
+}
+
+h2:hover a.glyphicon,
+h3:hover a.glyphicon,
+h4:hover a.glyphicon,
+h5:hover a.glyphicon,
+h6:hover a.glyphicon {
+	opacity: 1
+}
+
+a.glyphicon:after {
+	content: "§";
+	font-style: normal;
+	text-decoration: none;
+}
+
+/**
+ * Disable smooth scrolling when users have prefers-reduced-motion enabled
+ */
+@media screen and (prefers-reduced-motion: reduce) {
+	html {
+		scroll-behavior: auto;
+	}
+}
+
+span.times {
+	font-size: 1.1em;
+	line-height: 0;
+	vertical-align: -0.225em;
+}
+
+span.minus,
+span.dash {
+	line-height: 0;
+	font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', 'Courier New', Courier, monospace;
+}
+
+span.dash {
+	margin-left: -0.1em;
+	margin-right: -0.05em;
+}
+
+span.VeryThinSpace:after {
+	/* content: ' '; */
+}
+
+span.invisible {
+	opacity: 0;
+}
+
+span.invisible:after {
+	content: attr(data-str);
+}
+
+code {
+	font-size: 0.95em;
+	font-family: 'KaTeX_Main';
+}
+
+/* code var {
+	font-size: 0.95em;
+	letter-spacing: -0.05em;
+} */
+
+/* The following makes a space thinner, the above rule gives spacing without adding a space character */
+span.ThinSpace {
+	/* justify-content: ; */
+	/* text-align: initial;
+	word-spacing: normal; */
+	/* -0.5em; */
+	/* word-spacing: -0.05em; */
+	/* word-spacing: 0.001em; */
+	/* word-spacing: 0; */
+}
+
+span.ThinSpace:after {
+	content: ' ';
+	/* Thin Space */
+	content: ' ';
+	/* Medium space */
+	/* content: ' '; */
+	/* Full space */
+	/* content: ' '; */
+}
+
+span.ThickSpace:after {
+	content: ' ';
+}
+
+em {
+	/* font-style: normal; */
+	font-style: italic;
+}
+
+div.pseudocode i {
+}
+
+var, .var {
+	/* margin-right: 0.025em;
+    margin-left: 0.025em; */
+	/* 0.833333333333em; */
+	/* font-size: 0.8em; */
+	/* font-family: 'Old Standard TT', "Libre Baskerville", 'Playfair Display', serif; */
+	/* font-size: 1em; */
+	font-family: "KaTeX_Math", Times, 'Times New Roman', serif;
+	font-variant-caps: normal;
+	font-style: italic;
+	/* margin-left: 0.05em;
+	margin-right: 0.05em; */
+	/* padding-left: 0; */
+	font-size: 1.075em;
+	/* vertical-align: -0.025em; */
+	/* font-weight: normal; */
+
+	/* white-space: nowrap; */
+
+	/* padding: 0;
+	margin: 0; */
+	/* padding-top: -10em; */
+	/* height: max-content; */
+	line-height: 0;
+	/* transform: translateY(2.11em); */
+	/* padding-top: 1; */
+	/* font-style: oblique; */
+}
+
+.katex_nowrap {
+	font-family: "KaTeX_Main", Times, 'Times New Roman', serif;
+	white-space: nowrap;
+	break-inside: avoid;
+}
+
+.it {
+	font-style: italic;
+	white-space: nowrap;
+	break-inside: avoid;
+}
+
+.nowrap {
+	flex-wrap: nowrap;
+	break-inside: avoid;
+	white-space: nowrap;
+	word-spacing: normal;
+}
+
+span.complexity {
+	font-family: "KaTeX_Main", Times, 'Times New Roman', serif;
+	font-style: normal;
+	font-weight: normal;
+
+	flex-wrap: nowrap;
+	break-inside: avoid;
+	white-space: nowrap;
+	word-spacing: 0.1em;
+
+	/* font-size: 1.05em;
+	vertical-align: -0.025em;
+	line-height: 0; */
+
+
+	/* margin-left: 0.1em;
+	margin-right: 0.1em; */
+
+	/* display: inline-block;
+	margin: 0;
+	padding: 0;
+	margin-left: -1em;
+	vertical-align: 0.08em; */
+	/* padding-top: 400px; */
+	/* padding-top: -1em; */
+	/* text- */
+	/* text-align: start; */
+	/* transform: translateY(-22px); */
+}
+
+table>tbody>tr>td>span.complexity {
+	word-spacing: normal;
+}
+
+var.trie {
+	font-family: KaTeX_Caligraphic;
+	/* padding-left: 0.5em; */
+	padding-right: 0.35em;
+	line-height: 0;
+}
+
+var.BP {
+	font-family: KaTeX_Caligraphic;
+	line-height: 0;
+}
+
+var.L {
+	font-family: KaTeX_Caligraphic;
+	line-height: 0;
+}
+
+var.threshold {
+	font-family: KaTeX_Caligraphic;
+	font-size: 0.8em;
+	font-weight: bold;
+	line-height: 0;
+	vertical-align: 0.08em;
+}
+
+span.l\00007C, span.r\00007C, span.\00005B, span.\00005D, span.\000028, span.\000029, span.\00230A, span.\00230B {
+	font-family: KaTeX_Math;
+	font-size: 1.1em;
+	margin-left: 0.025em;
+	margin-right: 0.025em;
+	line-height: 0;
+}
+
+span.l\00007C {
+	margin-right: 0.05em;
+}
+
+span.r\00007C {
+	margin-left: 0.1em;
+}
+
+.theta,
+.big-O {
+	font-variant-caps: normal;
+	font-family: Georgia, Times, 'Times New Roman', serif;
+	/* Cochin */
+	line-height: 0;
+	/* display: inline-block; */
+	margin: 0;
+	padding: 0;
+	/* margin-left: 0; */
+	/* text-justify: left;
+	justify-self: left; */
+	/* margin-left: -0.15em; */
+
+	/* font-size: 1.125em;
+	vertical-align: -0.0625em; */
+
+	font-size: 1.15em;
+	/* vertical-align: -0.09375em; */
+	vertical-align: -0.075em;
+	font-style: italic;
+	/* display: inline-block; */
+	/* margin-left: 0; */
+	/* text-justify: left;
+	justify-self: left; */
+	/* margin-left: -0.15em; */
+	break-after: avoid;
+}
+
+
+/* var::before {
+	content: "";
+	margin-top: -9px;
+	height: 0;
+} */
+/* display: block; */
+
+* {
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+}
+
+.indented {
+	text-indent: 2rem;
+}
+
+@media screen {
+	article {
+		/* the padding is 116px 116px 80px 116px, from which we remove the border */
+		/* padding: 88px 88px 72px 108px; */
+		/* padding: 1in 1in 1in 1in; */
+		background: #fff;
+		/* border-top: 28px solid transparent;
+		border-right: 28px solid transparent;
+		border-bottom: 8px solid transparent;
+		border-left: 4px solid transparent;
+		border-image: url('card-bg.png') 28 28 8 4 repeat; */
+
+		/* Styles for better appearance on screens only -- are reset to defaults in print styles later */
+
+		/* Reflect the paper width in the screen rendering (must match size from @page rule) */
+		width: 21cm;
+		/* Reflect the paper height in the screen rendering (must match size from @page rule) */
+		min-height: 29.7cm;
+
+		/* Reflect the actual page margin/padding on paper in the screen rendering (must match margin from @page rule) */
+		padding-left: 2cm;
+		padding-top: 2cm;
+		padding-right: 2cm;
+		padding-bottom: 2cm;
+	}
+}
+
+.funcname {
+	line-height: 0;
+	font-family: KaTeX_Main;
+	font-variant: small-caps !important;
+	font-style: normal !important;
+	font-weight: normal !important;
+}
+
+div.ps-root {
+	/* -ms-transform: scale(0.95, 0.95);
+	-webkit-transform: scale(0.95, 0.95);
+	transform: scale(0.95, 0.95);
+	margin-top: -2em; */
+
+	page-break-inside: avoid;
+	font-size: 0.9em;
+}
+
+span.mrel, span.ps_arrow {
+	opacity: 1;
+	font-weight: 600;
+	font-size: 0.8em;
+	vertical-align: 0.125em;
+	line-height: 0;
+}
+
+span.ps_comment {
+	opacity: 0.64;
+	word-spacing: 0.1em;
+	/* font-size: 0.72em; */
+	font-size: 0.68em;
+	font-size: 0.75em;
+	vertical-align: 0.0925em;
+
+	word-spacing: 0;
+	font-size: 0.815em;
+}
+
+/* Use CSS Paged Media to switch from continuous documents to sheet-like documents with separate pages */
+@page {
+	/* You can only change the size, margins, orphans, widows and page breaks here */
+
+	/* Paper size and page orientation */
+	size: A4 portrait;
+
+	/* Margin per single side of the page */
+	margin-left: 2cm;
+	margin-top: 2cm;
+	margin-right: 2cm;
+	margin-bottom: 2cm;
+}
+
+p+p {
+	/* Restore the spacing between the paragraphs */
+	/* margin-top: 0.5cm; */
+}
+
+p {
+	/* Reset the margin so that the text starts and ends at the expected marks */
+	margin: 0;
+	-moz-hyphens: auto;
+	hyphens: auto;
+	/* widows: 2;
+  orphans: 2; */
+	break-inside: avoid;
+	/* margin-top: 0; */
+	/* margin-bottom: 1em; */
+}
+
+section {
+	/* margin: 0; */
+	margin-top: 6em;
+}
+
+article>section:first-of-type {
+	/* margin: 0; */
+	margin-top: 1em;
+}
+
+section>p {
+	text-align: justify;
+	margin-top: 2em;
+	margin-bottom: 2em;
+}
+
+aside>p {
+	text-align: justify;
+}
+
+section[id="references"] p {
+	text-align: initial;
+	margin-top: 1em;
+	margin-bottom: 1em;
+}
+
+body>section,
+article {
+	margin: 0 auto 1em auto;
+	margin-bottom: 100vh;
+}
+
+h1,
+h2,
+h3 {
+	/*  text-align: center; */
+	font-weight: 700;
+	margin-bottom: 0.5em;
+	line-height: normal;
+	letter-spacing: 1px;
+}
+
+section>h2 {
+	page-break-before: always;
+	page-break-after: avoid;
+	page-break-inside: avoid;
+}
+
+section[id="abstract"]>h2 {
+	page-break-before: avoid;
+	page-break-after: avoid;
+	page-break-inside: avoid;
+}
+
+section>h3 {
+	page-break-before: auto;
+	page-break-after: avoid;
+	page-break-inside: avoid;
+}
+
+h1 {
+	font-variant: small-caps;
+	padding-top: 1in;
+	padding-bottom: 1em;
+	/* letter-spacing: .75px; */
+	font-size: 1.9em;
+	text-align: center;
+}
+
+div.author-info {
+	text-align: center;
+	font-size: larger;
+	color: inherit;
+	padding-bottom: 16px;
+}
+
+div.author-info a,
+a.citation {
+	font-weight: normal;
+	text-decoration: none;
+	letter-spacing: 0.25px;
+}
+
+div.author-info a:hover,
+a.citation:hover {
+	text-decoration: underline;
+}
+
+h2 {
+	font-variant: small-caps;
+	/* break-before: always; */
+	/* padding-top: 0.75em !important; */
+	/* FIXME:*/
+	padding-bottom: 0;
+	/* padding-bottom: 0.25em; */
+	font-size: 1.666666666666667em;
+}
+
+section[id="abstract"]>h2 {
+	text-align: center;
+}
+
+h3 {
+	/* display: block; */
+	/* margin-top: -3em; */
+	/* padding-top: -3em; */
+	/* top: -3em; */
+	/* padding-bottom: 0.5em; */
+	font-size: 1.25em;
+}
+
+article:first-child {
+	padding-top: 0 !important;
+	margin-top: 0 !important;
+}
+
+figure:first-child {
+	padding-top: 0 !important;
+	margin-top: 0 !important;
+}
+
+section {
+	/* padding-bottom: 6em; */
+	break-before: always;
+	break-after: always;
+}
+
+dfn {
+	font-style: italic;
+	/* text-decoration: underline; */
+}
+
+abbr {
+	text-decoration: none;
+	border-bottom: 1px dotted currentcolor;
+}
+
+a:hover {
+	text-decoration: none;
+}
+
+.libre {
+	font-size: 0.9em;
+}
+/* .libre {
+	font-family: "Libre Baskerville", serif;
+	font-size: smaller;
+} */
+
+a {
+	overflow-wrap: break-word;
+	text-decoration: underline;
+	/* font-style: italic; */
+	/* font-weight: bold; */
+}
+
+a.citation {
+	font-weight: normal;
+}
+
+a.uncolored,
+a.citation,
+a {
+	color: inherit;
+}
+
+figure img {
+	page-break-before: auto;
+	page-break-after: auto;
+	page-break-inside: avoid;
+	max-width: 100%;
+	/* max-height: 90vh; */
+	width: auto;
+	height: auto;
+}
+
+/* figure img { border: 2px dashed currentcolor; }
+article { border: 2px dashed currentcolor;} */
+
+figure {
+	text-align: center;
+}
+
+pre,
+code,
+a[property="schema:citation"] {
+	-moz-hyphens: none;
+	hyphens: none;
+}
+
+code {
+	border: 1px solid rgba(0, 0, 0, 0.1);
+	border-radius: 0.3em;
+	margin: 0 0.2em;
+	padding: 0.2em;
+	background: #FDFDFD;
+	display: inline;
+
+	overflow: visible;
+	white-space: pre-wrap;
+}
+
+code.language-html {
+	color: inherit;
+}
+
+pre code {
+	color: inherit;
+	border: none;
+	padding: 0;
+	background: none;
+}
+
+/* p + section {
+  margin-top: 2em;
+}
+ul + p {
+  margin-top: 1em;
+} */
+
+/* pre {
+  border: solid 1px #DFDFDF;
+  border-left: solid #358CCB 10px;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin:0;
+  padding-left: 1em;
+} */
+
+meta {
+	display: none;
+}
+
+figure {
+	display: flex;
+	flex-direction: column;
+	box-sizing: border-box;
+	overflow: auto;
+	margin: 2em auto;
+	padding: 0;
+}
+
+figure pre,
+figure table {
+	flex: auto;
+	overflow: auto;
+}
+
+table {
+	break-inside: avoid;
+	break-before: avoid;
+	/* width: auto; */
+	margin: 2em auto;
+	margin-top: 4em;
+	margin-bottom: 4em;
+	/* font-family: sans-serif; */
+	/* letter-spacing: .25px; */
+	border-collapse: collapse;
+	box-sizing: border-box;
+	/* Avoid page breaks inside */
+	page-break-inside: avoid;
+	align-self: center;
+
+	/* border: 1px solid lightgray; */
+}
+
+table th {
+	font-weight: bold;
+	/* padding: 8px 16px 8px 16px; */
+	/* white-space: nowrap; */
+	/* border-bottom: 0px;
+  border-top: 0px; */
+	/* letter-spacing: .5px; */
+	/* line-height: 15px; */
+	/* text-align: center;
+  padding: 0;
+  vertical-align: baseline; */
+}
+
+table.trie-node-table {}
+
+table.trie-node-table tr>td:first-of-type::after,
+table.trie-node-table tr>th:first-of-type::after {
+	content: ":";
+}
+
+
+table.trie-node-table tr>td,
+table.trie-node-table tr>th {
+	padding-right: 0em;
+}
+
+table.trie-node-branch-points {}
+
+table.complexity-table tr>td:first-of-type,
+table.complexity-table tr>th:first-of-type {
+	text-align: right;
+	padding: 0;
+	margin: 0;
+	/* padding-left: 1em; */
+	padding-right: 0.5em;
+	/* text-indent: 1em; */
+	/* padding: 12px; */
+	border-right: 1px solid lightgray;
+	/* line-height: 18px; */
+	vertical-align: baseline;
+	/* font-weight: 300; */
+}
+
+table.complexity-table tr>td:last-of-type,
+table.complexity-table tr>th:last-of-type {
+	padding-left: 0.5em;
+	text-align: right;
+	/* padding-right: 0.5em; */
+}
+
+table.complexity-table tbody>tr {
+	border-top: 1px solid lightgray;
+}
+
+/* table tr > th:first-of-type {
+	border-right: 1px solid black;
+} */
+
+table.complexity-table thead {
+	border-bottom: 1px solid black;
+	border-bottom: 1px solid lightgray;
+	/* border: 1px solid black; */
+}
+
+table.complexity-table tbody>tr:first-of-type {
+	border-top: none;
+}
+
+/**************************************************/
+
+table.complexity-table2 tr>td:first-of-type {
+	text-align: right;
+	padding: 0;
+	margin: 0;
+	/* padding-left: 1em; */
+	padding-right: 0.5em;
+	/* text-indent: 1em; */
+	/* padding: 12px; */
+	/* border-right: 1px solid lightgray; */
+	/* line-height: 18px; */
+	vertical-align: baseline;
+
+	/* font-weight: 300; */
+}
+
+table.complexity-table2 tr>td,
+table.complexity-table2 tr>th {
+	padding-left: 0.5em;
+	padding-right: 0.5em;
+	border-left: 1px solid lightgray;
+	/* text-align: right; */
+	/* padding-right: 0.5em; */
+}
+
+table.complexity-table2 tbody>tr>td {
+	border-top: 1px solid lightgray;
+	text-align: left;
+}
+
+
+table.complexity-table2 tr>td:first-of-type,
+table.complexity-table2 tr>th:first-of-type {
+	/* font-style: italic; */
+	font-weight: bold;
+	border-left: none;
+	/* border-top: none; */
+}
+
+/* table tr > th:first-of-type {
+	border-right: 1px solid black;
+} */
+
+/* table.complexity-table2 thead { */
+/* border-bottom: 1px solid black; */
+/* border-bottom: 1px solid lightgray; */
+/* border: 1px solid black; */
+/* } */
+
+/* table.complexity-table2 tbody > tr:first-of-type {
+	border-top: none;
+} */
+
+caption {
+	/* "Libre Baskerville", Times,  */
+	font-family: Times, 'Times New Roman', serif;
+	text-align: left;
+	padding: 16px;
+	margin-top: 16px;
+	width: 100%;
+	box-sizing: border-box;
+	caption-side: bottom;
+	font-style: italic;
+	/* we're removing the border (28+4=32) + horizontal padding (88+108=196px) = 228px */
+	max-width: calc(100vw - 228px)
+}
+
+figcaption {
+	/* text-align: center; */
+	text-align: justify;
+	color: #808080;
+	/* margin: 24px 0px 0 0px; */
+	margin: 1.25em 0 0em 0;
+	/* padding: 0 0 1.25em 0; */
+	/* letter-spacing: .35px; */
+	/* border-bottom: 1px solid #ccc; */
+	/* font-style: italic; */
+	/* hyphens: auto; */
+	/* padding-bottom: 8px; */
+	/* border-left: 1px solid #ccc;
+  border-right: 1px solid #ccc; */
+}
+
+/* section[typeof='sa:Abstract'] > h2:first-of-type {
+	margin-top: 2em;
+}
+
+section[typeof='sa:Abstract'] p {
+	margin: 0;
+	margin-bottom: 6em;
+} */
+
+/* have less vertical space in structured abstracts */
+/* section[typeof='sa:Abstract'] p {
+  margin: 0;
+  margin-bottom: 0.5em;
+}
+section[typeof='sa:Abstract'] p:first-of-type {
+  margin: 0;
+  margin-bottom: 2em;
+} */
+/* section[typeof='sa:Abstract'] > section > h2 {
+  display: inline;
+  font-variant: small-caps;
+  float: left;
+  font-size: inherit;
+  line-height: inherit;
+  margin: 0;
+  padding: 16px 8px 0 0;
+  color: #9E9E9E;
+} */
+
+aside {
+	/* margin: 1em 0; */
+	/* font-style: italic; */
+	background: #F0F6FA;
+	padding: 0.25in 0.25in;
+
+	margin-top: 2em;
+	margin-bottom: 2em;
+}
+
+aside p:last-child {
+	margin: 0;
+}
+
+/* wide screen */
+/* @media screen and (min-width: 1900px) {
+	article {
+		max-width: 1200px;
+		font-size: 1.333333333333333em;
+		line-height: 30px;
+	}
+} */
+/* @media screen and (min-width: 1900px) { */
+article {
+	/* max-width: 1200px;
+    font-size: 1.333333333333333em; */
+	/* line-height: 30px; */
+}
+
+/* header p.title, header p.subtitle, footer p {
+    max-width: 1200px;
+  } */
+/* footer {
+    font-size: 1.333333333333333em;
+  } */
+/* } */
+/* @media screen and (max-width: 979px) {
+  article {
+    width: 100%;
+    padding: 115px 116px 79px 116px;
+    border-top: 1px solid #E0E0E0;
+    border-bottom: 1px solid #E0E0E0;
+    border-left: none;
+    border-right: none;
+  }
+  caption { */
+/* we're removing the horizontal padding (116px*2 = 232px) */
+/* max-width: calc(100vw - 232px)
+  }
+} */
+/* @media screen and (max-width: 799px) {
+  article {
+    padding: 57px 58px 39px 58px;
+  }
+  caption { */
+/* we're removing the horizontal padding (58px*2 = 116px) */
+/* max-width: calc(100vw - 116px)
+  }
+} */
+/* @media screen and (max-width: 399px) {
+  article {
+    padding: 28px 29px 19px 29px;
+  }
+  caption {
+    max-width: calc(100vw - 58px)
+  }
+  footer {
+    font-size: 0.8333333333333333em;
+  }
+  article > section:first-of-type ol::before {
+    float: none;
+    width: auto;
+    margin-left: 0;
+  }
+  article > section:first-of-type ol {
+    margin-left: 0;
+    padding: 0;
+  }
+  section[typeof="sa:Abstract"] {
+    margin-top: 30px;
+  }
+} */
+
+/*
+DUDE I can not get this paper to print properly!!!
+Figure 2 aka #decomposed_trie keeps pushing its figcaption away!
+
+*/
+@media print {
+	header {
+		display: none;
+	}
+
+	footer {
+		position: absolute;
+	}
+
+	article {
+		border: none;
+	}
+
+	a {
+		text-decoration: none;
+		color: inherit;
+	}
+
+	section {
+		margin-top: 0 !important;
+	}
+
+	figcaption {
+		margin: 0 !important;
+		padding: 1.25em 0 0em 0 !important;
+		page-break-before: avoid !important;
+	}
+
+	figure {
+		page-break-inside: avoid !important;
+	}
+
+
+	figure img {
+		page-break-after: avoid !important;
+		margin-bottom: 0 !important;
+		padding-bottom: 0 !important;
+	}
+}
+
+/* @-epubx-page-template {
+	@-epubx-page-master first-page {
+	  @-epubx-partition main {
+		  top: -epubx-expr(introduction.bottom-edge);
+		  column-width: 25em;
+		  column-gap: 2em;
+		  margin: 0 3em 3em;
+		  width: -epubx-expr(100% - main.margin-left - main.margin-right);
+		  -epubx-flow-from: body;
+	  }
+	  @-epubx-partition introduction {
+		  -epubx-required: true;
+		  top: 0;
+		  height: auto;
+		  margin-top: 3em;
+		  margin-bottom: 0;
+		  margin-left: -epubx-expr(3em + (main.column-count > 2 ? ( main.column-count = 3 ? (main.column-width + main.column-gap) / 2: main.column-width + main.column-gap) : 0 ));
+		  margin-right: -epubx-expr(introduction.margin-left);
+		  width: -epubx-expr(100% - introduction.margin-left - introduction.margin-right);
+		  -epubx-flow-from: intro;
+	  }
+	}
+	@-epubx-page-master normal {
+	  @-epubx-partition main {
+		  -epubx-required: true;
+		  top: 0;
+		  column-width: 25em;
+		  column-gap: 2em;
+		  margin: 3em;
+		  top: 0;
+		  -epubx-required: false;
+		  -epubx-flow-from: body;
+	  }
+	  @-epubx-partition figures-2 {
+		  -epubx-enabled: -epubx-expr( main.column-count >=4 );
+		  -epubx-flow-from: figs;
+		  height: auto;
+		  bottom: 0px;
+		  right: 0px;
+		  padding: 0px 3em;
+		  margin: 3em 3em 3em 0px;
+		  width: -epubx-expr( min( 100% - 6em , main.column-width * 2 + main.column-gap) - 6em );
+	  }
+	  @-epubx-partition figures {
+		  -epubx-flow-from: figs;
+		  margin: 3em 0px 3em 3em;
+		  padding-left: -epubx-expr( main.column-count >= 2 ? 1em : 0px );
+		  padding-right: -epubx-expr( figures.padding-left);
+		  height: auto;
+		  top: 0px;
+		  left: 0px;
+		  width: -epubx-expr( min( 100% - 6em , main.column-width * 2 + main.column-gap) - figures.padding-left - figures.padding-right );
+	  }
+	}
+	figure {
+	 -epubx-flow-into: figs;
+	 -epubx-flow-options: exclusive;
+	}
+	@-epubx-flow figs {
+	 -epubx-flow-consume: all;
+	}
+	article h1,
+	article h1 + section,
+	#abstract {
+	 -epubx-flow-into: intro;
+	}
+	figure {
+	 max-height: -epubx-expr(page-height - 6em);
+	 break-inside: avoid;
+	}
+} */
+
+/* break-after: avoid; */
+
+
+html {}
+
+span.div {
+	font-family: KaTeX_Math, Georgia, 'Times New Roman', Times, serif;
+	/* margin-left: -0.15em;
+	margin-right: -0.15em; */
+	margin-right: 0.05em;
+	line-height: 0;
+}
+
+span.ps_minus, span.ps_plus, span.plus {
+	font-family: KaTeX_Typewriter;
+	line-height: 0;
+}
+
+div.ps_header {
+	border-top: 2px solid black;
+	font-size: 12pt;
+	font-family: KaTeX_Main;
+}
+
+div.pseudocode, div.ps_header>div {
+	counter-reset: ruler;
+	font-size: 12pt;
+	border-top: 1px solid black;
+	padding-bottom: 2pt;
+	border-bottom: 1px solid black;
+}
+
+div.pseudocode>div.non-lines, div.ps_header>div>div.non-lines {
+	line-height: 1.15em;
+	margin-top: 0.1em;
+	margin-bottom: 0.1em;
+}
+
+div.pseudocode>div:not(.non-lines), div.ps_header>div>div:not(.non-lines) {
+	line-height: 1.15em;
+	word-spacing: 0.2em;
+}
+
+div.pseudocode>div:not(.non-lines)::before, div.ps_header>div>div:not(.non-lines)::before, div.pseudocode>div.non-lines>div::before, div.ps_header>div>div.non-lines>div::before {
+	counter-increment: ruler;
+	content: counter(ruler);
+	/* '\A0'; */
+	width: 1em;
+	display: inline-block;
+	text-align: right;
+	font-size: 9pt;
+	line-height: 0;
+	vertical-align: 0.5pt;
+	opacity: 0.8 !important;
+	/* padding-right: 1em; */
+	margin-right: 0.75em;
+	font-family: KaTeX_SansSerif;
+}
+
+div.pseudocode>div.non-lines>div::before, div.ps_header>div>div.non-lines>div::before {
+	counter-reset: ruler;
+	content: ' ';
+}
+
+span.cmp {
+	color: #000;
+	font-weight: 600;
+	font-size: 0.75em;
+	vertical-align: 0.125em;
+	line-height: 0;
+	opacity: 0.9;
+}
+
+figcaption span.cmp {
+	color: inherit;
+}
+
+/* span.ps_plus {
+	font-size: 0.9em;
+	line-height: 0;
+	vertical-align: 0.05em;
+} */
+
+g.bb-legend-item.bb-legend-item-DynSDT, tr.bb-tooltip-name-DynSDT > td.name {
+	visibility: hidden;
+	display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+	.bb-button .bb-zoom-reset {
+		background-color: #000 !important;
+		border-color: #333 !important;
+	}
+	/*
+	<div class="bb-tooltip-container" style="position: absolute; pointer-events: none; top: 49.4271px; left: 259.5px; display: none; visibility: hidden;"><table class="bb-tooltip"><tbody><tr><th colspan="2">9956</th></tr><tr class="bb-tooltip-name-DynSDT"><td class="name"><span style="background-color:#1f77b4"></span>DynSDT</td><td class="value"><b>Mid:</b> 6.89515ms <b>High:</b> 7.1549ms <b>Low:</b> 6.2458ms</td></tr></tbody></table></div>
+	*/
+
+	img[src$=".svg"] {
+		filter: invert(1);
+	}
+	div.bb-tooltip-container {
+		filter: invert(1);
+		color: #282828;
+	}
+
+	div.bb-tooltip-container > table > tbody > tr:first-of-type > th {
+		color: #000;
+	}
+
+	svg {
+		filter: invert(1);
+	}
+
+	article {
+		background: rgb(41, 41, 41);
+	}
+
+	body {
+		background-color: #222;
+		color: #d8d8d8;
+		color: #ccc;
+	}
+
+	/* [style*="font-weight: bold"], strong, table th, a.internal-link, table.complexity-table2 tr>th:first-of-type, div.ps_header::before, b {
+		color: red;
+	} */
+
+	code {
+		border: 1px solid rgba(255, 255, 255, 0.4);
+		background: #292929;
+	}
+
+	aside {
+		background: #061825;
+	}
+
+	span.mrel, span.cmp, span.ps_arrow {
+		color: #fff;
+	}
+
+	figcaption {
+		color: #a1a1a1;
+	}
+
+	div.ps_header, div.pseudocode, div.ps_header>div {
+		border-color: rgba(255, 255, 255, 0.9);
+	}
+}

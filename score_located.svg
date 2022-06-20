@@ -1,0 +1,274 @@
+<svg version="1.1" width="500" height="350" xmlns="http://www.w3.org/2000/svg" viewBox="0 3 500 348">
+	<!-- <rect x="0" y="0" width="100%" height="100%" fill="#fff" /> -->
+<text x='0' y='0' class='T'>
+<tspan x='0' dy='12'>(1, "<tspan class="C">t</tspan>ownship", 16894)</tspan>
+<tspan fill="red" x='0' dy='12'>(2, "<tspan class="C">te</tspan>xas", 8909)</tspan>
+	<tspan fill="red" x='40' dy='12'>(2, "<tspan class="C">te</tspan>nnis", 5826)</tspan>
+		<tspan fill="blue" x='80' dy='12'>(2, "<tspan class="C">te</tspan>levision", 4673)</tspan>
+		<tspan fill="red" x='80' dy='12'>(4, "<tspan class="C">tenn</tspan>essee", 3461)</tspan>
+		<tspan fill="red" x='80' dy='12'>(3, "<tspan class="C">ten</tspan>", 1452)</tspan>
+		<tspan fill="red" x='80' dy='12'>(6, "<tspan class="C">tennis</tspan> championships", 1218)</tspan>
+			<tspan fill="red" x='120' dy='12'>( 7, "<tspan class="C">tennis </tspan>at", 845)</tspan>
+				<tspan fill="blue" x='160' dy='12'>(7, "<tspan class="C">tennis </tspan>tournament", 190)</tspan>
+				<tspan x='160' dy='12'>(8, "<tspan class="C">tennis a</tspan>ssociation", 37)</tspan>
+					<tspan x='200' dy='12'>( 8, "<tspan class="C">tennis a</tspan>nd", 9)</tspan>
+						<tspan class="Italic" style="font-weight: 900" x='240' dy='12'>(8, "<tspan class="C" style="font-weight:900">tennis a</tspan>cademy", 8)</tspan>
+							<tspan fill="blue" x='280' dy='12'>(8, "<tspan class="C">tennis a</tspan>bruzzo", 7)</tspan>
+							<tspan fill="red" x='280' dy='12'>(9, "<tspan class="C">tennis ac</tspan>es", 1)</tspan>
+					<tspan x='200' dy='12'>(18, "<tspan class="C">tennis association</tspan>s", 1)</tspan>
+				<tspan x='160' dy='12'>(9, "<tspan class="C">tennis at</tspan>hletes", 1)</tspan>
+			<tspan x='120' dy='12'>( 8, "<tspan class="C">tennis c</tspan>lassic", 267)</tspan>
+			<tspan fill="blue" x='120' dy='12'>( 6, "<tspan class="C">tennis</tspan>trophy", 75)</tspan>
+			<tspan x='120' dy='12'>(10, "<tspan class="C">tennis cha</tspan>llenge", 75)</tspan>
+			<tspan x='120' dy='12'>(19, "<tspan class="C">tennis championship</tspan>", 52)</tspan>
+			<tspan x='120' dy='12'>(16, "<tspan class="C">tennis champions</tspan>", 7)</tspan>
+			<tspan x='120' dy='12'>(15, "<tspan class="C">tennis champion</tspan>", 1)</tspan>
+			<tspan x='120' dy='12'>( 9, "<tspan class="C">tennis ch</tspan>umps", 1)</tspan>
+		<tspan fill="red" x='80' dy='12'>(5, "<tspan class="C">tenni</tspan>lle", 13)</tspan>
+	<tspan x='40' dy='12'>(5, "<tspan class="C">texas</tspan> state", 510)</tspan>
+	<tspan x='40' dy='12'>(3, "<tspan class="C">tex</tspan>t", 290)</tspan>
+	<tspan x='40' dy='12'>(4, "<tspan class="C">texa</tspan>na", 93)</tspan>
+
+
+<tspan x='0' dy='12'>(4, "<tspan class="C">team</tspan> in", 1232)</tspan>
+<tspan x='0' dy='12'>(3, "<tspan class="C">tea</tspan>", 641)</tspan>
+</text>
+
+<!-- <g transform="translate(500 0)">
+
+</g> -->
+	<defs>
+		<path id="arrow" stroke-width="1" d="M 0 -4 L 0 0 L -5 -2 Z" stroke="blue" fill="blue"/>
+	</defs>
+
+	<circle cx="173" cy="21" r="5.5" fill="red"/>
+	<text x="173" y="24" class="N Bold" text-anchor="middle" fill="white">1</text>
+	<text x="182" y="24" class="Q Medium" text-anchor="start" fill="black">Replace with new <tspan class="Italic" style="font-size: 10px;font-weight: 900">(2, "tennis academy", 9001)</tspan>,  <tspan x='182' dy='11'>LCP ⟵ 2</tspan></text>
+
+	<path stroke-width="1.5" d="M 163 20 L 115 20" stroke="black" fill="black"/>
+
+	<path stroke-width="1.5" d="M 115 18 L 115 22 L 110 20 Z" stroke="black" fill="black"/>
+
+
+	<g transform="translate(0 -10)">
+		<g transform="translate(14 -1)">
+			<circle cx="18" cy="43" r="5.5" fill="red"/>
+			<text x="18" y="46" class="N Bold" text-anchor="middle" fill="white">2</text>
+		</g>
+
+		<text x="0" y="56" class="Q Medium" text-anchor="start" fill="black">promote,
+		<tspan x='0' dy='11'>LCP ⟵ 6,</tspan>
+		<tspan x='0' dy='11.5'>grab LCP's &#x003c; 6</tspan>
+		<!-- <tspan x='0' dy='11'>follow LCP = 6</tspan> -->
+		</text>
+	</g>
+
+	<g transform="translate(2 0)">
+	<path stroke-width="1.25" d="M 78 45, Q 50 50, 50 43" stroke="blue" fill="transparent"/>
+	<use transform="rotate(70 48 44)" href="#arrow" x="48" y="44"/>
+	</g>
+
+	<g transform="translate(240 0)">
+		<circle cx="45" cy="80" r="5.5" fill="red"/>
+		<text x="45" y="83" class="N Bold" text-anchor="middle" fill="white">3</text>
+		<text x="54" y="83" class="Q Medium" text-anchor="start" fill="black">
+		promote "tennistrophy",
+		<!-- <tspan x='54' dy='11'> -->
+			LCP ⟵ 7
+		<!-- </tspan> -->
+
+		</text>
+	</g>
+
+	<g transform="translate(240 12)">
+		<circle cx="45" cy="80" r="5.5" fill="red"/>
+		<text x="45" y="83.5" class="N Bold" text-anchor="middle" fill="white">4</text>
+		<text x="54" y="83" class="Q Medium" text-anchor="start" fill="black">
+		promote "tennis tournament",
+		<!-- <tspan x='54' dy='11'> -->
+			LCP ⟵ 8
+		<!-- </tspan> -->
+
+		</text>
+	</g>
+
+	<g transform="translate(295 36.5)">
+		<circle cx="45" cy="80" r="5.5" fill="red"/>
+		<text x="45" y="83.5" class="N Bold" text-anchor="middle" fill="white">5</text>
+		<text x="54" y="83" class="Q Medium" text-anchor="start" fill="black">
+		LCP is unchanged, keep going
+		</text>
+	</g>
+
+	<g transform="translate(295 48.5)">
+		<circle cx="45" cy="80" r="5.5" fill="red"/>
+		<text x="45" y="83.5" class="N Bold" text-anchor="middle" fill="white">6</text>
+		<text x="54" y="83" class="Q Medium" text-anchor="start" fill="black">
+		LCP is unchanged, keep going
+		</text>
+	</g>
+
+	<g transform="translate(52.5 12)">
+		<g transform="translate(295 48.5)">
+			<circle cx="45" cy="80" r="5.5" fill="red"/>
+			<text x="45" y="83.5" class="N Bold" text-anchor="middle" fill="white">7</text>
+			<text x="54" y="83.5" class="Q Medium" text-anchor="start" fill="black">
+			delete &#x0026; promote
+			<!-- promote &#x0026; -->
+			<!-- finish up! -->
+			</text>
+		</g>
+	</g>
+
+	<g transform="translate(72 36)">
+		<g transform="translate(295 48.5)">
+			<circle cx="45" cy="80" r="5.5" fill="red"/>
+			<text x="45" y="83.5" class="N Bold" text-anchor="middle" fill="white">8</text>
+			<text x="54" y="83.5" class="Q Medium" text-anchor="start" fill="black">
+			grab rest,
+			<tspan x='54' dy='11'>
+			then finish!
+			</tspan>
+			<!-- promote &#x0026; -->
+			<!-- finish up! -->
+			</text>
+		</g>
+	</g>
+
+	<!-- <g transform="translate(110 96.5)">
+		<g transform="translate(100 1.5)">
+			<circle cx="18" cy="42.5" r="5.5" fill="red"/>
+			<text x="18" y="46" class="N Bold" text-anchor="middle" fill="white">7</text>
+		</g>
+		<text x="68" y="47.5" class="Q Medium" text-anchor="start" fill="black">finish,
+		<tspan x='0' dy='11'>grab everything else</tspan>
+		</text>
+	</g> -->
+
+	<path stroke-width="1.25" d="M 118 213, Q 88 147, 88 91" stroke="blue" fill="transparent"/>
+	<use transform="rotate(90 86 92)" href="#arrow" x="86" y="92"/>
+
+	<path stroke-width="1.25" d="M 158 105, Q 138 111, 137.5 103" stroke="blue" fill="transparent"/>
+	<use transform="rotate(70 135.5 104)" href="#arrow" x="135.5" y="104"/>
+
+	<g transform="translate(2 0)">
+	<path stroke-width="1.25" d="M 278 153, Q 250 160, 249 151" stroke="blue" fill="transparent"/>
+	<use transform="rotate(70 247 151)" href="#arrow" x="247" y="151"/>
+	</g>
+
+  <style>
+
+tspan.C {
+	text-decoration: underline;
+	font-weight: bold;
+}
+
+tspan.C {
+	font-weight: bold;
+}
+
+text.N {
+	font-size: 9px;
+	font-family: "JetBrains Mono", monospace;
+}
+
+text.Q {
+	font-size: 9px;
+	font-family: "JetBrains Mono", monospace;
+}
+
+text.T {
+  font-size: 10px;
+  font-family: "JetBrains Mono", monospace;
+}
+
+text.Italic, tspan.Italic {
+  font-style: italic;
+}
+
+text.Bold, tspan.Bold {
+  font-weight: bold;
+}
+
+text.Medium, tspan.Medium {
+	font-weight: 700;
+}
+
+text.Bold, tspan.Bold {
+	font-weight: bold;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff2/JetBrainsMono-Bold-Italic.woff2') format('woff2'),
+    url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff/JetBrainsMono-Bold-Italic.woff') format('woff');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff2/JetBrainsMono-Bold.woff2') format('woff2'),
+    url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff/JetBrainsMono-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff2/JetBrainsMono-ExtraBold-Italic.woff2') format('woff2'),
+    url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff/JetBrainsMono-ExtraBold-Italic.woff') format('woff');
+  font-weight: 800;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff2/JetBrainsMono-ExtraBold.woff2') format('woff2'),
+    url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff/JetBrainsMono-ExtraBold.woff') format('woff');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff2/JetBrainsMono-Italic.woff2') format('woff2'),
+    url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff/JetBrainsMono-Italic.woff') format('woff');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff2/JetBrainsMono-Medium-Italic.woff2') format('woff2'),
+    url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff/JetBrainsMono-Medium-Italic.woff') format('woff');
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff2/JetBrainsMono-Medium.woff2') format('woff2'),
+    url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff/JetBrainsMono-Medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff2/JetBrainsMono-Regular.woff2') format('woff2'),
+    url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff/JetBrainsMono-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+  </style>
+</svg>

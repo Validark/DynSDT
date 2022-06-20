@@ -1,0 +1,191 @@
+<svg version="1.1" width="650" height="213" xmlns="http://www.w3.org/2000/svg" viewBox="0 13 650 165">
+	<!-- <rect x="0" y="0" width="100%" height="100%" fill="#fff" /> -->
+
+	<text x="0" y="0" class="T Bold Italic">Running maximums list</text>
+	<text x="355" y="0" class="T Bold Italic">Queue</text>
+	<text x="0" y="20" class="T">( 7, "tennis at", 845)</text>
+	<!-- <text x="290" y="35" class="T">___________________________</text> -->
+
+	<text x="355" y="40" class="T">( 8, "tennis classic", 267)</text>
+	<text x="355" y="60" class="T">( 6, "tennistrophy", 75)</text>
+
+	<text x="355" y="80" class="T">(10, "tennis challenge", 75)</text>
+	<text x="355" y="100" class="T">(20, "tennis championships 2020", 68)</text>
+	<text x="355" y="120" class="T">(20, "tennis championships", 63)</text>
+	<text x="355" y="140" class="T">(19, "tennis championship", 52)</text>
+	<text x="355" y="160" class="T">(16, "tennis champions", 7)</text>
+	<text x="355" y="180" class="T">(15, "tennis champion", 1)</text>
+	<text x="355" y="200" class="T">( 9, "tennis chumps", 1)</text>
+
+	<!-- <g id="iter_0"> -->
+		<text x="0" y="40" class="T">( 8, "tennis classic", 267)</text>
+		<!-- from: tennis classic -->
+		<path stroke-width="1.5" d="M 355 35 Q 300 15, 180 12" stroke="red" fill="transparent"/>
+		<g transform="translate(0 -13)">
+			<path stroke-width="1.5" d="M 185 23 L 185 27 L 180 25 Z" stroke="red" fill="red"/>
+		</g>
+	<!-- </g> -->
+
+	<!-- <g id="iter_1"> -->
+		<!-- from: tennistrophy -->
+		<path stroke-width="1.5" d="M 355 55 Q 300 20, 182 20" stroke="red" fill="transparent"/>
+		<g transform="translate(0 -12)">
+			<path stroke-width="1.5" d="M 185 30 L 185 34 L 180 32 Z" stroke="red" fill="red"/>
+		</g>
+	<!-- </g> -->
+
+	<!-- <g id="iter_2"> -->
+		<!-- from: tennis challenge -->
+		<text x="0" y="80" class="T">(10, "tennis challenge", 75)</text>
+		<path stroke-width="1.5" d="M 355 75 Q 300 35, 220 35" stroke="red" fill="transparent"/>
+		<g transform="translate(0 -15)">
+			<path stroke-width="1.5" d="M 225 48 L 225 52 L 220 50 Z" stroke="red" fill="red"/>
+		</g>
+
+	<!-- <g id="iter_3"> -->
+		<!-- from: tennis championships -->
+		<text x="0" y="100" class="T">(20, "tennis championships 2020", 63)</text>
+		<path stroke-width="1.5" d="M 355 95 Q 300 75, 230 72" stroke="red" fill="transparent"/>
+		<g transform="translate(0 -15)">
+			<path stroke-width="1.5" d="M 232 85 L 232 89 L 227 87 Z" stroke="red" fill="red"/>
+		</g>
+	<!-- </g> -->
+
+	<!-- <g id="iter_4"> -->
+		<!-- from: tennis championship -->
+		<path stroke-width="1.5" d="M 355 115 Q 290 125, 289 109" stroke="red" fill="transparent"/>
+		<g transform="translate(30 0)">
+			<path stroke-width="1.5" d="M 257 109 L 261 109 L 259 105 Z" stroke="red" fill="red"/>
+		</g>
+
+		<path stroke-width="1.5" d="M 355 135 Q 275 140, 274 109" stroke="red" fill="transparent"/>
+		<g transform="translate(15 0)">
+			<path stroke-width="1.5" d="M 257 109 L 261 109 L 259 105 Z" stroke="red" fill="red"/>
+		</g>
+
+		<path stroke-width="1.5" d="M 355 155 Q 260 155, 259 109" stroke="red" fill="transparent"/>
+			<path stroke-width="1.5" d="M 257 109 L 261 109 L 259 105 Z" stroke="red" fill="red"/>
+
+		<path stroke-width="1.5" d="M 355 175 Q 245 175, 244 109" stroke="red" fill="transparent"/>
+		<g transform="translate(-15 0)">
+			<path stroke-width="1.5" d="M 257 109 L 261 109 L 259 105 Z" stroke="red" fill="red"/>
+		</g>
+	<!-- </g> -->
+
+	<!-- <g id="iter_5"> -->
+		<!-- from: tennis champions -->
+		<!-- <path stroke-width="1.5" d="M 385 150 Q 330 109, 262 111" stroke="red" fill="transparent"/>
+		<path stroke-width="1.5" d="M 264 109 L 264 113 L 259 111 Z" stroke="red" fill="red"/> -->
+	<!-- </g> -->
+
+	<!-- <g id="iter_6"> -->
+		<!-- from: tennis champions -->
+		<!-- <path stroke-width="1.5" d="M 385 170 Q 330 115, 262 117" stroke="red" fill="transparent"/>
+		<path stroke-width="1.5" d="M 264 115 L 264 119 L 259 117 Z" stroke="red" fill="red"/> -->
+	<!-- </g> -->
+
+	<!-- <g id="iter_7"> -->
+		<!-- from: tennis chumps -->
+		<path stroke-width="1.5" d="M 355 196 Q 340 70, 230 78" stroke="red" fill="transparent"/>
+		<g transform="translate(0 -16)">
+			<path stroke-width="1.5" d="M 232 92 L 232 96 L 227 94 Z" stroke="red" fill="red"/>
+		</g>
+	<!-- </g> -->
+
+	<style>
+		text.T {
+			font-size: 10pt;
+			font-family: "JetBrains Mono", monospace;
+		}
+
+		text.Medium {
+			font-weight: 700;
+			<!-- font-variant: small-caps; -->
+		}
+
+		text.Italic {
+			font-style: italic;
+		}
+
+		text.Bold {
+			font-weight: bold;
+		}
+
+		tspan.inf {
+			font-size: 17pt;
+			font-weight: 300;
+		}
+
+		@font-face {
+		font-family: 'JetBrains Mono';
+		src: url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff2/JetBrainsMono-Bold-Italic.woff2') format('woff2'),
+			url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff/JetBrainsMono-Bold-Italic.woff') format('woff');
+		font-weight: 700;
+		font-style: italic;
+		font-display: swap;
+		}
+
+		@font-face {
+		font-family: 'JetBrains Mono';
+		src: url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff2/JetBrainsMono-Bold.woff2') format('woff2'),
+			url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff/JetBrainsMono-Bold.woff') format('woff');
+		font-weight: 700;
+		font-style: normal;
+		font-display: swap;
+		}
+
+		@font-face {
+		font-family: 'JetBrains Mono';
+		src: url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff2/JetBrainsMono-ExtraBold-Italic.woff2') format('woff2'),
+			url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff/JetBrainsMono-ExtraBold-Italic.woff') format('woff');
+		font-weight: 800;
+		font-style: italic;
+		font-display: swap;
+		}
+
+		@font-face {
+		font-family: 'JetBrains Mono';
+		src: url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff2/JetBrainsMono-ExtraBold.woff2') format('woff2'),
+			url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff/JetBrainsMono-ExtraBold.woff') format('woff');
+		font-weight: 800;
+		font-style: normal;
+		font-display: swap;
+		}
+
+		@font-face {
+		font-family: 'JetBrains Mono';
+		src: url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff2/JetBrainsMono-Italic.woff2') format('woff2'),
+			url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff/JetBrainsMono-Italic.woff') format('woff');
+		font-weight: 400;
+		font-style: italic;
+		font-display: swap;
+		}
+
+		@font-face {
+		font-family: 'JetBrains Mono';
+		src: url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff2/JetBrainsMono-Medium-Italic.woff2') format('woff2'),
+			url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff/JetBrainsMono-Medium-Italic.woff') format('woff');
+		font-weight: 500;
+		font-style: italic;
+		font-display: swap;
+		}
+
+		@font-face {
+		font-family: 'JetBrains Mono';
+		src: url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff2/JetBrainsMono-Medium.woff2') format('woff2'),
+			url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff/JetBrainsMono-Medium.woff') format('woff');
+		font-weight: 500;
+		font-style: normal;
+		font-display: swap;
+		}
+
+		@font-face {
+		font-family: 'JetBrains Mono';
+		src: url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff2/JetBrainsMono-Regular.woff2') format('woff2'),
+			url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff/JetBrainsMono-Regular.woff') format('woff');
+		font-weight: 400;
+		font-style: normal;
+		font-display: swap;
+		}
+	</style>
+</svg>

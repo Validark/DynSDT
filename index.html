@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en-GB"><head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>DynSDTs for Top-k Autocomplete</title>
+	<link rel="stylesheet" href="scholarly.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/katex.min.css" integrity="sha384-ZPe7yZ91iWxYumsBEOn7ieg8q/o+qh/hQpSaPow8T6BwALcXSCS6C6fSRPIAnTQs" crossorigin="anonymous">
+	<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png">
+	<link rel="manifest" href="./site.webmanifest">
+</head>
+<body prefix="schema: http://schema.org/ xsd: http://www.w3.org/2001/XMLSchema# sa: https://ns.science.ai/">
+	<article typeof="schema:ScholarlyArticle" resource="#" style="display: block">
+		<h1>Heap-like Dynamic Score-Decomposed Tries for Top-<var>k</var> Autocomplete</h1>
+		<div class="author-info" style="font-size: 1.5em; margin-bottom: 4em">
+			<a class="uncolored" property="schema:author" href="https://github.com/Validark" typeof="schema:Person" target="_blank" rel="noopener noreferrer">
+				<span property="schema:givenName">Niles</span>
+				<span property="schema:familyName">Salter</span>
+			</a>
+			<div property="sa:roleContactPoint" typeof="schema:ContactPoint">
+				<a class="uncolored" property="schema:email" href="mailto:Validark@pm.me" title="corresponding author" style="font-size: smaller; vertical-align: top;">Validark@pm.me</a>
+			</div>
+		</div>
+		<section typeof="sa:Abstract" id="abstract">
+			<h2><a href="#abstract" class="heading-link">Abstract</a><a href="#abstract" class="glyphicon glyphicon-link"></a></h2>
+			<p>
+				Query autocompletion, also known as type-ahead search, is a critical feature for a wide range of services: mobile keyboards, web stores, social media sites, and virtually every modern system connected to a database.
+				This paper improves scored prefix completion by introducing a simple, pointer-based data structure called the
+				<i>Dynamic Score-Decomposed Trie</i> that has the properties of both a decomposed trie and a binary max-heap, enabling the top-<var>k</var> highest scored completions to a prefix <var>p</var> to be computed in a time in <span class="complexity"><span class="big-O">O</span>(<span class="l|">|</span><var>p</var><span class="r|">|</span><span class="ThickSpace"></span><span class="ThickSpace"></span><span class="plus">+</span><span class="ThickSpace"></span><span class="ThickSpace"></span><var>k</var><span class="ThinSpace"></span>log<span class="ThinSpace"></span><var>k</var>)</span> after the node representing <var>p</var> is located (for which several options are given).
+			</p>
+		</section>
+		<section id="introduction">
+			<h2><a href="#introduction" class="heading-link">1.&nbsp;&nbsp;Introduction</a><a href="#introduction" class="glyphicon glyphicon-link"></a>
+			</h2>
+			<p class="indented">
+				Autocomplete is a critical component of every modern search service.
+				For users, it reduces the keystrokes and effort required to express intent.
+				For platforms, it provides an opportunity to suggest content or products to users.
+				Since query autocompletion can occur with every keystroke, it is the most interactive component of search services and thus receives the most traffic.
+				This necessitates the development of extraordinarily time-efficient algorithms to service these requests in real-time.
+			</p>
+			<p class="indented">
+				This paper solves the scored prefix completion problem, which is the problem of finding the top-<var>k</var> highest scored completions which begin with a given prefix string <var>p</var>, where the <dfn>score</dfn> is a numeric rank denoting each string's relevance relative to every other string in a string corpus.
+				This is the foundation of other autocomplete problems such as error-correcting autocompletion which may be viewed as an extension of this problem.
+			</p>
+			<p class="indented">
+				Tries (i.e. prefix trees) are the natural choice for prefix completion queries for their obvious structural and performance advantages in this problem space.
+				However, most tries are not amenable to <em>scored</em> prefix completion.
+				While any off-the-shelf trie can be augmented with scores, without a specialized data structure <em>every</em> completion to <var>p</var>
+				must be considered a candidate for the top-<var>k</var> because scores could occur in any order in the trie.
+				When the trie is large and <var>p</var> is short,
+				so much of the trie must be traversed that it precludes being performed on-demand in real-time.
+				Many real-world trie-based autocomplete services explicitly disallow (or cache) prefix queries with fewer than three characters for this very reason [<a class="citation" href="#PRUNING">27</a>], even though it is possible to experience the same performance issues anywhere, so long as the candidate set of completions to <var>p</var> is massive.
+				Although some or all of the top-<var>k</var>
+				completions could be precomputed and cached, this strategy requires a preordained <var>k</var> and often too much space in practice.
+				This paper instead improves query times by traversing smaller amounts of a specialized trie data structure tailored specifically for the autocomplete problem.
+			</p>
+		</section>
+		<section id="related-work">
+			<h2><a href="#related-work" class="heading-link">2.&nbsp;&nbsp;Related work</a><a href="#related-work" class="glyphicon glyphicon-link"></a>
+			</h2>
+			<p class="indented">
+				The scored prefix completion problem has been solved many times in the query autocompletion (QAC) literature, often with different constraints and goals for different solutions. Only the most similar works are mentioned here, so refer to surveys [<a class="citation" href="#2016Survey">25</a>, <a class="citation" href="#Taxonomy">26</a>] for a broader summary of the query autocompletion research which goes beyond the problem addressed in this paper.
+			</p>
+			<p class="indented">
+				A popular solution is to precompute the top-<var>k</var> answers to all possible queries and store them in each node of a trie [<a class="citation" href="#TASTIER">18</a>] or in a (distributed [<a class="citation" href="#WALMART">29</a>]) hash table [<a class="citation" href="#MIXMAX">24</a>].
+				However, precomputing takes a large amount of space and is rendered unnecessary by faster algorithms.
+			</p>
+			<p class="indented">
+				Another solution is augmenting a sorted string data structure with a <i>Segment Tree</i> [<a class="citation" href="#MATANI">21</a>] or some other Range-Minimum-Query structure [<a class="citation" href="#HON">19</a>, <a class="citation" href="#COMPLETION">22</a>, <a class="citation" href="#GOG">28</a>].
+				The main advantage of an RMQ strategy is in its simplicity and modularity, as it works with existing dictionary structures without much modification [<a class="citation" href="#COMPLETION">22</a>].
+				However, it is much slower in practice than data structures that are specialized for the scored prefix completion problem [<a class="citation" href="#COMPLETION">22</a>].
+			</p>
+			<p class="indented">
+				In [<a class="citation" href="#COMPLETION">22</a>], Hsu &amp; Ottaviano introduced the <i>Completion Trie</i>, which serves as the baseline for this paper and is discussed at length in the <a href="#background" class="internal-link named">Background</a>
+				section. Note that this paper presents their algorithms with a few improvements: namely using a double-ended priority queue bounded to size <var>k</var> rather than an unbounded max-heap, and not inserting nodes into the priority queue that are guaranteed to be extracted immediately after.
+			</p>
+			<p class="indented">
+				In [<a class="citation" href="#COMPLETION">22</a>], Hsu &amp; Ottaviano also introduced the <i>Score-Decomposed Trie</i> [<a class="citation" href="#COMPLETION">22</a>, <a class="citation" href="#OttavianoThesis">23</a>], which is a succinct representation of a decomposed <i>Completion Trie</i>.
+				Explained briefly, tries can be succinctly encoded by traversing the tree and encoding its shape in a bitmap with roughly 2<var>n</var> bits [<a class="citation" href="#SuccinctPractice">20</a>].
+				One technique is to perform a depth-first traversal and encode a 1 each time the algorithm descends and a 0 each time it ascends [<a class="citation" href="#SuccinctPractice">20</a>].
+				All traversal operations over the original structure can then be simulated on the resulting bitmap, so long as the data held in each succinct “node” can be mapped to by some auxiliary structure(s).
+				Due to simulated tree traversal operations being slower than pointer-chasing, the <i>Score-Decomposed Trie</i> of [<a class="citation" href="#COMPLETION">22</a>] had about half the throughput of their <i>Completion Trie</i> (on older hardware), however,
+				it required about half the space and was competitive with gzip for massive datasets.
+				The other limitation
+				is that succinct data structures are (almost [<a class="citation" href="#DynPDT">17</a>]) always static, rendering them unsuitable for highly dynamic settings.
+			</p>
+			<p class="indented">
+				The structure presented in this paper is not succinct, but is still Score-Decomposed because it is derived from the score-based path decomposition of conventional tries. It is not the first data structure in this category, since the <i>Dynamic Path-Decomposed Trie</i> of Kanda et al. [<a class="citation" href="#DynPDT">17</a>, <a class="citation" href="#OldDynPDT">16</a>] is another such non-succinct path-decomposed trie, albeit for a different problem.
+			</p>
+		</section>
+		<section id="preliminaries">
+			<h2><a href="#preliminaries" class="heading-link">3.&nbsp;&nbsp;Preliminaries</a><a href="#preliminaries" class="glyphicon glyphicon-link"></a>
+			</h2>
+			<p class="indented">
+				A <dfn>trie</dfn> [<a class="citation" href="#PREFIX_TREE">4</a>, <a class="citation" href="#TRIE">5</a>], also known as a <dfn>prefix tree</dfn>, is a digital search tree that encodes a set of strings, organized such that every string is encoded as a root-to-node path and each edge extending from a parent node to a child node represents subsequent characters (or bit(s)) in the string.
+				This is useful for autocompletion because all strings under (i.e. in the subtree of) the node representing <var>p</var> are valid completions to <var>p</var>.
+			</p>
+			<p class="indented">
+				A <dfn>compacted trie</dfn>
+				[<a class="citation" href="#RADIX">11</a>], also known as a <dfn>radix tree</dfn>, is a trie that allows multiple characters to be associated with a single edge.
+				This eliminates nodes that would otherwise have only one child, thereby reducing memory consumption.
+			</p>
+			<p class="indented">
+				A <dfn>left-child right-sibling binary trie</dfn> [<a class="citation" href="#LCRS">6</a>], abbreviated here as “LCRS trie”, is a trie where every node only holds two references to other nodes: its first child and next sibling.
+				Any trie can be represented as an LCRS trie by transforming each list of children into a linked list and letting each parent point only to the first node in the linked list and its sibling.
+			</p>
+			<p class="indented">
+				A <dfn>priority queue</dfn>, also known as a <dfn>heap</dfn> [<a class="citation" href="#HEAP">8</a>], is an abstract data type similar to a queue except that elements have a “priority” which determines the order in which they are handled.
+				Min-heaps support the operations <dfn class="funcname" id="HeapPush">HeapPush</dfn>, which adds an element, and <dfn class="funcname" id="HeapPopMin">HeapPopMin</dfn>, which removes and returns the minimum priority element.
+				Max-heaps are the opposite, supporting <dfn class="funcname" id="HeapPopMax">HeapPopMax</dfn> instead, which removes and returns the maximum priority element.
+				The aforementioned operations are assumed to take
+				<span class="complexity"><span class="theta">Θ</span>(log<span class="ThinSpace"></span><var>x</var>)</span>
+				time, where <var>x</var> is the maximum size to which the heap grows.
+				Note that this paper does not delay the construction of heaps until just before the first <span class="funcname">HeapPop</span> operation is needed, which could save a few comparisons via Floyd's linear-time heap construction algorithm [<a class="citation" href="#FLOYD">7</a>].
+			</p>
+			<p class="indented">
+				A <dfn>double-ended priority queue</dfn>, abbreviated as DEPQ, is a priority queue that simultaneously supports the operations of a min-heap and a max-heap [<a class="citation" href="#DEPQ">10</a>].
+			</p>
+			<p class="indented">
+				A <dfn>bounded priority queue</dfn> or <dfn>bounded heap</dfn> is a priority queue constrained to a certain capacity.
+				When an element is pushed to a full priority queue, the lowest priority element is discarded.
+				Whether the element to be discarded happens to be the incoming element can be determined via a single comparison with the lowest priority element in the heap.
+				Although this may garner performance gains in practice, this paper assumes the worst case: that each pushed element requires a logarithmic-time <span class="funcname">HeapPush</span>.
+			</p>
+			<p class="indented">
+				<dfn>Insertion sort</dfn> is a simple, comparison-based, in-place sorting algorithm that sorts each successive item in a list by performing a linear scan on the items that precede it, shifting each higher ordered element, and inserting it immediately after the first element with a lower order is found [<a class="citation" href="#PROGRAMMING_PEARLS">15</a>]. In this paper it is used in online algorithms to sort a single element into an otherwise sorted list. The <dfn class="funcname" id="InsertionSort">InsertionSort</dfn> functions (<dfn class="funcname" id="InsertionSortDown">Down</dfn>/<dfn class="funcname" id="InsertionSortUp">Up</dfn>) take as input a list and an index into it where there is an element which may need to be shifted to maintain the list's sorted order, and returns the index into which it was shifted.
+				<dfn class="funcname" id="MergeSortedSublists">MergeSortedSublists</dfn> takes the same parameters, but the index instead points to the first element that is not properly sorted with the elements before it, but is sorted with the elements after it. <span class="funcname">MergeSortedSublists</span> performs <span class="funcname">InsertionSortUp</span> on each successive element, starting at the given index, terminates once an element is encountered that need not be shifted, and returns the final index of the element that originally occurred at the given index.
+				<dfn class="funcname" id="InsertionSortIntoList">InsertionSortIntoList</dfn> takes a list and an element, performs <dfn class="funcname" id="AppendToList">AppendToList</dfn> which appends the element to the back of the list, insertion sorts it upwards/leftwards, and returns its new index in the list. <dfn class="funcname" id="RemoveIndexFromList">RemoveIndexFromList</dfn> is a similar function that takes a list and an index and shifts all the elements after the index to the left by one, effectively shrinking the list.
+			</p>
+		</section>
+		<section id="background">
+			<h2><a href="#background" class="heading-link">4.&nbsp;&nbsp;Background</a><a href="#background" class="glyphicon glyphicon-link"></a></h2>
+			<p class="indented">
+				The data structure serving as the baseline for this paper was introduced in Hsu &amp; Ottaviano's 2013 paper <cite><a class="uncolored invisible-link" target="_blank" rel="noopener noreferrer" href="https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/TopKCompletion.pdf">Space-Efficient Data Structures for Top-<var>k</var> Completion</a></cite> [<a href="#COMPLETION" class="citation">22</a>].
+				It introduced the <dfn>Completion Trie</dfn>: a scored compacted trie where each internal node is given a <i>score</i> equal to the maximum <i>score</i> in its subtree.
+				This conveniently allows internal nodes and leaf nodes (which hold their own <i>score</i>) to have the same shape, but more importantly, it enables the algorithm which searches for the top-<var>k</var> scores in a given subtree to know at every step which path leads to the next highest scored completion.
+			</p>
+			<p class="indented">
+				After ordinary trie traversal yields the <dfn>locus node</dfn>, i.e. the highest node representing a completion string with the given prefix <var>p</var>, the top-<var>k</var> search algorithm over the <i class="nowrap">Completion Trie</i> proceeds as follows:
+				First, each child of the locus node is inserted into a bounded double-ended priority queue (DEPQ) constrained to size <span class="katex_nowrap"><var>k</var> <span class="minus">-</span> 1</span>, except for the node with the same <i>score</i> as the locus node, for which the same process is repeated. (If there are multiple nodes with the target <i>score</i>, pick one.) In other words, the locus node's <i>score</i> is followed downwards to the corresponding leaf with the same <i>score</i>, and all other children along the path from the locus to the leaf are inserted into the DEPQ. Once the leaf is reached, it is pushed to the output list, <var>k</var> is decremented, and the maximum node is extracted from the DEPQ (again constraining its size to <span class="katex_nowrap"><var>k</var> <span class="minus">-</span> 1</span>). The algorithm repeats for the extracted node and only terminates once <var>k</var> is 0 or the DEPQ is empty.
+			</p>
+			<p class="indented">
+				This top-<var>k</var> search algorithm is a variation of the <a class="uncolored" target="_blank" rel="noopener noreferrer" href="https://en.wikipedia.org/wiki/A*_search_algorithm">A*&nbsp;search algorithm</a> [<a class="citation" href="#A*">9</a>] with the scores serving as an exact heuristic function [<a class="citation" href="#COMPLETION">22</a>]. This algorithm takes <span class="complexity"><span class="theta">Θ</span>(<var>b</var><var>d</var><var>k</var><span class="ThinSpace"></span>log<span class="ThinSpace"></span><var>k</var>)</span> time in the worst case, where <var>d</var> denotes the average <em>depth</em> of each leaf node corresponding to the top-<var>k</var> completions to <var>p</var>, and <var>b</var> denotes the average <em>breadth</em> of each visited level.
+				Since there are <span class="complexity"><span class="theta">Θ</span>(<var>d</var><var>k</var>)</span>
+				visited levels of size <var>b</var>, there are a total of <span class="complexity"><span class="theta">Θ</span>(<var>b</var><var>d</var><var>k</var>)</span>
+				nodes pushed to the DEPQ, each taking <span class="complexity"><span class="theta">Θ</span>(log<span class="ThinSpace"></span><var>k</var>)</span> worst-case time.
+				Note that <var>b</var> is at most the size of the alphabet and <var>d</var> is at most the length of the string completions.
+			</p>
+			<p class="indented">
+				Hsu &amp; Ottaviano further improve the top-<var>k</var> search time by sorting each node's children by <i>score</i>, so that
+				only one node from each level needs to be pushed to the DEPQ as the path of first-child nodes is iteratively followed to each completion's leaf.
+				Each node in the DEPQ then effectively acts like a forward iterator which inserts the next element on its level when extracted (before its first-child path is followed to the leaf).
+				This improved top-<var>k</var> search is a variation of the <a class="uncolored" target="_blank" rel="noopener noreferrer" href="https://en.wikipedia.org/wiki/K-way_merge_algorithm"><var>k</var>-way&nbsp;merge algorithm</a> [<a class="citation" href="#PROGRAMMING_PEARLS">15</a>] and takes
+				<span class="complexity"><span class="theta">Θ</span>(<var>d</var><var>k</var><span class="ThinSpace"></span>log<span class="ThinSpace"></span><var>k</var>)</span> time.
+			</p>
+			<figure id="completion_trie">
+				<a target="_blank" rel="noopener noreferrer" href="https://example.com"><img src="./completion_trie3.svg"></a>
+				<figcaption>
+					<a class="internal-link" href="#completion_trie">Figure 1.</a>
+					The first step for the empty string query (<var>p</var> = “”) over a <i>Completion Trie</i> is depicted.
+					The algorithm starts at the locus node, which for the empty string is the root node, and traverses downward until reaching a leaf node, in this case the node representing “wikipedia$”.
+					Because this structure is sorted horizontally by <i>score</i>, the next highest completion starts at the node with the maximum <i>score</i> among the <span class="red_word"></span> first-sibling nodes.
+				</figcaption>
+			</figure>
+			<p class="indented">
+				Intuitively, since sorting horizontally removed the breadth factor <var>b</var>, it stands to reason that sorting vertically would remove the depth factor <var>d</var>.
+				In other words, if the highlighted sibling nodes in <a class="internal-link" href="#completion_trie">Figure 1</a> (adjacent to the path of “wikipedia”) were sorted, then only the (next) highest of those nodes would need to be in the priority queue at any given time.
+				However, the trie structure needs to be <em>decomposed</em> to support vertical sorting.
+				This is the intuition and motivation behind the structure introduced in the next section.
+				In summary:
+			</p>
+			<table class="complexity-table">
+				<thead>
+					<tr>
+						<th>Data Structure</th>
+						<th>Top-<var>k</var> Search Time </th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>Unsorted <i>Completion Trie</i><span class="invisible" data-str="?"></span></td>
+						<td><span class="complexity"><span class="theta">Θ</span>(<var>b</var><var>d</var><var>k</var><span class="ThinSpace"></span>log<span class="ThinSpace"></span><var>k</var>)</span></td>
+					</tr>
+					<tr>
+						<td>Horizontally Sorted <i>Completion Trie</i><span class="invisible" data-str="?"></span>
+						</td>
+						<td><span class="complexity"><span class="theta">Θ</span>(<var>d</var><var>k</var><span class="ThinSpace"></span>log<span class="ThinSpace"></span><var>k</var>)</span></td>
+					</tr>
+					<tr>
+						<td>Horizontally <em style="font-style: normal">and</em>
+							Vertically Sorted Trie?</td>
+						<td><span class="complexity"><span class="theta">Θ</span>(<var>k</var><span class="ThinSpace"></span>log<span class="ThinSpace"></span><var>k</var>)</span></td>
+					</tr>
+				</tbody>
+			</table>
+			<aside>
+				<p>
+					Note: The time it takes to find the locus node is considered separately from the top-<var>k</var> search time, and is thus not included in the above table. To find the locus node corresponding to a given prefix string of length <span class="complexity"><span class="l|">|</span><var>p</var><span class="r|">|</span></span>, standard tries must traverse <span class="complexity"><span class="theta">Θ</span>(<span class="l|">|</span><var>p</var><span class="r|">|</span>)</span>
+					levels in the worst case.
+					Hence, to find the locus node in <span class="complexity"><span class="theta">Θ</span>(<span class="l|">|</span><var>p</var><span class="r|">|</span>)</span>
+					time the trie must support constant time traversals, both horizontally and vertically, even for tries that maintain a sorted order (by <i>score</i>) horizontally and/or vertically.
+					If only the sorted order is maintained, horizontal sorting pessimizes lookup to <span class="complexity"><span class="theta">Θ</span>(<span class="l|">|</span><var>p</var><span class="r|">|</span><var>b</var>)</span>
+					and vertical sorting on top of that pessimizes prefix lookup to <span class="complexity"><span class="theta">Θ</span>(<span class="l|">|</span><var>p</var><span class="r|">|</span><var>b</var><var>d</var>)</span>
+					in the worst case (query and input).
+					However, the breadth and/or depth factors can be obviated by augmenting each node with HashMaps for constant time horizontal jumps and/or using a Linked HashMap (sorted by <i>score</i>) for constant time vertical jumps. Alternatively, a separate HashMap structure could map prefix strings to locus nodes.
+				</p>
+			</aside>
+		</section>
+		<section id="dynamic_score-decomposed_tries">
+			<h2><a href="#dynamic_score-decomposed_tries" class="heading-link">5.&nbsp;&nbsp;Dynamic Score-Decomposed Tries</a><a href="#dynamic_score-decomposed_tries" class="glyphicon glyphicon-link"></a></h2>
+			<p class="indented">
+				The <dfn>Dynamic Score-Decomposed Trie</dfn>
+				is a (non-succinct, pointer-based) data structure based on the path decomposition of normal tries.
+				When constructed from a normal trie, the path to each maximum completion is compressed into a single decomposed node by concatenating the substrings and keeping a list of all the first-sibling nodes along the path.
+				Each decomposed first-sibling node is further labeled with a <dfn>branch point</dfn> which denotes the longest common prefix length between the string it represents and its parent's.
+			</p>
+			<figure id="decomposed_trie">
+				<a target="_blank" rel="noopener noreferrer" href="https://example.com"><img src="./decomposed_trie2.svg"></a>
+				<figcaption>
+					<a href="#decomposed_trie" class="internal-link">Figure 2.</a> The <i>Completion Trie</i> of <a href="#completion_trie" class="internal-link">Figure 1</a> after decomposition.
+					Tuples are rendered in the form (LCP, node.<i>key</i>).
+					E.g. the node representing “wikipedia” has 8 outgoing edges with unique branch points, and one of those is (2,&nbsp;“william”).
+					The 2 denotes that “wi” is shared between the aforementioned strings. This is still equivalent to the <i>Score-Decomposed Trie</i> of [<a class="citation" href="#COMPLETION">22</a>, <a class="citation" href="#OttavianoThesis">23</a>].
+				</figcaption>
+			</figure>
+			<p class="indented">
+				Alternatively, this structure could be viewed as a derivative of the LCRS trie, as can the original trie structure of [<a class="citation" href="#PREFIX_TREE">4</a>, <a class="citation" href="#TRIE">5</a>].
+				The original trie can be derived from the LCRS trie by moving each <em>horizontal linked list</em> (of sibling nodes) into the parent node.
+				By the same token this structure could be derived from the LCRS trie by moving the <em>vertical linked lists</em> (of descendant nodes) into the parent node (after advancing horizontally by one on each level and letting the parent node hold the string representing the concatenation of the nodes that were advanced over).
+			</p>
+			<section id="description">
+				<h3><a href="#description" class="heading-link">5.1&nbsp;&nbsp;Structural Properties</a><a href="#description" class="glyphicon glyphicon-link"></a></h3>
+				<p class="indented">
+					Each node contains a string <i>key</i>, its corresponding numeric <i>score</i>, and a list of nodes with unique <i>branch points</i> which differ from <i>key</i> at different positions.
+					By construction, branch points in each node are greater than or equal to the branch point that led to that node (or 0 for the root) and less than or equal to the length of its <i>key</i>.
+					This gives the resulting structure the <dfn style="font-style: normal"><strong>trie property</strong></dfn>, meaning that all nodes have a unique path to them from the root, which can be found by matching successive characters, and that the subtree under any given node contains only completions to the string that was matched along the path to it.
+					To find the locus node representing (at least) <var>p</var>, the algorithm starts at the root node and iteratively computes the longest common prefix (LCP) between <var>p</var> and the current node's <i>key</i>, where the next current node is at the branch point matching the LCP length, and continues until all characters in <var>p</var> have been matched or until the target branch point does not exist within the current node.
+				</p>
+				<div id="Algorithm_1" class="ps_header"><a href="#Algorithm_1" class="internal-link">Algorithm 1</a>
+					Find the locus node for a prefix string <var>p</var> (without augmenting the structure)
+					<div class="pseudocode">
+						<div class="non-lines">
+							<div><b>Input:</b> <var class="trie">T</var>, a <i>Dynamic Score-Decomposed Trie</i> and <var>p</var>, a prefix string</div>
+							<div><b>Output:</b> <var>n</var>, the locus node, i.e. the highest node in <var class="trie">T</var> which represents at least <var>p</var></div>
+						</div>
+						<div><b>procedure</b> <a href="#Algorithm_1" class="funcname internal-link">FindLocusForPrefix</a>(<var class="trie">T</var>, <var>p</var>)</div>
+						<div>&nbsp;&nbsp;&nbsp;&nbsp;<var>lcp</var> <span class="ps_arrow">←</span> 0</div>
+						<div>&nbsp;&nbsp;&nbsp;&nbsp;<var>n</var> <span class="ps_arrow">←</span> <var class="trie">T</var>.<i>root</i> <span class="ps_comment">// the current node</span></div>
+						<div>&nbsp;&nbsp;&nbsp;&nbsp;<b>while</b> <var>n</var> ≠ <b>null</b> <b>do</b></div>
+						<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>while</b>
+							<var>lcp</var> <span class="cmp">&lt;</span>
+							<span class="funcname">Min</span>(<span class="l|">|</span><var>p</var><span class="r|">|</span>, <span class="l|">|</span><var>n</var>.<i>key</i><span class="r|">|</span>) <b>and</b>
+							<var>p</var><span class="[">[</span><var>lcp</var><span class="]">]</span> ⩵ <var>n</var>.<i>key</i><span class="[">[</span><var>lcp</var><span class="]">]</span> <b>do</b> <span class="ps_comment">// compute LCP</span></div>
+						<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<var>lcp</var>
+							<span class="ps_arrow">←</span>
+							<var>lcp</var> <span class="ps_plus">+</span> 1</div>
+						<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>if</b> <var>lcp</var> ⩵ <span class="l|">|</span><var>p</var><span class="r|">|</span> <b>then</b> <b>break</b> </div>
+						<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<var>n</var> <span class="ps_arrow">←</span> <a href="#FindNodeForLCP" class="funcname internal-link">FindNodeForLCP</a>(<var>n</var>.<i>branch-points</i>, <var>lcp</var>)</div>
+						<div>&nbsp;&nbsp;&nbsp;&nbsp;<b>return</b> <var>n</var></div>
+						<div></div>
+						<div id="FindNodeForLCP"><b>procedure</b> <a href="#FindNodeForLCP" class="funcname internal-link">FindNodeForLCP</a>(<var>bp</var>, <var>lcp</var>)</div>
+						<div>&nbsp;&nbsp;&nbsp;&nbsp;<b>for</b> <var>i</var> <span class="ps_arrow">←</span> 0 <b>to</b> <span class="l|">|</span><var>bp</var><span class="r|">|</span> <span class="ps_minus">-</span> 1 <b>do</b></div>
+						<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>if</b> <var>bp</var><span class="[">[</span><var>i</var><span class="]">]</span>.LCP ⩵ <var>lcp</var> <b>then</b></div>
+						<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>return</b> <var>bp</var><span class="[">[</span><var>i</var><span class="]">]</span>.node, <var>i</var></div>
+						<div>&nbsp;&nbsp;&nbsp;&nbsp;<b>return</b> <b>null</b>, NaN</div>
+					</div>
+				</div>
+				<p class="indented">
+					Since LCP lengths are stored explicitly, this structure is amenable to being sorted both horizontally <em>and</em> vertically.
+					To start, the root node holds the maximum scored completion in the data set.
+					To ensure horizontal sorted order, each branch point holds the highest-scored completion that matches its LCP with the containing node. To ensure vertical sorted order, each list of branch points is sorted by <i>score</i>.
+					This structure thus satisfies the <dfn style="font-style: normal"><strong>heap property</strong></dfn>, both horizontally <em>and</em> vertically, making this structure a variant of the binary max-heap (except that it has no constraint of being complete or nearly complete).
+					Hence, the top-<var>k</var> search algorithm over this structure is equivalent to the algorithm for <a target="_blank" rel="noopener noreferrer" href="https://www.quora.com/If-you-had-a-max-heap-with-n-elements-and-want-to-get-the-K-largest-elements-without-popping-and-rebalancing-how-would-you-do-it">finding the top-<var>k</var> nodes from a binary max-heap without mutating it</a> [<a class="citation" href="#HEAP_SELECTION">12</a>].
+				</p>
+				<figure id="heap-like_DynSDT">
+					<a target="_blank" rel="noopener noreferrer" href="https://example.com"><img src="./doubly-sorted5.svg"></a>
+					<figcaption>
+						<a href="#heap-like_DynSDT" class="internal-link">Figure 3.</a>
+						The <i>Dynamic Score-Decomposed Trie</i> of <a href="#decomposed_trie" class="internal-link">Figure 2</a> after sorting by score vertically, drawn in the LCRS representation. Tuples are rendered in the form (LCP, node.<i>key</i>, node.<i>score</i>).
+						Live demo available at <a class="libre" target="_blank" rel="noopener noreferrer" href="https://validark.github.io/DynSDT-demo">https://validark.github.io/DynSDT-demo</a>.
+					</figcaption>
+				</figure>
+				<p class="indented">
+					This structure also has the benefit of using only <var>n</var> nodes for <var>n</var> strings, as opposed to conventional tries, which require far more intermediary nodes and therefore more allocations and cache misses.
+				</p>
+			</section>
+			<section id="top-k_enumeration">
+				<h3><a href="#top-k_enumeration" class="heading-link">5.2&nbsp;&nbsp;Top-<var>k</var>
+						Completion Search</a><a href="#top-k_enumeration" class="glyphicon glyphicon-link"></a></h3>
+				<p class="indented">
+					The top-<var>k</var> search algorithm over this structure proceeds as follows: First, the <i>key</i> of the locus node and its highest-scored branch point with LCP&nbsp;<span class="cmp">≥</span>&nbsp;<span class="complexity"><span class="l|">|</span><var>p</var><span class="r|">|</span></span> are pushed to the output list and <var>k</var> is decremented twice.
+					Next, the two candidate nodes directly succeeding the latter node, one horizontally and one vertically (like a binary max-heap drawn with right angles), are pushed to a bounded DEPQ constrained to size <var>k</var>.
+					Iteratively, the maximum node is extracted from the DEPQ, its <i>key</i>
+					is pushed to the output list, <var>k</var> is decremented, and (up to) two nodes (one horizontal and one vertical) are pushed to the DEPQ.
+					This continues until <var>k</var>
+					reaches 0 or until the DEPQ is empty.
+					More specifically, the vertical node to be pushed to the DEPQ is the next branch point after the current node (in the containing node) with branching point&nbsp;<span class="cmp">≥</span>&nbsp;<span class="complexity"><span class="l|">|</span><var>p</var><span class="r|">|</span></span> and the horizontal node is the first branch point contained within the current node's list of branch points.
+					Some vertical successors can be skipped over because branch points in the locus node can have an LCP as low as the one that led to it (which is less than <span class="complexity"><span class="l|">|</span><var>p</var><span class="r|">|</span></span>, by definition).
+					Every other list of branch points encountered by the algorithm is found by following a branching point&nbsp;<span class="cmp">≥</span>&nbsp;<span class="complexity"><span class="l|">|</span><var>p</var><span class="r|">|</span></span>, and therefore no check is necessary outside the locus node's list of branch points.
+				</p>
+				<div class="ps_header" id="Algorithm_2"><a href="#Algorithm_2" class="internal-link">Algorithm 2</a>
+					Top-<var>k</var> Completions to <var>p</var>
+					<div class="pseudocode">
+						<div class="non-lines">
+						<div class="non-line"><b>Input:</b> the structure <var class="trie">T</var>, a string <var>p</var>, a number <var>k</var> <span class="cmp">&gt;</span> 0, and <var>c</var>, a list to fill with the completions to <var>p</var>
+						</div>
+						</div>
+						<div><var>L</var> <span class="ps_arrow">←</span> <a href="#Algorithm_1" class="funcname internal-link">FindLocusForPrefix</a>(<var class="trie">T</var>, <var>p</var>) <b>orelse</b> <b>return</b></div>
+						<div><a href="#AppendToList" class="funcname internal-link">AppendToList</a>(<var>c</var>, <var>L</var>.<i>key</i>)</div>
+						<div><b>if</b> <span class="ps_minus">--</span><var>k</var> ⩵ 0 <b>then</b> <b>return</b></div>
+						<div></div>
+						<div><var>bp</var> <span class="ps_arrow">←</span> <var>L</var>.<i>branch-points</i> <span class="ps_comment">// the current list of branch points</span></div>
+						<div><var>i</var> <span class="ps_arrow">←</span> 0 <span class="ps_comment">// the current index in <var>bp</var> (0-indexed)</span></div>
+						<div><b>while</b> (<var>i</var> <span class="cmp">&lt;</span> <span class="l|">|</span><var>bp</var><span class="r|">|</span> <b>or</b> <b>return</b>) <b>and</b> <var>bp</var><span class="[">[</span><var>i</var><span class="]">]</span>.LCP <span class="cmp">&lt;</span> <span class="l|">|</span><var>p</var><span class="r|">|</span> <b>do</b> <span class="ps_plus">++</span><var>i</var> <span class="ps_comment">// find first <var>bp</var><span class="[">[</span><var>i</var><span class="]">]</span> with LCP <span class="cmp">≥</span> <span class="l|">|</span><var>p</var><span class="r|">|</span></span></div>
+						<div><a href="#AppendToList" class="funcname internal-link">AppendToList</a>(<var>c</var>, <var>bp</var><span class="[">[</span><var>i</var><span class="]">]</span>.node.<i>key</i>)</div>
+						<div></div>
+						<div><var>Q</var> <span class="ps_arrow">←</span> new DEPQ of capacity <var>k</var> <span class="ps_comment">// When full, <a href="#HeapPush" class="funcname internal-link">HeapPush</a> internally calls <a href="#HeapPopMin" class="funcname internal-link">HeapPopMin</a> to constrain size to <var>k</var></span></div>
+						<div><b>while</b> <span class="ps_minus">--</span><var>k</var> <span class="cmp">&gt;</span> 0 <b>do</b></div>
+						<div>&nbsp;&nbsp;&nbsp;&nbsp;<b>if</b> <span class="l|">|</span><var>bp</var><span class="[">[</span><var>i</var><span class="]">]</span>.node.<i>branch-points</i><span class="r|">|</span> <span class="cmp">&gt;</span> 0 <b>then</b></div>
+						<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#HeapPush" class="funcname internal-link">HeapPush</a>(<var>Q</var>, { <var>bp</var>: <var>bp</var><span class="[">[</span><var>i</var><span class="]">]</span>.node.<i>branch-points</i>, <var>i</var>: 0 }) <span class="ps_comment">// horizontal candidate</span></div>
+						<div>&nbsp;&nbsp;&nbsp;&nbsp;<b>while</b> <span class="ps_plus">++</span><var>i</var> <span class="cmp">&lt;</span> <span class="l|">|</span><var>bp</var><span class="r|">|</span> <b>do</b></div>
+						<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>if</b> <var>bp</var><span class="[">[</span><var>i</var><span class="]">]</span>.LCP <span class="cmp">≥</span> <span class="l|">|</span><var>p</var><span class="r|">|</span> <b>then</b> <span class="ps_comment">// this check is always true when <var>bp</var> ≠ <var>L</var>.<i>branch-points</i></span></div>
+						<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#HeapPush" class="funcname internal-link">HeapPush</a>(<var>Q</var>, { <var>bp</var>, <var>i</var> }) <span class="ps_comment">// vertical candidate</span></div>
+						<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>break</b></div>
+						<div>&nbsp;&nbsp;&nbsp;&nbsp;<b>if</b> <span class="l|">|</span><var>Q</var><span class="r|">|</span> ⩵ 0 <b>then</b> <b>return</b></div>
+						<div>&nbsp;&nbsp;&nbsp;&nbsp;<var>bp</var>, <var>i</var> <span class="ps_arrow">←</span> <a href="#HeapPopMax" class="funcname internal-link">HeapPopMax</a>(<var>Q</var>) <span class="ps_comment">// The size of <var>Q</var> is now constrained to the new value of <var>k</var></span></div>
+						<div>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#AppendToList" class="funcname internal-link">AppendToList</a>(<var>c</var>, <var>bp</var><span class="[">[</span><var>i</var><span class="]">]</span>.node.<i>key</i>)</div>
+					</div>
+				</div>
+				<p class="indented">
+					In the worst case, this top-<var>k</var>
+					search algorithm inserts <span class="katex_nowrap">(<var>k</var> <span class="minus">-</span> 2) <span class="times">*</span> 2</span>
+					nodes into the DEPQ
+					and extracts <span class="katex_nowrap"><var>k</var> <span class="minus">-</span> 2</span>
+					nodes, contributing a <span class="complexity"><span class="theta">Θ</span>(<var>k</var><span class="ThinSpace"></span>log<span class="ThinSpace"></span><var>k</var>)</span> term to the time complexity.
+					The algorithm also skips over a number of nodes in the list of branch points contained within the locus node which is at most <span class="complexity"><span class="l|">|</span><var>p</var><span class="r|">|</span></span> minus the locus node's branch point in its containing node, which is an integer in the range <span class="[">[</span>0, <span class="complexity"><span class="l|">|</span><var>p</var><span class="r|">|</span></span><span class=")">)</span>, contributing a <span class="complexity"><span class="big-O">O</span>(<span class="l|">|</span><var>p</var><span class="r|">|</span>)</span>
+					term.
+					Therefore, the top-<var>k</var> search (after the locus node is located) takes a time in <span class="complexity"><span class="big-O">O</span>(<span class="l|">|</span><var>p</var><span class="r|">|</span><span class="ThickSpace"></span><span class="ThickSpace"></span><span class="plus">+</span><span class="ThickSpace"></span><span class="ThickSpace"></span><var>k</var><span class="ThinSpace"></span>log<span class="ThinSpace"></span><var>k</var>)</span>.
+				</p>
+				<p class="indented">
+					As previously mentioned, the locus node is found in worst-case <span class="complexity"><span class="theta">Θ</span>(<span class="l|">|</span><var>p</var><span class="r|">|</span>)</span>
+					time when unaugmented and <span class="complexity"><span class="theta">Θ</span>(<span class="l|">|</span><var>p</var><span class="r|">|</span><var>b</var><var>d</var>)</span>
+					otherwise.
+					Altogether, the total times to both find the locus node <em>and</em> perform the top-<var>k</var> search in its subtree are as follows:
+				</p>
+				<table class="complexity-table2">
+					<thead>
+						<tr>
+							<th style="text-align: right"></th>
+							<th>Augmented</th>
+							<th>Unaugmented</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td style="padding-left: 0.5em">
+								<i>Dynamic Score-Decomposed Trie</i>
+							</td>
+							<td><span class="complexity"><span class="theta">Θ</span>(<span class="l|">|</span><var>p</var><span class="r|">|</span><span class="ThickSpace"></span><span class="ThickSpace"></span><span class="plus">+</span><span class="ThickSpace"></span><span class="ThickSpace"></span><var><span class="invisible" data-str="d"></span></var><var>k</var><span class="ThinSpace"></span>log<span class="ThinSpace"></span><var>k</var>)</span></td>
+							<td><span class="complexity"><span class="theta">Θ</span>(<span class="l|">|</span><var>p</var><span class="r|">|</span><var>b</var><var>d</var><span class="ThickSpace"></span><span class="ThickSpace"></span><span class="plus">+</span><span class="ThickSpace"></span><span class="ThickSpace"></span><var><span class="invisible" data-str="d"></span></var><var>k</var><span class="ThinSpace"></span>log<span class="ThinSpace"></span><var>k</var>)</span></td>
+						</tr>
+						<tr>
+							<td><i>Completion Trie</i></td>
+							<td><span class="complexity"><span class="theta">Θ</span>(<span class="l|">|</span><var>p</var><span class="r|">|</span><span class="ThickSpace"></span><span class="ThickSpace"></span><span class="plus">+</span><span class="ThickSpace"></span><span class="ThickSpace"></span><var>d</var><var>k</var><span class="ThinSpace"></span>log<span class="ThinSpace"></span><var>k</var>)</span></td>
+							<td><span class="complexity"><span class="theta">Θ</span>(<span class="l|">|</span><var>p</var><span class="r|">|</span><var>b</var><var><span class="invisible" data-str="d"></span></var><span class="ThickSpace"></span><span class="ThickSpace"></span><span class="plus">+</span><span class="ThickSpace"></span><span class="ThickSpace"></span><var>d</var><var>k</var><span class="ThinSpace"></span>log<span class="ThinSpace"></span><var>k</var>)</span></td>
+						</tr>
+					</tbody>
+				</table>
+				<section id="heap_optimization">
+					<h4><a href="#heap_optimization" class="heading-link">5.2.1&nbsp;&nbsp;DEPQ Capacity Optimization</a><a href="#heap_optimization" class="glyphicon glyphicon-link"></a></h4>
+					<p class="indented">
+						As in the Heapsort algorithm [<a class="citation" href="#HEAP">8</a>], the DEPQ and the output list can be backed by the same underlying array. When that strategy is not used, one observation that can improve performance in high-level languages that always heap-allocate is that the maximum capacity of the DEPQ is actually only <span class="katex_nowrap"><span class="⌊">⌊</span>0.5<var>k</var><span class="⌋">⌋</span></span>.
+						The reason for this is that each iteration has the net effect of incrementing the DEPQ size (after inserting 2 and extracting 1) and decrementing <var>k</var>.
+						Since the size and <var>k</var>
+						approach each other at the same rate (in the worst case), they converge in the middle.
+						Note that the two values meet in the middle <em>after</em> inserting 2 and extracting 1, meaning the size overshoots the midpoint, briefly reaching size <span class="katex_nowrap"><span class="⌊">⌊</span>0.5<var>k</var> <span class="plus">+</span> 1<span class="⌋">⌋</span></span> before the extract operation.
+						However, because <var>k</var> is decremented twice in the step before the DEPQ is used, the maximum size of the DEPQ is actually given by <span class="katex_nowrap"><span class="⌊">⌊</span>0.5(<var>k</var> <span class="minus">-</span> 2) <span class="plus">+</span> 1<span class="⌋">⌋</span></span>, reducing to <span class="katex_nowrap"><span class="⌊">⌊</span>0.5<var>k</var><span class="⌋">⌋</span></span>.
+						The DEPQ can also be implemented as an insertion-sorted array for optimal performance when <span class="katex_nowrap"><span class="⌊">⌊</span>0.5<var>k</var><span class="⌋">⌋</span></span> is low and fallback on a Min-Max Heap [<a class="citation" href="#DEPQ">10</a>, <a class="citation" href="#SYMMETRIC_MIN-MAX_HEAP">14</a>] for higher values of <var>k</var>
+						to maintain logarithmic asymptotic complexities.
+					</p>
+				</section>
+				<section id="eliminating_log">
+					<h4><a href="#eliminating_log" class="heading-link">5.2.2&nbsp;&nbsp;Eliminating logarithmic factors</a><a href="#eliminating_log" class="glyphicon glyphicon-link"></a></h4>
+					<p class="indented">
+						When it is acceptable for the top-<var>k</var> completions to be returned in arbitrary order, the logarithmic factors in the time complexities above can be eliminated. If the <i>score</i> of the <var>k</var>th highest completion was available before the start of the top-<var>k</var> search, then a depth-first search could retrieve the top-<var>k</var> completions in non-sorted order in <span class="complexity"><span class="theta">Θ</span>(<var>k</var>)</span>
+						time [<a class="citation" href="#HEAP_SELECTION">12</a>].
+						For a predetermined <var>k</var>, precomputing the <var>k</var>th highest <i>score</i> for all values of <var>p</var> with at least <var>k</var> completions enables this strategy. For arbitrary values of <var>k</var>, the ideas of [<a class="citation" href="#HEAP_SELECTION">12</a>] or something similar might be adaptable to this structure such that the <var>k</var>th highest <i>score</i> for a completion to <var>p</var> could be computed in a time in <span class="complexity"><span class="big-O">O</span>(<var>k</var>)</span>.
+						While such strategies were not explored with implementations, it is conceivable that these ideas could bring the total query complexity down to the optimal <span class="complexity"><span class="theta">Θ</span>(<span class="l|">|</span><var>p</var><span class="r|">|</span><span class="ThickSpace"></span><span class="ThickSpace"></span><span class="plus">+</span><span class="ThickSpace"></span><span class="ThickSpace"></span><var>k</var>)</span> time by eliminating the need for a DEPQ. Another potential small performance benefit is that whether a branch point has an LCP <span class="cmp">&lt;</span> <span class="complexity"><span class="l|">|</span><var>p</var><span class="r|">|</span></span>
+						would not be unnecessarily checked for nodes that are not under the locus (as the previous algorithm requires unless two separate DEPQ's are used), since the codepath for nodes that are not under the locus node could be separate from the ones under the locus.
+					</p>
+					<div class="ps_header" id="Algorithm_3"><a href="#Algorithm_3" class="internal-link">Algorithm 3</a>
+						Top-<var>k</var> Completions to <var>p</var>, DFS version <div class="pseudocode">
+						<div class="non-lines">
+							<div class="non-line"><b>Input:</b> the structure <var class="trie">T</var>, a string <var>p</var>, a number <var>k</var> <span class="cmp">&gt;</span> 0, and <var>c</var>, a list to fill with the completions to <var>p</var>
+							</div>
+						</div>
+							<div><var>L</var> <span class="ps_arrow">←</span>
+								<a href="#Algorithm_1" class="funcname internal-link">FindLocusForPrefix</a>(<var class="trie">T</var>, <var>p</var>) <b>orelse return</b>
+							</div>
+							<div><var>s</var> <span class="ps_arrow">←</span>
+								<span class="funcname">KthHighestScore</span>(<var>L</var>, <var>p</var>, <var>k</var>)</div>
+							<div><a href="#AppendToList" class="funcname internal-link">AppendToList</a>(<var>c</var>, <var>L</var>.<i>key</i>)</div>
+							<div><b>for each</b> (LCP, node) <b>in</b>
+								<var>L</var>.<i>branch-points</i>
+								<b>do</b>
+							</div>
+							<div>&nbsp;&nbsp;&nbsp;&nbsp;<b>if</b> node.<i>score</i> <span class="cmp">&lt;</span>
+								<var>s</var> <b>then break</b>
+							</div>
+							<div>&nbsp;&nbsp;&nbsp;&nbsp;<b>if</b> LCP <span class="cmp">≥</span> <span class="l|">|</span><var>p</var><span class="r|">|</span> <b>then</b>
+							</div>
+							<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="funcname">DFS-Helper</span>(<var>c</var>, node, <var>s</var>)</div>
+							<div></div>
+							<div><b>procedure</b>
+								<span class="funcname">DFS-Helper</span>(<var>c</var>, <var>n</var>, <var>s</var>)</div>
+							<div>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#AppendToList" class="funcname internal-link">AppendToList</a>(<var>c</var>, <var>n</var>.<i>key</i>)</div>
+							<div>&nbsp;&nbsp;&nbsp;&nbsp;<b>for each</b> (_, node) <b>in</b>
+								<var>n</var>.<i>branch-points</i>
+								<b>do</b>
+							</div>
+							<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>if</b> node.<i>score</i> <span class="cmp">&lt;</span>
+								<var>s</var> <b>then break</b>
+							</div>
+							<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="funcname">DFS-Helper</span>(<var>c</var>, node, <var>s</var>)</div>
+						</div>
+					</div>
+				</section>
+			</section>
+			<section id="string_compression">
+				<h3><a href="#string_compression" class="heading-link">5.3&nbsp;&nbsp;String Compression</a><a href="#string_compression" class="glyphicon glyphicon-link"></a></h3>
+				<p class="indented">
+					Optionally, this structure can omit the prefix of each <i>key</i>
+					which is implied by its path from the root, greatly reducing space usage when the uncompressed strings are not needed in main memory by any other process.
+					This does, however, result in a performance penalty during top-<var>k</var> enumeration because each completion must then be reconstructed on-demand to answer each query.
+					Fortunately, the compressed version of this structure requires only <var>k</var> substring and concatenation operations to reconstruct <var>k</var> completions
+					to a given prefix string <var>p</var>
+					(specifically, this is executed <var>k</var>
+					times:<code><var>str</var><sub>1</sub>.substring(0,&nbsp;<var>len</var>).concat(<var>str</var><sub>2</sub>)</code>).
+					This is still an improvement over the <i>Completion Trie</i>, which requires <span class="complexity"><span class="theta">Θ</span>(<var>d</var><var>k</var>)</span> concatenations to reconstruct <var>k</var> completions.
+					However, if the uncompressed strings are going to be stored in main memory anyway, or if multiple <i>Dynamic Score-Decomposed Tries</i> share the same set of completions (but with different scores) on a single machine, then it is quite advantageous that this structure does not <em>need</em> to divide strings into substrings as regular non-decomposed tries do. To aid understanding, the diagrams in this paper depict each node with the complete string <i>key</i> it represents, with the redundant prefix underlined and bolded.
+				</p>
+				<aside>
+					<p>
+						It is not universal how string concatenations should pessimize theoretical time complexity, as they can be performed in amortized constant time via an array of strings, logarithmic time with data structures like ropes or cords [<a class="citation" href="#ROPES">13</a>], and linear time over contiguous arrays of characters.
+						Also, this algorithm <em>could</em>
+						avoid concatenations by returning completions as the first <var>x</var> characters of string <var>a</var> concatenated with all the characters in string <var>b</var>.
+						Of course, displaying the result requires some kind of
+						linear traversal at some point, and these ideas can only delay that.
+						It is more of a matter of circumstance and other factors such as platform support whether concatenations should pessimize theoretical time complexity.
+					</p>
+				</aside>
+			</section>
+			<section id="numeric_compression">
+				<h3><a href="#numeric_compression" class="heading-link">5.4&nbsp;&nbsp;Numeric Compression</a><a href="#numeric_compression" class="glyphicon glyphicon-link"></a></h3>
+				<p class="indented">
+					A few techniques employed by others for numeric compression are also applicable to this structure: Firstly, longest common prefix lengths (i.e. LCP values) could be made relative to their containing node's LCP, which makes the numbers smaller and therefore require less space, as in [<a href="#COMPLETION" class="citation">22</a>, <a href="#OttavianoThesis" class="citation">23</a>, <a href="#DynPDT" class="citation">17</a>, <a href="#OldDynPDT" class="citation">16</a>]. E.g. If a node's LCP is 8 and its containing node has an LCP of 3, then the contained node only needs to store that its LCP is 5 relative to its containing node.
+					Relative LCP's must be in the range <span class="[">[</span>0, <span class="complexity"><span class="l|">|</span><var>x</var><span class="r|">|</span></span><span class="]">]</span> where <span class="complexity"><span class="l|">|</span><var>x</var><span class="r|">|</span></span> is the length of the containing node's <i>compressed key</i> (which has the string implied by the path from the root omitted), and hence can be stored in <span class="katex_nowrap">log<sub>2</sub>(<span class="l|">|</span><var>x</var><span class="r|">|</span> <span class="plus">+</span> 1)</span> bits.
+					Secondly, because scores tend to exhibit a skewed power law distribution, variable-byte encoding schemes have been shown to reduce the space usage of scores [<a href="#COMPLETION" class="citation">22</a>, <a href="#OttavianoThesis" class="citation">23</a>]. These techniques are otherwise omitted from this paper for ease of understanding, but greatly reduce space usage in practice [<a href="#COMPLETION" class="citation">22</a>, <a href="#OttavianoThesis" class="citation">23</a>].
+				</p>
+			</section>
+			<section id="construction">
+				<h3><a href="#construction" class="heading-link">5.5&nbsp;&nbsp;Construction</a><a href="#construction" class="glyphicon glyphicon-link"></a>
+				</h3>
+				<p class="indented">
+					The simplest way to construct a <i>Dynamic Score-Decomposed Trie</i> is with a list of scored, unique completions sorted in descending order by <i>score</i>.
+					To start, the first scored completion in the list becomes the root node.
+					Each subsequent scored completion is inserted by iteratively computing the longest common prefix (LCP) with the current node's <i>key</i> (starting with the root) and jumping to the current node's branch point which corresponds to that LCP and making that the new current node.
+					When no branch point is found, the scored completion is inserted at the end of the current node's branch points.
+					Because the input list is sorted, the trie produced by this algorithm is also properly sorted, both horizontally and vertically.
+				</p>
+<div class="ps_header" id="Algorithm_4"><a href="#Algorithm_4" class="internal-link">Algorithm 4</a>
+	Simple Construction
+<div class="pseudocode">
+	<div class="non-lines">
+		<div class="non-line"><b>Input:</b> <var>c</var>, a non-empty list of unique completions sorted in descending order by <i>score</i></div>
+		<div class="non-line"><b>Output:</b> <var class="trie">T</var>, a <i>Dynamic Score-Decomposed Trie</i> made from <var>c</var></div>
+	</div>
+	<div><var class="trie">T</var> <span class="ps_arrow">←</span> <span style="word-spacing: 0">a new <i>Dynamic Score-Decomposed Trie</i></span></div>
+	<div><var class="trie">T</var>.<i>root</i> <span class="ps_arrow">←</span> { <i>key:</i> <var>c</var><span class="[">[</span>0<span class="]">]</span>.<i>term</i>, <i>score:</i> <var>c</var><span class="[">[</span>0<span class="]">]</span>.<i>score</i>, <i>branch-points:</i> <b>new</b> List }</div>
+	<div><b>for</b> (term, score) <b>in</b> <var>c</var><span class="[">[</span>1..<span class="]">]</span> <b>do</b> <span class="ps_comment">// start loop at index 1 in <var>c</var></span></div>
+	<div>&nbsp;&nbsp;&nbsp;&nbsp;<var>n</var> <span class="ps_arrow">←</span> <var class="trie">T</var>.<i>root</i></div>
+	<div>&nbsp;&nbsp;&nbsp;&nbsp;<var>lcp</var> <span class="ps_arrow">←</span> 0</div>
+	<div>&nbsp;&nbsp;&nbsp;&nbsp;<b>loop</b></div>
+	<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>while</b>
+		<var>lcp</var> <span class="cmp">&lt;</span>
+		<span class="funcname">Min</span>(<span class="l|">|</span>term<span class="r|">|</span>, <span class="l|">|</span><var>n</var>.<i>key</i><span class="r|">|</span>) <b>and</b>
+		term<span class="[">[</span><var>lcp</var><span class="]">]</span> ⩵ <var>n</var>.<i>key</i><span class="[">[</span><var>lcp</var><span class="]">]</span> <b>do</b> <span class="ps_comment">// compute LCP</span></div>
+	<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<var>lcp</var>
+		<span class="ps_arrow">←</span>
+		<var>lcp</var> <span class="ps_plus">+</span> 1</div>
+		<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<var>n</var>, <var>j</var> <span class="ps_arrow">←</span> <a href="#FindNodeForLCP" class="funcname internal-link">FindNodeForLCP</a>(<var>n</var>.<i>branch-points</i>, <var>lcp</var>) <b>orelse</b> <b>break</b></div>
+	<div>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#AppendToList" class="funcname internal-link">AppendToList</a>(<var>n</var>.<i>branch-points</i>, (<var>lcp</var>, { <i>key:</i> term, <i>score</i>, <i>branch-points:</i> <b>new</b> List }))</div>
+	<div><b>return</b> <var class="trie">T</var></div>
+	</div>
+</div>
+				<p class="indented">
+					To construct the trie incrementally (i.e. online), or to change an existing structure, an algorithm is needed which does not assume that successive scores are lower or that every completion is not already in the trie.
+					This <a href="#Algorithm_5" class="funcname internal-link">Set</a>
+					algorithm is given as input a string <i>term</i>
+					and a numeric <i>score</i> to associate with it and proceeds as follows: If the trie is empty, the new scored completion becomes the root.
+					Otherwise, the trie is traversed in the same way as the previous algorithm: Starting at the root, the LCP of the new completion with the current node's <i>key</i> is iteratively computed, and the next current node becomes the one at the branch point corresponding to that LCP.
+					The traversal terminates when either a node is found whose <i>key</i> exactly matches <i>term</i> <span style="font-weight: bold">(<a href="#exact-match" class="internal-link">5.5.1</a>)</span>, when the current node's <i>score</i> is lower than the given <i>score</i> <span style="font-weight: bold">(<a href="#score_placement" class="internal-link">5.5.2</a>)</span>, or when there is no corresponding branch point for the computed LCP (the only case in the previous algorithm).
+				</p>
+<div class="ps_header" id="Algorithm_5"><a href="#Algorithm_5" class="internal-link">Algorithm 5</a>
+	<span class="funcname">Set</span>
+	<div class="pseudocode">
+		<div class="non-lines">
+			<div class="non-line"><b>Input:</b> the structure <var class="trie">T</var>, a string <i>term</i> and a numeric <i>score</i> to associate with it</div>
+		</div>
+		<div><b>if</b> <var class="trie">T</var>.<i>root</i> ⩵ <b>null</b> <b>then</b></div>
+		<div>&nbsp;&nbsp;&nbsp;&nbsp;<var class="trie">T</var>.<i>root</i> <span class="ps_arrow">←</span> { <i>key:</i> <i>term</i>, <i>score</i>, <i>branch-points:</i> <b>new</b> List }</div>
+		<div>&nbsp;&nbsp;&nbsp;&nbsp;<b>return</b></div>
+		<div></div>
+		<div><var>n</var> <span class="ps_arrow">←</span> <var class="trie">T</var>.<i>root</i>  <span class="ps_comment">// <var class="trie">T</var>.<i>root</i> is an alias for <var class="trie">T</var>.<i>root-branch-points</i><span class="[">[</span>0<span class="]">]</span>.node</span></div>
+		<div><var>bp</var> <span class="ps_arrow">←</span> <var class="trie">T</var>.<i>root-branch-points</i> <span class="ps_comment">// the list of branch points that contains <var>n</var></span></div>
+		<div><var>i</var> <span class="ps_arrow">←</span> 0 <span class="ps_comment">// the index in <var>bp</var> (0-indexed), such that <var>n</var> = <var>bp</var><span class="[">[</span><var>i</var><span class="]">]</span></span></div>
+		<div><var>lcp</var> <span class="ps_arrow">←</span> 0</div>
+		<div></div>
+		<div><b>loop</b></div>
+		<div>&nbsp;&nbsp;&nbsp;&nbsp;<b>while</b>
+			<var>lcp</var> <span class="cmp">&lt;</span>
+			<span class="funcname">Min</span>(<span class="l|">|</span><i>term</i><span class="r|">|</span>, <span class="l|">|</span><var>n</var>.<i>key</i><span class="r|">|</span>) <b>and</b>
+			<i>term</i><span class="[">[</span><var>lcp</var><span class="]">]</span> ⩵ <var>n</var>.<i>key</i><span class="[">[</span><var>lcp</var><span class="]">]</span> <b>do</b> <span class="ps_comment">// compute LCP</span></div>
+		<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<var>lcp</var> <span class="ps_arrow">←</span> <var>lcp</var> <span class="ps_plus">+</span> 1</div>
+		<div>&nbsp;&nbsp;&nbsp;&nbsp;<b>if</b> <var>lcp</var> ⩵ <span class="l|">|</span><i>term</i><span class="r|">|</span> <b>and</b> <var>lcp</var> ⩵ <span class="l|">|</span><var>n</var>.<i>key</i><span class="r|">|</span> <b>then</b></div>
+		<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>return</b> <a href="#Algorithm_6" class="funcname internal-link">Set-ExactMatchFound</a>(<i>score</i>, <var>n</var>, <var>bp</var>, <var>i</var>) <span class="ps_comment">// <a href="#exact-match" class="internal-link">5.5.1</a></span></div>
+		<div>&nbsp;&nbsp;&nbsp;&nbsp;<b>if</b> <i>score</i> <span class="cmp">&gt;</span> <var>n</var>.<i>score</i> <b>then</b></div>
+		<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>return</b> <a href="#Algorithm_7" class="funcname internal-link">Set-ScoreLocationFound</a>(<i>term</i>, <i>score</i>, <var>lcp</var>, <var>bp</var>, <var>i</var>) <span class="ps_comment">// <a href="#score_placement" class="internal-link">5.5.2</a></span></div>
+		<div>&nbsp;&nbsp;&nbsp;&nbsp;<var>bp</var> <span class="ps_arrow">←</span> <var>n</var>.<i>branch-points</i></div>
+		<div>&nbsp;&nbsp;&nbsp;&nbsp;<var>n</var>, <var>i</var> <span class="ps_arrow">←</span> <a href="#FindNodeForLCP" class="funcname internal-link">FindNodeForLCP</a>(<var>bp</var>, <var>lcp</var>) <b>orelse</b> <span class="ps_comment">// if there is no branch point for <var>lcp</var>, push to <var>bp</var></span></div>
+		<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>return</b> <a href="#AppendToList" class="funcname internal-link">AppendToList</a>(<var>bp</var>, (<var>lcp</var>, { <i>key:</i> <i>term</i>, <i>score</i>, <i>branch-points:</i> <b>new</b> List }))</div>
+	</div>
+</div>
+				<section id="exact-match">
+					<h4><a href="#exact-match" class="heading-link">5.5.1&nbsp;&nbsp;Exact match found (demotion)</a><a href="#exact-match" class="glyphicon glyphicon-link"></a></h4>
+					<p class="indented">
+						If the original traversal terminated because the current node's <i>key</i> exactly matches <i>term</i> (i.e. when LCP equals <i>term</i> length), the algorithm proceeds as follows: First, the current node's <i>score</i> is updated to the given <i>score</i>.
+						If <i>score</i> is greater than or equal to all the scores in the current node's subtree (determined by checking its first branch point) then the current node is simply insertion sorted (by <i>score</i>) in its containing node, at which point <a href="#Algorithm_5" class="funcname internal-link">Set</a> is done.
+					</p>
+					<p class="indented">
+						If <i>score</i> is not the greatest of the current node's subtree, then the current node swaps places with its first (highest-scored) branch point. Since both slots now have lower scores than before, they each must be insertion sorted downwards to maintain the sorted order of both lists.
+						The list of branch points into which the current node was demoted then becomes a queue of nodes to (non-recursively) reinsert into the subtree of the promoted node.
+						The promoted node adopts the LCP of its new position and the demoted node is given an LCP equal to its <i>key</i> length. Also note that the demoted node should have an empty list of branch points.
+					</p>
+					<figure id="exact_match_1">
+						<img style="overflow: hidden;" src="./exact_match.svg">
+						<figcaption>
+							<a href="#exact_match_1" class="internal-link">Figure 4.</a>
+							An example of the previous step for <a href="#Algorithm_5" class="funcname internal-link">Set</a>(“tennis&nbsp;championships”, 63) called on the Wikipedia dataset [<a class="citation" href="#WIKI_DATA">3</a>] with tuples in the format (LCP, <i>key</i>, <i>score</i>).
+							Since 63 <span class="cmp">&lt;</span> 845, “tennis championships” and “tennis at” switch places, then both are insertion sorted downwards. In this case, only “tennis championships” moves down after swapping.
+						</figcaption>
+					</figure>
+					<p class="indented">
+						To reinsert each node from the queue, the naïve algorithm starts at the promoted node and iteratively computes the LCP and follows the corresponding branch points until one does not exist or until the dequeued node's <i>score</i> is higher than the current branch point's.
+						If no branch point matches the target LCP, the dequeued node is insertion sorted into the current list of branch points.
+						Otherwise, if the proper location for the dequeued node's <i>score</i> was found, the node formerly occupying that location is supplanted and insertion sorted directly into the dequeued node's branch points. The dequeued node is then inserted in the proper location and insertion sorted upwards. (Note that the supplanted node's LCP is guaranteed to not be present in the dequeued node. The reason for that is more apparent with the improved algorithm.)
+					</p>
+					<p class="indented">
+						Unfortunately, the naïve algorithm is quite wasteful as it often performs the same tree traversal for each dequeued node and unnecessarily recalculates LCP's. Two observations improve this algorithm: Firstly, the LCP of any two nodes in a list of branch points is equal to the minimum of their LCP's (with the containing node). Secondly, nodes from the queue are always reinserted into one of the previous nodes in the queue or the promoted node due to the <strong>trie property</strong>.
+					</p>
+					<p class="indented">
+						With these observations, a better algorithm emerges that employs the use of a running maximums list, which holds a reference to each node from the queue that had the maximum LCP when it was encountered. The algorithm starts by pushing the promoted node to the running maximums list with its original LCP.
+						Each successive node in the queue is inserted into the first element in the running maximums list that has an LCP greater than or equal to it. If the current node from the queue has the highest LCP encountered thus far, it is inserted into the maximum element from the running maximums list and is pushed to the running maximums list itself.
+						Since the running maximums list is, by construction, sorted in ascending order of LCP, it is binary searchable in <span class="complexity"><span class="big-O">O</span>(log<span class="ThinSpace"></span><var>d</var>)</span> time.
+					</p>
+					<figure id="exact_match_revised">
+						<img style="overflow: hidden;" src="./exact_match_revised.svg">
+						<figcaption>
+							<a href="#exact_match_revised" class="internal-link">Figure 5.</a>
+							A continuation of <a href="#exact_match_1" class="internal-link">Figure 4</a>.
+							Arrows indicate which nodes from the queue are inserted into which nodes in the running maximums list.
+						</figcaption>
+					</figure>
+					<aside>
+						<p>
+							If LCP's occur in a completely random order, then the running maximums list is expected to be of size <span class="complexity"><span class="theta">Θ</span>(log<span class="ThinSpace"></span><var>d</var>)</span>, in which case the binary search takes only <span class="complexity"><span class="theta">Θ</span>(log<span class="ThinSpace"></span>log<span class="ThinSpace"></span><var>d</var>)</span> time. Of course, when assuming random distribution, a linear search over the running-maximums list would have an expected <span class="complexity"><span class="theta">Θ</span>(1)</span>
+							cost on average, because each successive running maximum would be expected to roughly bisect the dataset. In other words, there would be a 50% chance of the first running maximum being the answer, a 25% chance of the second, a 12.5% chance of the third, and so on. However, anecdotally, the Wikipedia dataset [<a class="citation" href="#WIKI_DATA">3</a>] seems to have these probabilities flipped the other way around since the highest-scored branch point under a given node seems likely to have the lowest possible LCP it can have.
+							E.g. “wikipedia” is the highest-scored node and the second highest is quite likely to not start with “w” at all, and in this case, it happens to be “list”. For that reason, the lowest LCP's are likely to occur at the beginning of branch point lists (which is beneficial during trie traversal), although a significantly higher LCP typically occurs around the third slot, due to terms that are extensions of the same word.
+							E.g. the three highest branch points contained within <span class="nowrap">“national”</span> are <span class="nowrap">(0, “river”)</span>, <span class="nowrap">(1, “new”)</span>, and <span class="nowrap">(6, “nations”)</span>, with “nations” more than bisecting the remainder of the available LCP's.
+							If the above algorithm was applied to these examples, most branch points would be reinserted into the second or third term.
+							As a compromise, the reference implementation checks if the last running maximum has the first LCP higher than the current node before falling back on a binary search.
+						</p>
+					</aside>
+					<p class="indented">
+						Inserting into a node works as before, except now the <strong>trie property</strong> guarantees that the target LCP cannot change from the minimum of the LCP's between the two elements from the running maximums list and the queue.
+						The chain of LCP's in the running maximums list is followed until the dequeued node's <i>score</i> is higher than the current branch point, supplanting it, and insertion sorting it directly into the dequeued node's branch points.
+						If the current list of branch points contains no node with the target LCP, then the dequeued node is insertion sorted directly into it.
+						Note that when the dequeued node has a lower LCP than the current maximum LCP, the <strong>trie property</strong> guarantees that the node in the running maximums list into which it is inserted cannot contain a branch point with the same LCP as the dequeued node.
+						Also note that the LCP given to reinserted elements in the trie does not change its LCP in the queue or running maximums list.
+						Once all the nodes in the queue have been reinserted, <a href="#Algorithm_5" class="funcname internal-link">Set</a> is finished.
+					</p>
+			<div id="Algorithm_6" class="ps_header"><a href="#Algorithm_6" class="internal-link">Algorithm 6</a>
+				<a href="#Algorithm_5" class="funcname internal-link">Set</a> Helper: Exact match found (demotion)
+				<div class="pseudocode">
+					<div class="non-lines">
+						<div class="non-line"><b>Input:</b> the new <i>score</i> of a node <var>n</var>, branch points <var>bp</var>, and the index <var>i</var> in <var>bp</var> where <var>n</var> occurs</div>
+					</div>
+					<div><b>procedure</b> <a href="#Algorithm_6" class="funcname internal-link">Set-ExactMatchFound</a>(<i>score</i>, <var>n</var>, <var>bp</var>, <var>i</var>)</div>
+					<div>&nbsp;&nbsp;&nbsp;&nbsp;<var>n</var>.<i>score</i> <span class="ps_arrow">←</span> <i>score</i></div>
+					<div>&nbsp;&nbsp;&nbsp;&nbsp;<var>Q</var> <span class="ps_arrow">←</span> <var>n</var>.<i>branch-points</i></div>
+					<div>&nbsp;&nbsp;&nbsp;&nbsp;<b>if</b> <span class="l|">|</span><var>Q</var><span class="r|">|</span> ⩵ 0 <b>or</b> <i>score</i> <span class="cmp">≥</span> <var>Q</var><span class="[">[</span>0<span class="]">]</span>.node.<i>score</i> <b>then</b></div>
+					<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>return</b> <a href="#InsertionSort" class="funcname internal-link">InsertionSort</a>(<var>bp</var>, <var>i</var>)</div>
+					<div></div>
+					<div>&nbsp;&nbsp;&nbsp;&nbsp;<var>R</var> <span class="ps_arrow">←</span> <b>new</b> List <span class="ps_comment">// the running maximums list</span></div>
+					<div>&nbsp;&nbsp;&nbsp;&nbsp;<var>bp</var><span class="[">[</span><var>i</var><span class="]">]</span>.node <span class="ps_arrow">←</span> <var>Q</var><span class="[">[</span>0<span class="]">]</span>.node</div>
+					<div>&nbsp;&nbsp;&nbsp;&nbsp;<var>i</var> <span class="ps_arrow">←</span> <a href="#InsertionSortDown" class="funcname internal-link">InsertionSortDown</a>(<var>bp</var>, <var>i</var>)</div>
+					<div>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#AppendToList" class="funcname internal-link">AppendToList</a>(<var>R</var>, { <i>LCP:</i> <var>Q</var><span class="[">[</span>0<span class="]">]</span>.LCP, <var>bp</var>, <var>i</var> })</div>
+					<div>&nbsp;&nbsp;&nbsp;&nbsp;<var>Q</var><span class="[">[</span>0<span class="]">]</span> <span class="ps_arrow">←</span> (<span class="l|">|</span><var>n</var>.<i>key</i><span class="r|">|</span>, { <i>key:</i> <var>n</var>.<i>key</i>, <i>score</i>, <i>branch-points:</i> <b>new</b> List })</div>
+					<div>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#InsertionSortDown" class="funcname internal-link">InsertionSortDown</a>(<var>Q</var>, 0) <span class="ps_comment">// Sorting <var>Q</var> ensures that no <var>bp</var><span class="[">[</span><var>i</var><span class="]">]</span> in <var>R</var> can become invalidated.</span></div>
+					<div></div>
+					<div>&nbsp;&nbsp;&nbsp;&nbsp;<b>for each</b> (LCP, node) <b>in</b> <var>Q</var> <b>do</b></div>
+					<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>max-LCP</i>, <var>bp</var>, <var>i</var> <span class="ps_arrow">←</span> <var>R</var><span class="[">[</span><span class="l|">|</span><var>R</var><span class="r|">|</span> <span class="ps_minus">-</span> 1<span class="]">]</span></div>
+					<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>if</b> LCP <span class="cmp">≥</span> <i>max-LCP</i> <b>then</b> <span class="ps_comment">// find where node belongs in the chain of LCP's equal to <i>max-LCP</i></span></div>
+					<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>loop</b></div>
+					<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<var>bp</var> <span class="ps_arrow">←</span> <var>bp</var><span class="[">[</span><var>i</var><span class="]">]</span>.node.<i>branch-points</i></div>
+					<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<var>n</var>, <var>i</var> <span class="ps_arrow">←</span> <a href="#FindNodeForLCP" class="funcname internal-link">FindNodeForLCP</a>(<var>bp</var>, <i>max-LCP</i>) <b>orelse</b></div>
+					<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<var>i</var> <span class="ps_arrow">←</span> <a href="#InsertionSortIntoList" class="funcname internal-link">InsertionSortIntoList</a>(<var>bp</var>, (<i>max-LCP</i>, node))</div>
+					<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>break</b></div>
+					<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>if</b> node.<i>score</i> <span class="cmp">≥</span> <var>n</var>.<i>score</i> <b>then</b></div>
+					<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#InsertionSortIntoList" class="funcname internal-link">InsertionSortIntoList</a>(node.<i>branch-points</i>, <var>bp</var><span class="[">[</span><var>i</var><span class="]">]</span>)</div>
+					<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<var>bp</var><span class="[">[</span><var>i</var><span class="]">]</span> <span class="ps_arrow">←</span> (<i>max-LCP</i>, node)</div>
+					<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<var>i</var> <span class="ps_arrow">←</span> <a href="#InsertionSortUp" class="funcname internal-link">InsertionSortUp</a>(<var>bp</var>, <var>i</var>)</div>
+					<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>break</b></div>
+					<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>if</b> LCP <span class="cmp">&gt;</span> <i>max-LCP</i> <b>and</b> <span class="ps_comment">/* not last iteration */</span> node ≠ <var>Q</var><span class="[">[</span><span class="l|">|</span><var>Q</var><span class="r|">|</span> <span class="ps_minus">-</span> 1<span class="]">]</span>.node <b>then</b></div>
+					<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#AppendToList" class="funcname internal-link">AppendToList</a>(<var>R</var>, { LCP, <var>bp</var>, <var>i</var> })</div>
+					<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>else</b> <span class="ps_comment">// LCP <span class="cmp">&lt;</span> <i>max-LCP</i></span></div>
+					<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<var>l</var> <span class="ps_arrow">←</span> 0</div>
+					<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<var>r</var> <span class="ps_arrow">←</span> <span class="l|">|</span><var>R</var><span class="r|">|</span> <span class="ps_minus">-</span> 2 <span class="ps_comment">// <span class="l|">|</span><var>R</var><span class="r|">|</span> <span class="ps_minus">-</span> 1 was already checked</span></div>
+					<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>while</b> <var>l</var> <span class="cmp">≤</span> <var>r</var> <b>do</b> <span class="ps_comment">// binary search to find the first <var>l</var> for which LCP <span class="cmp">&lt;</span> <var>R</var><span class="[">[</span><var>l</var><span class="]">]</span> is <b>true</b></span></div>
+					<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<var>m</var> <span class="ps_arrow">←</span> <span class="⌊">⌊</span>(<var>l</var> <span class="ps_plus">+</span> <var>r</var>) <span class="div">÷</span> 2<span class="⌋">⌋</span> <span class="ps_comment">// Watch out for numeric overflow in real-world applications!</span></div>
+					<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>if</b> LCP <span class="cmp">&lt;</span> <var>R</var><span class="[">[</span><var>m</var><span class="]">]</span>.LCP <b>then</b></div>
+					<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<var>r</var> <span class="ps_arrow">←</span> <var>m</var> <span class="ps_minus">-</span> 1</div>
+					<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>else</b></div>
+					<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<var>l</var> <span class="ps_arrow">←</span> <var>m</var> <span class="ps_plus">+</span> 1</div>
+					<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_, <var>bp</var>, <var>i</var> <span class="ps_arrow">←</span> <var>R</var><span class="[">[</span><var>l</var><span class="]">]</span></div>
+					<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#InsertionSortIntoList" class="funcname internal-link">InsertionSortIntoList</a>(<var>bp</var><span class="[">[</span><var>i</var><span class="]">]</span>.node.<i>branch-points</i>, (LCP, node))</div>
+				</div>
+			</div>
+				</section>
+				<section id="score_placement">
+					<h4><a href="#score_placement" class="heading-link">5.5.2&nbsp;&nbsp;Found location for score (promotion)</a><a href="#score_placement" class="glyphicon glyphicon-link"></a></h4>
+					<p class="indented">
+						If the original traversal terminated because the new <i>score</i> is greater than the current branch point, then the algorithm needs to traverse deeper in the trie to find the branch points for the inserted node, as well as delete the old node which represented <i>term</i>, if one exists. To start, the node in the current branch point is supplanted by a new node with the given <i>score</i> that represents <i>term</i> and is insertion sorted upwards. The supplanted node is then placed as the first element in the new node's list of branch points (with an LCP equal to the current LCP from the traversal). Next, all branch points in the supplanted node's branch points with an LCP lower than the current LCP (from the traversal) are moved to the new list of branch points.
+					</p>
+					<p class="indented">
+						While the current LCP does not equal the length of <i>term</i>, the current LCP is followed, starting in the supplanted node's branch points, until a node is found whose <i>key</i> matches at least one more character of <i>term</i>.
+						If no node is found, then <a href="#Algorithm_5" class="funcname internal-link">Set</a> is finished. If a node is found, it is replaced by its branch point with the same LCP as the current LCP, if one exists. Next, the current LCP is increased by matching successive characters of <i>term</i> to the replaced node's <i>key</i>. If the replaced node does not represent <i>term</i> exactly, it is assigned the current LCP and insertion sorted upwards in the new list of branch points, and then all of the replaced node's branch points with an LCP lower than its new LCP are moved to the new list of branch points and insertion sorted upwards. This algorithm repeats inside the replaced node until the current LCP equals the length of <i>term</i>.
+					</p>
+					<p class="indented">
+						While the current node does not exactly represent <i>term</i> (i.e. if it is a superstring of <i>term</i>), the chain of branch points with the current LCP is followed down to the node which exactly represents <i>term</i>.
+						If it exists, the node which exactly represents <i>term</i> is replaced by its branch point with the current LCP (equal to the length of <i>term</i>) and the remainder of its branch points are insertion sorted upwards into the new list of branch points.
+						<a href="#Algorithm_5" class="funcname internal-link">Set</a> is then finished.
+					</p>
+					<div id="Algorithm_7" class="ps_header"><a href="#Algorithm_7" class="internal-link">Algorithm 7</a>
+						<a href="#Algorithm_5" class="funcname internal-link">Set</a> Helper: Found location for score (promotion)
+						<div class="pseudocode">
+							<div class="non-lines">
+							</div>
+							<div><b>procedure</b> <a href="#Algorithm_7" class="funcname internal-link">Set-ScoreLocationFound</a>(<i>term</i>, <i>score</i>, LCP, <var>bp</var>, <var>i</var>)</div>
+							<div>&nbsp;&nbsp;&nbsp;&nbsp;<var class="BP">BP</var> <span class="ps_arrow">←</span> <b>new</b> List <span class="ps_comment">// the new branch points for our new node</span></div>
+							<div>&nbsp;&nbsp;&nbsp;&nbsp;<var>n</var> <span class="ps_arrow">←</span> <var>bp</var><span class="[">[</span><var>i</var><span class="]">]</span>.node</div>
+							<div>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#AppendToList" class="funcname internal-link">AppendToList</a>(<var class="BP">BP</var>, (LCP, <var>n</var>))</div>
+							<div>&nbsp;&nbsp;&nbsp;&nbsp;<var>bp</var><span class="[">[</span><var>i</var><span class="]">]</span>.node <span class="ps_arrow">←</span> { <i>key:</i> <i>term</i>, <i>score</i>, <i>branch-points</i>: <var class="BP">BP</var> }</div>
+							<div>&nbsp;&nbsp;&nbsp;&nbsp;<var>i</var> <span class="ps_arrow">←</span> <a href="#InsertionSortUp" class="funcname internal-link">InsertionSortUp</a>(<var>bp</var>, <var>i</var>)</div>
+							<div>&nbsp;&nbsp;&nbsp;&nbsp;<var>n</var>.<i>branch-points</i> <span class="ps_arrow">←</span> <a href="#ExtractLCPsBelowThreshold" class="funcname internal-link">ExtractLCPsBelowThreshold</a>(<var>n</var>.<i>branch-points</i>, LCP, <var class="BP">BP</var><span class="ThinSpace"></span>)</div>
+							<div>&nbsp;&nbsp;&nbsp;&nbsp;<var>bp</var> <span class="ps_arrow">←</span> <var class="BP">BP</var></div>
+							<div>&nbsp;&nbsp;&nbsp;&nbsp;<var>i</var> <span class="ps_arrow">←</span> 0</div>
+							<div>&nbsp;&nbsp;&nbsp;&nbsp;<b>while</b> LCP ≠ <span class="l|">|</span><i>term</i><span class="r|">|</span> <b>do</b> <span class="ps_comment">// find all peers with LCP ∈ <span class="(">(</span>LCP, <span class="l|">|</span><i>term</i><span class="r|">|</span><span class="]">]</span></span></div>
+							<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>do</b> <span class="ps_comment">// find <var>n</var> such that <var>n</var>.<i>key</i> matches at least one more character</span></div>
+							<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<var>bp</var> <span class="ps_arrow">←</span> <var>bp</var><span class="[">[</span><var>i</var><span class="]">]</span>.node.<i>branch-points</i></div>
+							<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<var>n</var>, <var>i</var> <span class="ps_arrow">←</span> <a href="#FindNodeForLCP" class="funcname internal-link">FindNodeForLCP</a>(<var>bp</var>, LCP) <b>orelse</b> <b>return</b></div>
+							<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>while</b> LCP ⩵ <span class="l|">|</span><var>n</var>.<i>key</i><span class="r|">|</span> <b>or</b> <i>term</i><span class="[">[</span>LCP<span class="]">]</span> ≠ <var>n</var>.<i>key</i><span class="[">[</span>LCP<span class="]">]</span></div>
+							<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#SupplantNodeFromParent" class="funcname internal-link">SupplantNodeFromParent</a>(<var>bp</var>, <var>i</var>, <var>n</var>, LCP)</div>
+							<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>do</b> <span class="ps_plus">++</span>LCP <b>while</b> LCP <span class="cmp">&lt;</span> <span class="funcname">Min</span>(<span class="l|">|</span><i>term</i><span class="r|">|</span>, <span class="l|">|</span><var>n</var>.<i>key</i><span class="r|">|</span>) <b>and</b> <i>term</i><span class="[">[</span>LCP<span class="]">]</span> ⩵ <var>n</var>.<i>key</i><span class="[">[</span>LCP<span class="]">]</span></div>
+							<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>if</b> LCP ≠ <span class="l|">|</span><i>term</i><span class="r|">|</span> <b>or</b> LCP ≠ <span class="l|">|</span><var>n</var>.<i>key</i><span class="r|">|</span> <b>then</b></div>
+							<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<var>bp</var> <span class="ps_arrow">←</span> <var class="BP">BP</var></div>
+							<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<var>i</var> <span class="ps_arrow">←</span> <span class="l|">|</span><var>bp</var><span class="r|">|</span></div>
+							<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#AppendToList" class="funcname internal-link">AppendToList</a>(<var>bp</var>, (LCP, <var>n</var>)) <span class="ps_comment">// write to <var>bp</var><span class="[">[</span><var>i</var><span class="]">]</span></span></div>
+							<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<var>n</var>.<i>branch-points</i> <span class="ps_arrow">←</span> <a href="#ExtractLCPsBelowThreshold" class="funcname internal-link">ExtractLCPsBelowThreshold</a>(<var>n</var>.<i>branch-points</i>, LCP, <var>bp</var>)</div>
+							<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<var>i</var> <span class="ps_arrow">←</span> <a href="#MergeSortedSublists" class="funcname internal-link">MergeSortedSublists</a>(<var>bp</var>, <var>i</var>)</div>
+							<div></div>
+							<div>&nbsp;&nbsp;&nbsp;&nbsp;<b>if</b> LCP ≠ <span class="l|">|</span><var>n</var>.<i>key</i><span class="r|">|</span> <b>then</b> <span class="ps_comment">// if <var>n</var> is not the node that exactly represents <i>term</i>, go look for the one that does</span></div>
+							<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>do</b></div>
+							<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<var>bp</var> <span class="ps_arrow">←</span> <var>bp</var><span class="[">[</span><var>i</var><span class="]">]</span>.node.<i>branch-points</i></div>
+							<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<var>n</var>, <var>i</var> <span class="ps_arrow">←</span> <a href="#FindNodeForLCP" class="funcname internal-link">FindNodeForLCP</a>(<var>bp</var>, LCP) <b>orelse</b> <b>return</b></div>
+							<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>while</b> LCP ≠ <span class="l|">|</span><var>n</var>.<i>key</i><span class="r|">|</span></div>
+							<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#SupplantNodeFromParent" class="funcname internal-link">SupplantNodeFromParent</a>(<var>bp</var>, <var>i</var>, <var>n</var>, LCP)</div>
+							<div></div>
+							<div>&nbsp;&nbsp;&nbsp;&nbsp;<var>j</var> <span class="ps_arrow">←</span> <span class="l|">|</span><var class="BP">BP</var><span class="ThinSpace"></span><span class="r|">|</span></div>
+							<div>&nbsp;&nbsp;&nbsp;&nbsp;<b>for each</b> (LCP, node) <b>in</b> <var>n</var>.<i>branch-points</i> <b>do</b> <a href="#AppendToList" class="funcname internal-link">AppendToList</a>(<var class="BP">BP</var>, (LCP, node))</div>
+							<div>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#MergeSortedSublists" class="funcname internal-link">MergeSortedSublists</a>(<var class="BP">BP</var>, <var>j</var>)</div>
+							<div></div>
+							<div id="SupplantNodeFromParent"><b>procedure</b> <a href="#SupplantNodeFromParent" class="funcname internal-link">SupplantNodeFromParent</a>(<var>bp</var>, <var>i</var>, <var>n</var>, LCP)</div>
+							<div>&nbsp;&nbsp;&nbsp;&nbsp;<var>c</var>, <var>j</var> <span class="ps_arrow">←</span> <a href="#FindNodeForLCP" class="funcname internal-link">FindNodeForLCP</a>(<var>n</var>.<i>branch-points</i>, LCP) <b>orelse</b> <span class="ps_comment">// find next link in the horizontal list</span></div>
+							<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>return</b> <a href="#RemoveIndexFromList" class="funcname internal-link">RemoveIndexFromList</a>(<var>bp</var>, <var>i</var>) <span class="ps_comment">// if there is no next link, just remove node's old spot</span></div>
+							<div>&nbsp;&nbsp;&nbsp;&nbsp;<var>bp</var><span class="[">[</span><var>i</var><span class="]">]</span> <span class="ps_arrow">←</span> <var>n</var>.<i>branch-points</i><span class="[">[</span><var>j</var><span class="]">]</span> <span class="ps_comment">// move next link (LCP, <var>c</var>) into <var>n</var>'s old spot and sort</span></div>
+							<div>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#InsertionSortDown" class="funcname internal-link">InsertionSortDown</a>(<var>bp</var>, <var>i</var>)</div>
+							<div>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#RemoveIndexFromList" class="funcname internal-link">RemoveIndexFromList</a>(<var>n</var>.<i>branch-points</i>, <var>j</var>)</div>
+							<div>&nbsp;&nbsp;&nbsp;&nbsp;</div>
+							<div id="ExtractLCPsBelowThreshold"><b>procedure</b> <a href="#ExtractLCPsBelowThreshold" class="funcname internal-link">ExtractLCPsBelowThreshold</a>(<i>src</i>, <i>lcp</i>, <i>dst</i>)</div>
+							<div>&nbsp;&nbsp;&nbsp;&nbsp;<var class="L">L</var> <span class="ps_arrow">←</span> <b>new</b> List <span class="ps_comment">// the new branch points to replace <i>src</i></span></div>
+							<div>&nbsp;&nbsp;&nbsp;&nbsp;<b>for each</b> (LCP, node) <b>in</b> <i>src</i> <b>do</b></div>
+							<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#AppendToList" class="funcname internal-link">AppendToList</a>(<b>if</b> <i>lcp</i> <span class="cmp">&gt;</span> LCP <b>then</b> <i>dst</i> <b>else</b> <var class="L">L</var>, (LCP, node))</div>
+							<div>&nbsp;&nbsp;&nbsp;&nbsp;<b>return</b> <var class="L">L</var></div>
+						</div>
+					</div>
+					<figure id="score_located">
+						<img style="overflow: hidden;" src="./score_located.svg">
+						<figcaption>
+							<a href="#score_located" class="internal-link">Figure 6.</a>
+							The aforementioned process for <a href="#Algorithm_5" class="funcname internal-link">Set</a><span class="nowrap">(“tennis academy”, 9001)</span>.
+							<span class="Red_word"></span> nodes are the new branch points for <span class="nowrap">(“tennis academy”, 9001)</span>. <span class="Blue_word"></span> nodes are promoted to fill the old locations of replaced <span class="red_word"></span> nodes.
+							<style>
+							.Red_word::after { content: "Red" }
+							.red_word::after { content: "red" }
+							.Blue_word::after { content: "Blue" }
+							@media (prefers-color-scheme: dark) {
+								.Red_word::after { content: "Cyan" }
+								.red_word::after { content: "cyan" }
+								.Blue_word::after { content: "Yellow" }
+							}
+							</style>
+							<script defer>
+if (window.matchMedia) { // if this exists, we can make the content actually part of the document!
+	var o = {
+		Red_word: ["Red", "Cyan"],
+		red_word: ["red", "cyan"],
+		Blue_word: ["Blue", "Yellow"]
+	};
+	for (var key in o) {
+		var a = document.getElementsByClassName(key)
+		while (a.length > 0)
+			for (var x of a) {
+				x.className = "js_" + key
+			}
+	}
+	function changeColorScheme(event) {
+		var isDark = +event.matches;
+		for (var key in o) {
+			var word = o[key][+isDark];
+			for (var x of document.getElementsByClassName("js_" + key)) {
+				x.innerText = word
+			}
+		}
+	}
+	window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', changeColorScheme);
+	changeColorScheme(window.matchMedia('(prefers-color-scheme: dark)'));
+}
+							</script>
+						</figcaption>
+					</figure>
+					<figure id="score_located2">
+						<img style="overflow: hidden;" src="./score_located2.svg">
+						<figcaption>
+							<a href="#score_located2" class="internal-link">Figure 7.</a>
+							The structure of <a href="#score_located" class="internal-link">Figure 6</a>
+							after <a href="#Algorithm_5" class="funcname internal-link">Set</a><span class="nowrap">(“tennis academy”, 9001)</span>
+							finishes. Nodes have the same color as before.
+						</figcaption>
+					</figure>
+				</section>
+			</section>
+			<section id="Deletion">
+				<h3><a href="#Deletion" class="heading-link">5.6&nbsp;&nbsp;Deletion</a><a href="#Deletion" class="glyphicon glyphicon-link"></a>
+				</h3>
+				<p class="indented">
+					The <span class="funcname">Delete</span> algorithm is nearly a subset of the <a href="#Algorithm_5" class="funcname internal-link">Set</a> algorithm.
+					It takes as input a <i>term</i> and traverses the tree as previously described until a node is found that exactly represents <i>term</i>. If such a node exists, it is removed from the tree and all of the nodes it contained are reinserted, as in <a href="#exact-match" class="internal-link">5.5.1</a>.
+				</p>
+			</section>
+		</section>
+		<section id="discussions">
+			<h2><a href="#discussions" class="heading-link">6.&nbsp;&nbsp;Discussions</a><a href="#discussions" class="glyphicon glyphicon-link"></a></h2>
+			<p class="indented">
+				Presumably, the stricter max-heap-like invariant of the <i>Dynamic Score-Decomposed Trie</i> can be back-ported to the <i>Score-Decomposed Trie</i> of [<a class="citation" href="#COMPLETION">22</a>, <a class="citation" href="#OttavianoThesis">23</a>], yielding a succinct (and static) structure with the same asymptotic time complexity improvements over the <i>Completion Trie</i>. Also like the <i>Completion Trie</i>, any fuzzy completion algorithm applicable to a trie is also applicable to the <i>Dynamic Score-Decomposed Trie</i> because it, too, supports the same traversal operations as conventional tries [<a class="citation" href="#COMPLETION">22</a>].
+			</p>
+		</section>
+		<section id="conclusion">
+			<h2><a href="#conclusion" class="heading-link">7.&nbsp;&nbsp;Conclusion</a><a href="#conclusion" class="glyphicon glyphicon-link"></a></h2>
+			<p class="indented">
+				This paper introduced the <i>Dynamic Score-Decomposed Trie</i> and the algorithms to construct it (both offline and online) and search it to enumerate the top-<var>k</var> completions to a prefix <var>p</var>. Top-<var>k</var> enumerations can be performed in <span class="complexity"><span class="theta">Θ</span>(<span class="l|">|</span><var>p</var><span class="r|">|</span><span class="ThickSpace"></span><span class="ThickSpace"></span><span class="plus">+</span><span class="ThickSpace"></span><span class="ThickSpace"></span><var>k</var><span class="ThinSpace"></span>log<span class="ThinSpace"></span><var>k</var>)</span> time when the structure is augmented with HashMaps for constant time horizontal/vertical traversals, and <span class="complexity"><span class="theta">Θ</span>(<span class="l|">|</span><var>p</var><span class="r|">|</span><var>b</var><var>d</var><span class="ThickSpace"></span><span class="ThickSpace"></span><span class="plus">+</span><span class="ThickSpace"></span><span class="ThickSpace"></span><var>k</var><span class="ThinSpace"></span>log<span class="ThinSpace"></span><var>k</var>)</span> time otherwise. A live demo [<a class="citation" href="#live-demo">1</a>] and reference implementations [<a class="citation" href="#implementation">2</a>] are provided.
+			</p>
+		</section>
+		<section id="references">
+			<h2><a href="#references" class="heading-link">8.&nbsp;&nbsp;References</a><a href="#references" class="glyphicon glyphicon-link"></a></h2>
+			<p id="live-demo">[1]&nbsp;&nbsp;<a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://github.com/Validark/DynSDT/">Live demo of the <i>Completion Trie</i> and the <i>Dynamic Score-Decomposed Trie</i>. <b class="libre">https://validark.github.io/DynSDT-demo</b>.</a>
+			</p>
+			<p id="implementation">[2]&nbsp;&nbsp;<a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://github.com/Validark/DynSDT/">Reference implementations. <b class="libre">https://github.com/Validark/DynSDT/</b></a>.
+			</p>
+			<p id="WIKI_DATA">[3]&nbsp;&nbsp;<a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://github.com/wolfgarbe/PruningRadixTrie/raw/master/PruningRadixTrie.Benchmark/terms.zip">Wikipedia word frequency data. <b class="libre" style="font-size: 75%;">https://github.com/wolfgarbe/PruningRadixTrie/raw/master/PruningRadixTrie.Benchmark/terms.zip</b></a>.
+			</p>
+			<section id="preliminary-references">
+				<h3><a href="#preliminary-references" class="heading-link">8.1&nbsp;&nbsp;Preliminary data structures</a><a href="#preliminary-references" class="glyphicon glyphicon-link"></a></h3>
+				<p id="PREFIX_TREE"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://dl.acm.org/doi/pdf/10.1145/1457838.1457895">[4]&nbsp;&nbsp;René de la Briandais. (1959). File searching using variable length keys. In Western Joint Computer Conference, IRE-AIEE-ACM '59 (Western), <span class="nowrap">295–298</span>, New York, NY, 42 USA, 1959. ACM.</a></p>
+				<p id="TRIE"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://dl.acm.org/doi/pdf/10.1145/367390.367400">[5]&nbsp;&nbsp;Edward Fredkin. (1960). Trie memory.
+					Communications of the ACM 3, 9 (1960), <span class="nowrap">490–499</span>.<br>
+				</a></p>
+				<p id="LCRS"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://dl.acm.org/doi/pdf/10.1145/366552.366600">[6]&nbsp;&nbsp;Sussenguth, Edward H. (1963). Use of tree structures for processing files.
+					Communications of the ACM 6 (5): <span class="nowrap">272–279</span>.</a></p>
+				<p id="FLOYD"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://dl.acm.org/doi/pdf/10.1145/355588.365103">[7]&nbsp;&nbsp;FLOYD, R. W. (1964), Algorithm 245, Treesort 3. Communications of the ACM 7, 701.<br>
+				</a></p>
+				<p id="HEAP"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://dl.acm.org/doi/pdf/10.1145/512274.512284">[8]&nbsp;&nbsp;Williams, J. W. J. (1964). Algorithm 232: Heapsort. Communications of the ACM 7, <span class="nowrap">347–348</span>.<br>
+				</a></p>
+				<p id="A*"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://www.cs.auckland.ac.nz/courses/compsci709s2c/resources/Mike.d/astarNilsson.pdf">[9]&nbsp;&nbsp;Hart, P., Nilsson, N., &amp; Raphael, B.
+					(1968). A Formal Basis for the Heuristic Determination of Minimum Cost Paths.
+					IEEE Transactions on Systems Science and Cybernetics, 4(2), <span class="nowrap">100–107</span>.
+					10.1109/tssc.1968.300136.<br>
+				</a></p>
+				<p id="DEPQ"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://www.researchgate.net/profile/M-Atkinson/publication/220424085_Min-Max_Heaps_and_Generalized_Priority_Queues/links/00b49514bc2c945127000000/Min-Max-Heaps-and-Generalized-Priority-Queues.pdf">[10]&nbsp;&nbsp;Atkinson, M. D. &amp; Sack, Jörg-Rüdiger &amp; Santoro, Nicola &amp; Strothotte, Thomas.
+					(1986). Min-Max Heaps and Generalized Priority Queues. Communications of the ACM 29, no. 10. <span class="nowrap">996–1000</span>.</a></p>
+				<p id="RADIX"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://archive.org/details/textcompression00bell/page/238/mode/1up?view=theater">[11]&nbsp;&nbsp;Bell, Timothy &amp; Cleary, John &amp; Witten, Ian. (1990). Text Compression. <span class="nowrap">238–239</span>.
+					10.1007/978-0-387-39940-9_1151.</a></p>
+				<p id="HEAP_SELECTION"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://www.sciencedirect.com/sdfe/reader/pii/S0890540183710308">[12]&nbsp;&nbsp;Frederickson, Greg. N. (1993). An Optimal Algorithm for Selection in a Min-Heap. Information and Computation.
+					104(2). <span class="nowrap">197–214</span>.
+					10.1006/inco.1993.1030.</a></p>
+				<p id="ROPES"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://www.cs.tufts.edu/comp/150FP/archive/hans-boehm/ropes.pdf">[13]&nbsp;&nbsp;Boehm, Hans-J., Atkinson, Russ &amp; Plass, Michael (1995). Ropes: An Alternative to Strings. Software: Practice and Experience, 25(12), <span class="nowrap">1315–1330</span>.
+					10.1002/spe.4380251203.<br>
+				</a></p>
+				<p id="SYMMETRIC_MIN-MAX_HEAP"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://liacs.leidenuniv.nl/~stefanovtp/courses/StudentenSeminarium/Papers/AL/SMMH.pdf">[14]&nbsp;&nbsp;Arvind, A. &amp; Rangan, C. (1999).
+					Symmetric Min-Max Heap: A Simpler Data Structure for Double-Ended Priority Queue. Inf. Process. Lett. 69. <span class="nowrap">197–199</span>.
+					10.1016/S0020-0190(99)00014-9.</a></p>
+				<p id="PROGRAMMING_PEARLS">[15]&nbsp;&nbsp;<a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://books.google.com/books?id=kse_7qbWbjsC">
+					Bentley, Jon Louis (2000). Programming Pearls (2nd ed.). ACM Press / Addison Wesley. pp. </a><a class="nowrap" target="_blank" rel="noopener noreferrer" href="https://books.google.com/books?id=kse_7qbWbjsC&amp;pg=PA116">115–116</a>,
+					<a class="nowrap" target="_blank" rel="noopener noreferrer" href="https://books.google.com/books?id=kse_7qbWbjsC&amp;pg=PA147">147–162</a>.
+					<a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://books.google.com/books?id=kse_7qbWbjsC">ISBN 0201657880.</a>
+				</p>
+			</section>
+			<section id="Non-succinct_DynPDT">
+				<h3><a href="#Non-succinct_DynPDT" class="heading-link">8.2&nbsp;&nbsp;Non-succinct Decomposed Tries</a><a href="#Non-succinct_DynPDT" class="glyphicon glyphicon-link"></a></h3>
+				<p id="OldDynPDT"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://kampersanda.github.io/pdf/SPIRE2017.pdf">[16]&nbsp;&nbsp;Kanda, Shunsuke &amp; Morita, Kazuhiro &amp; Fuketa, Masao. (2017). Practical Implementation of Space-Efficient Dynamic Keyword Dictionaries. <span class="nowrap">221–233</span>.
+					10.1007/978-3-319-67428-5_19.</a></p>
+				<p id="DynPDT"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://arxiv.org/pdf/1906.06015.pdf">[17]&nbsp;&nbsp;Kanda, Shunsuke &amp; Köppl, Dominik &amp; Tabei, Yasuo &amp; Morita, Kazuhiro &amp; Fuketa, Masao. (2020). Dynamic Path-decomposed Tries. ACM Journal of Experimental Algorithmics. 25. <span class="nowrap">1–28</span>.
+					10.1145/3418033.</a></p>
+			</section>
+			<section id="autocomplete-references">
+				<h3><a href="#autocomplete-references" class="heading-link">8.3&nbsp;&nbsp;Autocomplete</a><a href="#autocomplete-references" class="glyphicon glyphicon-link"></a>
+				</h3>
+				<p id="TASTIER"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://www.researchgate.net/profile/Jianhua-Feng-3/publication/221213248_Efficient_type-ahead_search_on_relational_data_a_TASTIER_approach/links/0046351898fc540515000000/Efficient-type-ahead-search-on-relational-data-a-TASTIER-approach.pdf">[18]&nbsp;&nbsp;Li, Guoliang &amp; Ji, Shengyue &amp; Li, Chen &amp; Feng, Jianhua. (2009). Efficient type-ahead search on relational data: a <span style="font-size: larger; line-height: 1em; margin-right: -2px;">T</span>ASTIER approach. <span class="nowrap">695–706</span>.
+					10.1145/1559845.1559918.</a></p>
+				<p id="HON"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://www.academia.edu/es/26306826/Space_Efficient_Framework_for_Top_k_String_Retrieval_Problems">[19]&nbsp;&nbsp;Hon, Wing-Kai &amp; Shah, Rahul &amp; Vitter, Jeffrey. (2009). Space-Efficient Framework for Top-<var>k</var> String Retrieval Problems (extended abstract).
+					Proceedings - Annual IEEE Symposium on Foundations of Computer Science, FOCS.
+					<span class="nowrap">713–722</span>.
+					10.1109/FOCS.2009.19.</a></p>
+				<p id="SuccinctPractice"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://www.researchgate.net/profile/Diego-Arroyuelo-2/publication/220982101_Succinct_Trees_in_Practice/links/54601edc0cf2c1a63bfdc158/Succinct-Trees-in-Practice.pdf">[20]&nbsp;&nbsp;Arroyuelo, Diego &amp; Cánovas Barroso, Rodrigo &amp; Navarro, Gonzalo &amp; Sadakane, Kunihiko. (2010). Succinct Trees in Practice. 2010 Proceedings of the 12th Workshop on Algorithm Engineering and Experiments, ALENEX 2010. <span class="nowrap">84–97</span>.
+					10.1137/1.9781611972900.9.</a></p>
+				<p id="MATANI"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://arxiv.org/pdf/2110.15535.pdf">[21]&nbsp;&nbsp;Mátáni, Dhrúv. (2011). An <span class="complexity"><span class="big-O">O</span>(<var>k</var><span class="ThinSpace"></span>log<span class="ThinSpace"></span><var>n</var>)</span>
+					algorithm for prefix based ranked autocomplete. ArXiv (2021), abs/2110.15535.</a></p>
+				<p id="COMPLETION"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/TopKCompletion.pdf">[22]&nbsp;&nbsp;Hsu, Bo-June &amp; Ottaviano, Giuseppe.
+					(2013). Space-efficient Data Structures for Top-<var>k</var> Completion. WWW 2013 - Proceedings of the 22nd International Conference on World Wide Web. <span class="nowrap">583–594</span>.
+					10.1145/2488388.2488440.<br>
+				</a></p>
+				<p id="OttavianoThesis"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://core.ac.uk/download/16385353.pdf">[23]&nbsp;&nbsp;Ottaviano, Giuseppe. (2013).
+					Space-efficient Data Structures for Collections of Textual Data. Ph.D.
+					thesis. Pisa University Press. oai:etd.adm.unipi.it:etd-05232013-000551.<br>
+				</a></p>
+				<p id="MIXMAX"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://www.mixmax.com/engineering/autocomplete-search-performance">[24]&nbsp;&nbsp;Vogel, Brad. (2015). How we built 'instant' autocomplete for Mixmax. <br><b class="libre">https://www.mixmax.com/engineering/autocomplete-search-performance</b>.<br>
+				</a></p>
+				<p id="2016Survey"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://staff.fnwi.uva.nl/m.derijke/wp-content/papercite-data/pdf/cai-survey-2016.pdf">[25]&nbsp;&nbsp;Cai, Fei &amp; Rijke, Maarten. (2016). A Survey of Query Auto Completion in Information Retrieval.
+					10.1561/9781680832013.<br>
+				</a></p>
+				<p id="Taxonomy"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://people.eng.unimelb.edu.au/ammoffat/abstracts/kmz17adcs.pdf">[26]&nbsp;&nbsp;Krishnan, Unni &amp; Moffat, Alistair &amp; Zobel, Justin. (2017). A Taxonomy of Query Auto Completion Modes. <span class="nowrap">1–8</span>.
+					10.1145/3166072.3166081.</a></p>
+				<p id="PRUNING"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://seekstorm.com/blog/pruning-radix-trie#other-options">[27]&nbsp;&nbsp;Garbe, Wolf. (2020). The Pruning Radix Trie — a Radix Trie on steroids. <br><b class="libre">https://seekstorm.com/blog/pruning-radix-trie</b>.<br>
+				</a></p>
+				<p id="GOG"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://rossanoventurini.github.io/papers/SIGIR20.pdf">[28]&nbsp;&nbsp;Gog, Simon &amp; Pibiri, Giulio Ermanno &amp; Venturini, Rossano. (2020). Efficient and Effective Query Auto-Completion.
+					<span class="nowrap">2271–2280</span>.
+					10.1145/3397271.3401432.</a></p>
+				<p id="WALMART"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://medium.com/walmartglobaltech/how-we-rebuilt-the-walmart-autocomplete-backend-10efe71d624a">[29]&nbsp;&nbsp;Dutta, Shouvik. (2021). How we rebuilt the Walmart Autocomplete Backend.<br><b class="libre">https://medium.com/walmartglobaltech/how-we-rebuilt-the-walmart-autocomplete-backend-10efe71d624a</b>.<br>
+				</a></p>
+			</section>
+		</section>
+	</article>
+<script>
+for (const a of document.getElementsByTagName("a")) {
+	if (a.classList.contains("citation")) {
+		a.addEventListener("click", function() {
+			const href = a.getAttribute('href')
+			const element = document.getElementById(href.slice(1));
+			let i = 0;
+			const FRAMES1 = 150
+			const FRAMES2 = 150
+			const id1 = setInterval(function() {
+				i += 1;
+				element.style.backgroundColor = `rgba(255, 255, 0, ${i / FRAMES1})`
+				if (i === FRAMES1)
+				{
+					clearInterval(id1)
+					setTimeout(function() {
+						i = 0
+						const id2 = setInterval(function() {
+							i += 1;
+							element.style.backgroundColor = `rgba(255, 255, 0, ${(FRAMES2 - i) / FRAMES2})`
+							if (i === FRAMES2)
+								clearInterval(id2)
+						}, 1)
+					}, 50)
+				}
+			}, 1)
+		})
+	}
+}
+</script>
+</body></html>
