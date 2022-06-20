@@ -1,0 +1,822 @@
+<link rel="stylesheet" href="../src/sigma.settings.css">
+<link rel="stylesheet" href="./edge-renderers.css">
+<link rel="stylesheet" href="../paper/scholarly.css">
+
+<!-- <script src="../node_modules/svgcanvas/utils.js" type="module"></script>
+<script src="../node_modules/svgcanvas/image.js" type="module"></script>
+<script src="../node_modules/svgcanvas/context.js" type="module"></script>
+<script src="../node_modules/svgcanvas/element.js" type="module"></script> -->
+
+<div id="container">
+	<div id="graph-container"></div>
+
+	<div class="control-pane" style="background-color: rgba(255, 255, 255, 1); width: 100vw; height: 100vh; margin: 0; padding: 0; bottom: 0; left: 0; right: 0; top: 0; padding-top: 30vh;">
+		<h2 class="underline" style="font-size: 4em">Welcome!</h2>
+		<div class="textual-content" style="padding-left: 10vw; font-size: x-large;">
+			<p>
+				This demo works best on a large screen.<br>It is recommended to go fullscreen with the page zoom set at 100%<br>Click the arrow in the bottom right or press the right arrow on your keyboard to start the demo.
+
+				<br>
+				<br>
+				This demo heavily references the "Completion Trie", as created by:
+				<br>
+				<br>
+
+				Hsu, Bo-June & Ottaviano, Giuseppe. (2013). Space-efficient Data Structures for Top-<var>k</var> Completion. WWW 2013 - Proceedings of the 22nd International Conference on World Wide Web. 583-594. 10.1145/2488388.2488440.<br>
+				<a style="text-decoration: underline;" target="_blank" rel="noopener noreferrer" href="https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/TopKCompletion.pdf">https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/TopKCompletion.pdf</a>
+
+
+				<br>
+				<br>
+				This demo is a softer introduction to the data structure explored in more depth in my paper @ <a href="https://validark.github.io/DynSDT">validark.github.io/DynSDT</a>.
+
+
+			</p>
+		</div>
+	</div>
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">The Problem</h2>
+		<div class="textual-content">
+			<p class="indented">
+				This demo introduces progressively faster solutions to the autocomplete problem. The specific problem solved here is the scored prefix completion problem, which is the
+				problem of supplying a user with the top
+				<var>k</var> (usually 10 or so) highest-scored (most relevant) completions to a given prefix string <var>p</var> as a
+				query.
+				As an example, if a user types 'r' into
+				an autocompleted search bar, they should receive a list of the highest scored (most popular) strings
+				beginning with 'r':
+			</p>
+
+			<div id="example">
+				<div class="k-content">
+					<input id="countries"
+						style="width: 50%; font-size: large"
+						disabled value="r" />
+					<div class="k-animation-container"
+						style="width: 50%;">
+						<ul class="k-reset">
+							<li class="k-item"
+								style="font-size: large">
+								rubber ducky</li>
+							<li class="k-item"
+								style="font-size: large">
+								rare fidget toys</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">The Data Structure</h2>
+		<div class="textual-content">
+			<p class="indented">
+				One solution to this problem is to use a <a class="link" href="https://en.wikipedia.org/wiki/Radix_tree" target="_blank" rel="noopener noreferrer">compacted trie</a>. To complete a prefix <var>p</var>, successive characters in <var>p</var> can be matched along the corresponding path of edges descending from the root, terminating when <var>p</var> is fully exhausted, arriving upon the locus node. The <dfn>locus node</dfn> is the highest node with <var>p</var> as a prefix and it contains all completions to <var>p</var> in its subtree.
+
+				To enumerate the top-<var>k</var> highest-scored completions to <var>p</var>, a <a class="link" href="https://en.wikipedia.org/wiki/Depth-first_search" target="_blank" rel="noopener noreferrer">(depth-first) traversal</a> over this entire subtree must be performed, and an <a class="link" href="https://en.wikipedia.org/wiki/Partial_sorting#Heap-based_solution" target="_blank" rel="noopener noreferrer">online partial sort of the top-<var>k</var> elements</a> must be performed. I.e. during the depth-first search, the top-<var>k</var> highest-scored completions found at each point can be stored in a <a class="link" href="https://en.wikipedia.org/wiki/Heap_(data_structure)" target="_blank" rel="noopener noreferrer">min-heap</a> constrained to size <var>k</var>.
+
+				<!-- which allows insert/extract operations to be performed in <span class="complexity">Theta(log k)</span> time at each step. -->
+
+				This algorithm takes a time in <span class="complexity">O(N + n log k)</span>, where <var>n</var> is the number of completions to <var>p</var> (i.e. the number of scores to insert into the min-heap) and <var>N</var> is the total length of the <var>n</var> completions (i.e. the upper bound on the number of nodes to traverse).
+			</p>
+
+			<!-- <p class="indented"> -->
+				<!-- This algorithm works perfectly for prefix completion, as the autocomplete service can easily just return the first <var>k</var> completions under the locus node.
+
+				However, for scored prefix completion, the top-<var>k</var> highest-scored completions under the locus node must be found, which could occur anywhere in its subtree. This requires a full (depth-first) traversal of the entire subtree, which takes <span class="complexity">Theta(n)</span> time, where <var>n</var> is the total length of all the completions to <var>p</var>. When the trie is large and <var>p</var> is short, this algorithm gets incredibly slow. -->
+			<!-- </p> -->
+			<!-- <p class="indented">
+				The first level is sorted like so: ("w":1220297), ("l":101139), ("o":98750)
+			</p> -->
+		</div>
+	</div>
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">Example Traversal</h2>
+		<div class="textual-content">
+			<p class="indented">
+				For example, if the given prefix <var>p</var> to complete is "li", then the edge containing "l" from the root is followed, and then the edge containing "i" is followed. Under the locus node representing "li" is all completions to "li".
+			</p>
+
+			<p class="indented">
+				In the diagram above, the edges representing "lis", "lin", "lit", and "lif" extend from "li", and each of those subtrees must be traversed in their entirety and each score must be considered as a candidate for the list of the top-<var>k</var> scored completions. Note that this diagram is merely an abbreviated slice of the dataset containing the word frequencies of every word on Wikipedia, which contains over six million terms and thus this algorithm would be incredibly slow.
+			</p>
+		</div>
+	</div>
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">The Completion Trie</h2>
+		<div class="textual-content">
+			<p class="indented">
+				To improve top-<var>k</var> enumeration time, internal nodes in the trie can be given a <i>score</i> equal to the maximum <i>score</i> in its subtree.
+
+				<!-- This allows the top-<var>k</var> search algorithm to know which path leads to the next highest-scored completion at every step. -->
+
+				The top-<var>k</var> search algorithm then becomes a variation of the <a style="text-decoration: underline;" target="_blank" rel="noopener noreferrer" href="https://en.wikipedia.org/wiki/A*_search_algorithm">A*&nbsp;search algorithm</a> with the scores serving as an exact heuristic function (<a style="text-decoration: underline" target="_blank" rel="noopener noreferrer" href="https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/TopKCompletion.pdf">Hsu & Ottaviano, 2013</a>).
+			</p>
+
+			<p class="indented">
+				The algorithm proceeds as follows:
+
+				The path to the first completion is found by following the first child on each layer with a <i>score</i> equal to the <i>score</i> in the locus node. All other children are added to a bounded <a style="text-decoration: underline" target="_blank" rel="noopener noreferrer" href="https://en.wikipedia.org/wiki/Double-ended_priority_queue">DEPQ</a> constrained to size <var>k</var> <span class="minus">-</span> 1 (which discards the minimum element when an insertion would make its size exceed <var>k</var>).
+
+				When a completion is found, <var>k</var> is decremented and the highest-scored node in the DEPQ is extracted and the same process is repeated until <var>k</var> completions are found or the DEPQ becomes empty.
+			</p>
+		</div>
+	</div>
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">Top-<var>k</var> Search Example</h2>
+		<div class="textual-content">
+			<!-- <i>k = 4</i> <br> -->
+			<i>completions = {}</i> <br>
+			<i>DEPQ = { <span class="new strikethrough">(f,&nbsp;<b>504768</b>)</span>, <span class="new">(i,&nbsp;<b>62504</b>)</span>, <span class="new">(t,&nbsp;<b>66985</b>), (o,&nbsp;<b>98750</b>)</span>, <span class="new">(l,&nbsp;<b>101139</b>)</span> }</i>
+			<br>
+			<i><var>k</var> = 5</i>
+			<p class="indented">
+				To illustrate, this example will find the top-5 completions to the empty string (<var>p</var> = "", <var>k</var> = 5). The locus node is the root, which has a score of 1220297, representing the maximum score in the trie. All children of the root are added to the DEPQ constrained to size 4, except the node representing "w", because it has the same score as the locus node. <i>(f,&nbsp;<b>504768</b>)</i> has a score lower than the 4th highest score found thus far, and therefore it is discarded from the DEPQ.
+			</p>
+
+			<p class="indented">
+				Note: You can still mouse-over any node to see its <i>(string, score)</i>. You can also click and drag the screen around and scroll to zoom.
+			</p>
+		</div>
+	</div>
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">Traversing downwards</h2>
+		<div class="textual-content">
+			<i>completions = {}</i> <br>
+			<i>DEPQ = { <span class="new strikethrough">(w$,&nbsp;<b>8393</b>)</span>, <span class="new strikethrough">(we,&nbsp;<b>17837</b>)</span>, <span class="new strikethrough">(wo,&nbsp;<b>30978</b>)</span>, (i,&nbsp;<b>62504</b>), (t,&nbsp;<b>66985</b>), (o,&nbsp;<b>98750</b>), (l,&nbsp;<b>101139</b>) }</i>
+			<br>
+			<i><var>k</var> = 5</i>
+			<p class="indented">
+				Next, the process is repeated for the children of the node representing 'w'. The node representing 'wi' will be followed next, because it too has a score of 1220297. The other nodes are added to the DEPQ, but because they all have scores lower than the lowest in the DEPQ they are all discarded. Specifically, <i>(w$,&nbsp;<b>8393</b>)</i>, <i>(we,&nbsp;<b>17837</b>)</i>, <i>(wo,&nbsp;<b>30978</b>)</i> all have scores lower than <i>(i,&nbsp;<b>62504</b>)</i>.
+			</p>
+		</div>
+	</div>
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">Cont...</h2>
+		<div class="textual-content">
+			<i>completions = {}</i> <br>
+			<i>DEPQ = { (i,&nbsp;<b>62504</b>), (t,&nbsp;<b>66985</b>), (o,&nbsp;<b>98750</b>), (l,&nbsp;<b>101139</b>) }</i>
+			<br>
+			<i><var>k</var> = 5</i>
+			<p class="indented">
+				The node representing 'wik' matches the target score of 1220297, so it will be followed downwards in the next step. All other children are pushed to the DEPQ but because they all have scores lower than <i>(i,&nbsp;<b>62504</b>)</i> they are all discarded.
+			</p>
+		</div>
+	</div>
+
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">Cont...</h2>
+		<div class="textual-content">
+			<i>completions = {}</i> <br>
+			<i>DEPQ = { (i,&nbsp;<b>62504</b>), (t,&nbsp;<b>66985</b>), (o,&nbsp;<b>98750</b>), (l,&nbsp;<b>101139</b>) }</i>
+			<br>
+			<i><var>k</var> = 5</i>
+			<p class="indented">
+				The node representing 'wiki' matches the target score of 1220297, so it will be followed downwards in the next step. All other children of the node representing 'wik' are pushed to the DEPQ, but because they all have scores lower than <i>(i,&nbsp;<b>62504</b>)</i>, it remains unchanged.
+			</p>
+		</div>
+	</div>
+
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">Cont...</h2>
+		<div class="textual-content">
+			<i>completions = {}</i> <br>
+			<i>DEPQ = { (i,&nbsp;<b>62504</b>), (t,&nbsp;<b>66985</b>), (o,&nbsp;<b>98750</b>), (l,&nbsp;<b>101139</b>) }</i>
+			<br>
+			<i><var>k</var> = 5</i>
+			<p class="indented">
+				The node representing 'wikip' matches the target score of 1220297, so it will be followed downwards in the next step. All other children of the node representing 'wiki' are pushed to the DEPQ, but because they all have scores lower than <i>(i,&nbsp;<b>62504</b>)</i>, it remains unchanged.
+			</p>
+		</div>
+	</div>
+
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">Cont...</h2>
+		<div class="textual-content">
+			<i>completions = {}</i> <br>
+			<i>DEPQ = { (i,&nbsp;<b>62504</b>), (t,&nbsp;<b>66985</b>), (o,&nbsp;<b>98750</b>), (l,&nbsp;<b>101139</b>) }</i>
+			<br>
+			<i><var>k</var> = 5</i>
+			<p class="indented">
+				The node representing 'wikipedi' matches the target score of 1220297, so it will be followed downwards in the next step. All other children of the node representing 'wikip' are pushed to the DEPQ, but because they all have scores lower than <i>(i,&nbsp;<b>62504</b>)</i>, it remains unchanged.
+			</p>
+		</div>
+	</div>
+
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">Cont...</h2>
+		<div class="textual-content">
+			<i>completions = {}</i> <br>
+			<i>DEPQ = { (i,&nbsp;<b>62504</b>), (t,&nbsp;<b>66985</b>), (o,&nbsp;<b>98750</b>), (l,&nbsp;<b>101139</b>) }</i>
+			<br>
+			<i><var>k</var> = 5</i>
+			<p class="indented">
+				The node representing 'wikipedia' matches the target score of 1220297, so it will be followed downwards in the next step. All other children of the node representing 'wikipedi' are pushed to the DEPQ, but because they all have scores lower than <i>(i,&nbsp;<b>62504</b>)</i>, it remains unchanged.
+			</p>
+		</div>
+	</div>
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">Cont...</h2>
+		<div class="textual-content">
+			<i>completions = {}</i> <br>
+			<i>DEPQ = { (i,&nbsp;<b>62504</b>), (t,&nbsp;<b>66985</b>), (o,&nbsp;<b>98750</b>), (l,&nbsp;<b>101139</b>) }</i>
+			<br>
+			<i><var>k</var> = 5</i>
+			<p class="indented">
+				The path to 'wikipedia$' will be taken next. All other children of the node representing 'wikipedia' are pushed to the DEPQ, but because they all have scores lower than <i>(i,&nbsp;<b>62504</b>)</i>, it remains unchanged.
+			</p>
+		</div>
+	</div>
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">Cont...</h2>
+		<div class="textual-content">
+			<i>completions = { <span class="new">"wikipedia"</span> }</i> <br>
+			<i>DEPQ = { (i,&nbsp;<b>62504</b>), (t,&nbsp;<b>66985</b>), (o,&nbsp;<b>98750</b>), <span class="old strikethrough">(l,&nbsp;<b>101139</b>)</span> }</i>
+			<br>
+			<i><var>k</var> = 4</i>
+			<p class="indented">
+				The node representing 'wikipedia$' is a leaf, thus it is added to the set of completions and <var>k</var> is decremented.
+				The maximum node is then extracted from the DEPQ, which yields the highest-scored node of all of the <span style="color: white; background-color: var(--SELECTED_COLOR);">candidate nodes highlighted in this color.</span> In this case, it happens to be <i>(l,&nbsp;<b>101139</b>)</i>. Therefore, the path from the node representing 'l' will be followed next, and the score of the next completion is 101139. The DEPQ is also bounded to size 3 now.
+			</p>
+			<p class="indented">
+				From here on out this demo will pick up the pace and show one completion per frame.
+			</p>
+		</div>
+	</div>
+
+
+
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">Skipping ahead</h2>
+		<div class="textual-content">
+			<i>completions = { "wikipedia", <span class="new">"list"</span> }</i> <br>
+			<i>DEPQ = { <span class="old strikethrough">(i,&nbsp;<b>62504</b>)</span>, (t,&nbsp;<b>66985</b>), (o,&nbsp;<b>98750</b>), <span class="new">(list_,&nbsp;<b>100625</b>)</span> }</i>
+			<br>
+			<i><var>k</var> = 3</i>
+			<p class="indented">
+				Following the path of nodes with scores equalling 101139 from the node representing 'l' leads to the leaf representing 'list$', now added to the set of completions.
+
+				All of the new candidate nodes are pushed to the DEPQ, but only <i>(list_,&nbsp;<b>100625</b>)</i> makes it in. During insertion, the lowest value in the DEPQ <i>(i,&nbsp;<b>62504</b>)</i> is bumped out.
+			</p>
+		</div>
+	</div>
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">Cont...</h2>
+		<div class="textual-content">
+			<i>completions = { "wikipedia", "list", <span class="new">"list&nbsp;of"</span> }</i> <br>
+			<i>DEPQ = { (t,&nbsp;<b>66985</b>), (o,&nbsp;<b>98750</b>), <span class="old strikethrough">(list_,&nbsp;<b>100625</b>)</span> }</i>
+			<br>
+			<i><var>k</var> = 2</i>
+			<p class="indented">
+				The next completion is found by extracting the maximum from the DEPQ, which is <i>(list_,&nbsp;<b>100625</b>)</i>. <var>k</var> is decremented again and the DEPQ is now bounded to size 2.
+				The path formed by nodes with scores equalling 100625 which starts at the node representing 'list_' is followed to its corresponding leaf, which represents "list_of$", which gets pushed to the completions list. None of the children of the nodes representing "list_", "list_o", or "list_of" have scores large enough to penetrate the DEPQ, so it remains unchanged.
+			</p>
+		</div>
+	</div>
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">Cont...</h2>
+		<div class="textual-content">
+			<i>completions = { "wikipedia", "list", "list&nbsp;of", <span class="new">"of"</span> }</i> <br>
+			<i>DEPQ = { (t,&nbsp;<b>66985</b>), <span class="old strikethrough">(o,&nbsp;<b>98750</b>)</span> }</i>
+			<br>
+			<i><var>k</var> = 1</i>
+			<p class="indented">
+				The next completion is found by extracting the maximum from the DEPQ, which is <i>(o,&nbsp;<b>98750</b>)</i>. <var>k</var> is decremented again and the DEPQ is now bounded to size 1.
+				The path formed by nodes with scores equalling 98750 which starts at the node representing 'o' is followed to its corresponding leaf, which represents "of$", which gets pushed to the completions list. Again none of the nodes along the path have scores large enough to penetrate the DEPQ, so it remains unchanged.
+			</p>
+		</div>
+	</div>
+
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">Cont...</h2>
+		<div class="textual-content">
+			<i>completions = { "wikipedia", "list", "list&nbsp;of", "of", <span class="new">"the"</span> }</i> <br>
+			<i>DEPQ = { <span class="old strikethrough">(t,&nbsp;<b>66985</b>)</span> }</i>
+			<br>
+			<i><var>k</var> = 0</i>
+			<p class="indented">
+				The next completion is found by extracting the maximum from the DEPQ, which is <i>(t,&nbsp;<b>66985</b>)</i>. <var>k</var> is decremented again and the DEPQ is now bounded to size 0.
+
+				The path formed by nodes with scores equalling 66985 which starts at the node representing 't' is followed to its corresponding leaf, which represents "the$", which gets pushed to the completions list. Since the DEPQ is constrained to size 0, none of the nodes along the path are inserted into the DEPQ.
+			</p>
+		</div>
+	</div>
+
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">Time Complexity Analysis</h2>
+		<div class="textual-content">
+			<p class="indented">
+				The top-<var>k</var> search over this structure (not including the time to find the locus node) takes <span class="complexity">Theta(bdk log k)</span> time in the worst-case, where <var>d</var> is the average <i>depth</i> of each of the <var>k</var> leaf nodes sought by this algorithm, and <var>b</var> is the average <i>breadth</i> of each visited level. This results from <span class="complexity">Theta(bdk)</span> nodes being inserted into the DEPQ (and <var>k</var> of those being extracted), which takes worst-case <span class="complexity">Theta(log k)</span> time for each (even though many of the nodes could be rejected with a single comparison against the minimum element in the DEPQ).
+			</p>
+		</div>
+	</div>
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">Speeding up query time</h2>
+		<div class="textual-content">
+			<p class="indented">
+				To improve this search time, Hsu & Ottaviano (<a style="text-decoration: underline" target="_blank" rel="noopener noreferrer" href="https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/TopKCompletion.pdf">2013</a>) sort each horizontal layer during preprocessing. Rather than inserting into the DEPQ <em>every</em> child of each node iteratively extracted, only the second highest scored node from each level along the path to the next completion is added to the DEPQ as the first-child nodes are iteratively followed to the leaf representing the next completion.
+
+				Each node in the DEPQ thus acts like a forward iterator which inserts (among others) the next element on its level when extracted (<a style="text-decoration: underline" target="_blank" rel="noopener noreferrer" href="https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/TopKCompletion.pdf">Hsu & Ottaviano, 2013</a>).
+			</p>
+		</div>
+	</div>
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">Speeding up query time</h2>
+		<div class="textual-content">
+			<p class="indented">
+				When the trie is drawn in the <a style="text-decoration: underline" target="_blank" rel="noopener noreferrer" href="https://en.wikipedia.org/wiki/Left-child_right-sibling_binary_tree">left-child right sibling representation</a>, finding the top-5 completions to the empty string (<var>p</var> = "", <var>k</var> = 5) looks exactly like the <a style="text-decoration: underline;" target="_blank" rel="noopener noreferrer" href="https://en.wikipedia.org/wiki/K-way_merge_algorithm"><var>k</var>-way&nbsp;merge algorithm</a>.
+			</p>
+		</div>
+	</div>
+
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">Top-<var>k</var> Search Example</h2>
+		<div class="textual-content">
+			<i>completions = { <span class="new">"wikipedia"</span> }</i> <br>
+			<i>DEPQ = { <span class="new strikethrough">(wikipediocracy,&nbsp;<b>1</b>)</span>, <span class="new strikethrough">(wikipro,&nbsp;<b>1</b>)</span>, <span class="new strikethrough">(wikim,&nbsp;<b>17</b>)</span>, <span class="new strikethrough">(wikipedia_,&nbsp;<b>18</b>)</span>, <span class="new">(wikt,&nbsp;<b>36</b>)</span>, <span class="new">(wil,&nbsp;<b>27706</b>)</span>, <span class="new">(wo,&nbsp;<b>30978</b>)</span>, <span class="new">(l,&nbsp;<b>101139</b>)</span> }</i>
+
+			<br>
+			<i><var>k</var> = 4</i>
+			<p class="indented">
+
+
+				Because nodes are sorted on each level by their <i>score</i>,
+
+				the first completion is the leaf at the end of the chain of first-child nodes starting at the locus node. In other words,
+
+				the first completion is either the locus node itself, or its first child, or that node's first child, and so on. The nodes adjacent to the path to the first completion are added to the DEPQ which is constrained to size 4.
+					<!-- <pre style ="margin-top: -20pt; margin-left: 35%">
+<code>
+let node = locusNode
+while node.child != null do
+    node = node.child
+
+results.push(node.toString())</code>
+					</pre> -->
+			</p>
+		</div>
+	</div>
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">Top-<var>k</var> Search Example</h2>
+		<div class="textual-content">
+			<i>completions = { "wikipedia", <span class="new">"list"</span> }</i> <br>
+			<i>DEPQ = { <span class="old strikethrough">(wikt,&nbsp;<b>36</b>)</span>,
+
+
+				<span class="old strikethrough">(wil,&nbsp;<b>27706</b>)</span>, (wo,&nbsp;<b>30978</b>), <span class="new">(o,&nbsp;<b>98750</b>)</span>, <span class="new">(list_,&nbsp;<b>100625</b>)</span>, <span class="old strikethrough">(l,&nbsp;<b>101139</b>)</span> }</i>
+
+				<br>
+				<i><var>k</var> = 3</i>
+			<p class="indented">
+				Next, <var>k</var> is decremented and the maximum node from the DEPQ is extracted, which is <i>(l,&nbsp;<b>101139</b>)</i>. The extracted node's first-child path is followed down to the leaf, and all nodes adjacent to the path are added to the DEPQ which is now constrained to size 3. The net effect on the DEPQ is that <i>(o,&nbsp;<b>98750</b>)</i> and <i>(list_,&nbsp;<b>100625</b>)</i> supplant <i>(wikt,&nbsp;<b>36</b>)</i> and <i>(wil,&nbsp;<b>27706</b>)</i>.
+
+				The nodes <i>(le,&nbsp;<b>22168</b>)</i>, <i>(lin,&nbsp;<b>6574</b>)</i> and <i>(lisa,&nbsp;<b>1342</b>)</i> are ultimately discarded as well.
+			</p>
+		</div>
+	</div>
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">Top-<var>k</var> Search Example</h2>
+		<div class="textual-content">
+			<i>completions = { "wikipedia", "list", <span class="new">"list&nbsp;of"</span> }</i> <br>
+			<i>DEPQ = { (wo,&nbsp;<b>30978</b>), (o,&nbsp;<b>98750</b>), <span class="old strikethrough">(list_,&nbsp;<b>100625</b>)</span> }</i>
+
+			<br>
+			<i><var>k</var> = 2</i>
+			<p class="indented">
+				Next, <var>k</var> is decremented and the maximum node from the DEPQ is extracted, which is <i>(list_,&nbsp;<b>100625</b>)</i>. The extracted node's first-child path is followed down to the leaf, and all nodes adjacent to the path are added to the DEPQ which is now constrained to size 2. The nodes along the path (<i>(listi,&nbsp;<b>2974</b>)</i>, <i>(list_a,&nbsp;<b>50</b>)</i> and <i>(list ob,&nbsp;<b>1</b>)</i>) have lower scores than <i>(wo,&nbsp;<b>30978</b>)</i> and therefore have no effect on the DEPQ.
+			</p>
+		</div>
+	</div>
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">Top-<var>k</var> Search Example</h2>
+		<div class="textual-content">
+			<i>completions = { "wikipedia", "list", "list&nbsp;of", <span class="new">"of"</span> }</i> <br>
+			<i>DEPQ = { <span class="old strikethrough">(wo,&nbsp;<b>30978</b>)</span>, <span class="new">(t,&nbsp;<b>66985</b>)</span>, <span class="old strikethrough">(o,&nbsp;<b>98750</b>)</span> }</i>
+
+			<br>
+			<i><var>k</var> = 1</i>
+			<p class="indented">
+				Next, <var>k</var> is decremented and the maximum node from the DEPQ is extracted, which is <i>(o,&nbsp;<b>98750</b>)</i>. The extracted node's first-child path is followed down to the leaf, and all nodes adjacent to the path are added to the DEPQ which is now constrained to size 1. The net effect on the DEPQ is that <i>(t,&nbsp;<b>66985</b>)</i> supplants <i>(wo,&nbsp;<b>30978</b>)</i>.
+
+				The nodes <i>(op,&nbsp;<b>13563</b>)</i> and <i>(of_,&nbsp;<b>46771</b>)</i> are pushed to the DEPQ but are discarded as well.
+			</p>
+		</div>
+	</div>
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">Top-<var>k</var> Search Example</h2>
+		<div class="textual-content">
+			<i>completions = { "wikipedia", "list", "list&nbsp;of", "of", <span class="new">"the"</span> }</i> <br>
+			<i>DEPQ = { <span class="old strikethrough">(t,&nbsp;<b>66985</b>)</span> }</i>
+
+			<br>
+			<i><var>k</var> = 0</i>
+			<p class="indented">
+				Lastly, <var>k</var> is decremented and the maximum node from the DEPQ is extracted, which is <i>(t,&nbsp;<b>66985</b>)</i>. The extracted node's first-child path is followed down to the leaf, yielding the last completion. The DEPQ is constrained to size 0 so nodes along the path cannot be inserted into the DEPQ.
+			</p>
+		</div>
+	</div>
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">Time Complexity Analysis</h2>
+		<div class="textual-content">
+			<p class="indented">
+				The top-<var>k</var> search over this structure (not including the time to find the locus node) takes <span class="complexity">Theta(dk log k)</span> time in the worst-case, where <var>d</var> is the average <i>depth</i> of each of the <var>k</var> leaf nodes sought by this algorithm. This results from <span class="complexity">Theta(dk)</span> nodes being inserted into the DEPQ (and <var>k</var> of those being extracted), which takes worst-case <span class="complexity">Theta(log k)</span> time for each (even though many of the nodes could be rejected with a single comparison against the minimum element in the DEPQ).
+			</p>
+		</div>
+	</div>
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">Further Improvement</h2>
+		<div class="textual-content">
+			<p class="indented">
+				Intuitively, since sorting horizontally removed the breadth factor <var>b</var>, it stands to reason that sorting vertically on top of that will remove the depth factor <var>d</var>. Then, instead of inserting all the nodes along the path to the leaf, only the (next) highest-scored node from each vertical list needs to be in the priority queue at any given time.
+
+				<table class="complexity-table" style="margin: 1em">
+					<thead>
+						<tr>
+							<th>Data Structure</th>
+							<th>Top-<var>k</var> Search Time</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>Unsorted Completion Trie<span class="invisible" data-str="?"></span></td>
+							<td><span class="complexity">Theta(bdk log k)</span></td>
+						</tr>
+						<tr>
+							<td>Horizontally Sorted Completion Trie<span class="invisible" data-str="?"></span></td>
+							<td><span class="complexity">Theta(dk log k)</span></td>
+						</tr>
+						<tr>
+							<td>Horizontally <em>and</em> Vertically Sorted Trie?</td>
+							<td><span class="complexity">Theta(k log k)</span></td>
+						</tr>
+					</tbody>
+
+				</table>
+
+				However, the trie needs to be <em>decomposed</em> to support vertical sorting.
+			</p>
+		</div>
+	</div>
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">The Dynamic Decomposed Trie</h2>
+		<div class="textual-content">
+			<p class="indented">
+				The previous trie is <dfn>decomposed</dfn> by compressing paths to maximum completions and labeling the branch points along each compressed path with their longest common prefix length (LCP) with the maximum completion. E.g. The path to "wikipedia$" is compressed into the root node, and the first-sibling along the path representing "wo" was compressed into "world", and those strings have an LCP of 1 because because they have the prefix "w" in common (which has a length of 1).
+			</p>
+		</div>
+	</div>
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">The Dynamic Score-Decomposed Trie</h2>
+		<div class="textual-content">
+			<p class="indented">
+				Now that LCP values are explicitly stored, the structure can be sorted <em>vertically</em>. Since this structure was already sorted horizontally, it doubles as a <a style="text-decoration: underline;" target="_blank" rel="noopener noreferrer" href="https://en.wikipedia.org/wiki/Binary_heap">max-heap</a> as well as a trie.
+			</p>
+		</div>
+	</div>
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">Max heap view</h2>
+		<div class="textual-content">
+			<p class="indented">
+				When this structure is drawn in the <a style="text-decoration: underline" target="_blank" rel="noopener noreferrer" href="https://en.wikipedia.org/wiki/Left-child_right-sibling_binary_tree">left-child right sibling representation</a>, it becomes apparent that the top-<var>k</var> search algorithm over this data structure is equivalent to <a style="text-decoration: underline" target="_blank" rel="noopener noreferrer" href="https://www.quora.com/If-you-had-a-max-heap-with-n-elements-and-want-to-get-the-K-largest-elements-without-popping-and-rebalancing-how-would-you-do-it">finding the top-k nodes from an immutable max heap</a>.
+			</p>
+		</div>
+	</div>
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">The first two completions</h2>
+		<div class="textual-content">
+			<i>completions = { <span class="new">"wikipedia"</span>, <span class="new">"list"</span> }</i> <br>
+			<i>DEPQ = { <span class="new">(world,&nbsp;<b>30978</b>)</span>, <span class="new">(list&nbsp;of,&nbsp;<b>100625</b>)</span> }</i>
+			<br>
+			<i><var>k</var> = 3</i>
+
+			<p class="indented">
+				The first completion is the locus node, which in this case is the root <i>(wikipedia,&nbsp;<b>1220297</b>)</i> because <var>p</var> is the empty string. The second completion is its first branch point*, in this case <i>(list,&nbsp;<b>101139</b>)</i>. Since the first two completions have already been found, <var>k</var> is decremented twice. Next, the branch point succeeding <i>(list,&nbsp;<b>101139</b>)</i> in its vertical list is pushed to the DEPQ constrained to size <var>k</var> (which is 3 after being decremented twice), as is its first branch point.
+			</p>
+
+			<p>
+				* Simplification, will be elaborated upon later
+			</p>
+		</div>
+	</div>
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">The third completion</h2>
+		<div class="textual-content">
+			<i>completions = { "wikipedia", "list", <span class="new">"list&nbsp;of"</span> }</i> <br>
+			<i>DEPQ = { <span class="new strikethrough">(listings,&nbsp;<b>2974</b>)</span>, (world,&nbsp;<b>30978</b>), <span class="new">(of,&nbsp;<b>98750</b>)</span>, <span class="old strikethrough">(list&nbsp;of,&nbsp;<b>100625</b>)</span> }</i>
+			<br>
+			<i><var>k</var> = 2</i>
+			<p class="indented">
+				The highest-scored completion is then extracted from the DEPQ, which in this case is <i>(list&nbsp;of,&nbsp;<b>100625</b>)</i>. It is pushed to the output list and <var>k</var> is decremented, constraining the DEPQ to size 2. Next the successor branch point and first branch point within the node <i>(list&nbsp;of,&nbsp;<b>100625</b>)</i> are pushed to the DEPQ. <i>(listings,&nbsp;<b>2974</b>)</i> gets discarded, but <i>(of,&nbsp;<b>98750</b>)</i> becomes the new maximum, so it will be selected next.
+			</p>
+		</div>
+	</div>
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">The fourth completion</h2>
+		<div class="textual-content">
+			<i>completions = { "wikipedia", "list", "list&nbsp;of", <span class="new">"of"</span> }</i> <br>
+			<i>DEPQ = { <span class="new strikethrough">(league,&nbsp;<b>22168</b>)</span>, <span class="old strikethrough">(world,&nbsp;<b>30978</b>)</span>, <span class="new">(the,&nbsp;<b>66985</b>)</span>, <span class="old strikethrough">(of,&nbsp;<b>98750</b>)</span> }</i>
+			<br>
+			<i><var>k</var> = 1</i>
+			<p class="indented">
+				<i>(of,&nbsp;<b>98750</b>)</i> is extracted from the DEPQ and pushed to the output list, decrementing <var>k</var>, thereby constraining the DEPQ to size 1. <i>(league,&nbsp;<b>22168</b>)</i> and <i>(the,&nbsp;<b>66985</b>)</i> are then pushed to the DEPQ, which ultimately retains only <i>(the,&nbsp;<b>66985</b>)</i>.
+			</p>
+		</div>
+	</div>
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">The fifth completion</h2>
+		<div class="textual-content">
+			<i>completions = { "wikipedia", "list", "list&nbsp;of", "of", <span class="new">"the"</span> }</i> <br>
+			<i>DEPQ = { <span class="old strikethrough">(the,&nbsp;<b>66985</b>)</span> }</i>
+			<br>
+			<i><var>k</var> = 0</i>
+			<p class="indented">
+				The last value is extracted from the DEPQ and pushed to the output list. <var>k</var> is decremented to 0, so no further nodes are added to the DEPQ.
+			</p>
+		</div>
+	</div>
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">Time Complexity Analysis</h2>
+		<div class="textual-content">
+			<p class="indented">
+				The top-<var>k</var> search demonstrated here takes <span class="complexity">Theta(k log k)</span> time in the worst-case. This results from <span class="complexity">Theta(k)</span> nodes being inserted into and extracted from the DEPQ, which takes worst-case <span class="complexity">Theta(log k)</span> time for each (even though many of the nodes could be rejected with a single comparison against the minimum element in the DEPQ).
+			</p>
+
+
+			<p class="indented">
+				However, because the structure was queried with the empty string, the algorithm was simplified slightly. Next, the structure will be queried with (<var>p</var> = "li", <var>k</var> = 10) to demonstrate a more realistic query.
+			</p>
+		</div>
+	</div>
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">Finding the locus node</h2>
+		<div class="textual-content">
+			<i>completions = { <span class="new">"list"</span> }</i> <br>
+			<i>DEPQ = {}</i> <br>
+			<i><var>k</var> = 9</i>
+			<p class="indented">
+				To find the locus node, the algorithm starts at the root <i>(0, wikipedia)</i> and computes the LCP with between its string and <var>p</var>, in this case LCP("wikipedia", "li") = 0. Thus, the algorithm moves to the LCP matching 0 in the current node's list of branch points, which happens to be the first node in this case: <i>(0, "list")</i>. The same process is repeated until the LCP = <span class="complexity">|p|</span>. In this case, LCP("list", "li") = 2, so <i>(0, "list")</i> is the locus node. The locus node is the first completion, so it is pushed to the output list.
+			</p>
+
+			<p class="indented">
+				The second completion will be discussed in the next step.
+			</p>
+		</div>
+	</div>
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">The second completion</h2>
+		<div class="textual-content">
+			<i>completions = { "list", <span class="new">"list&nbsp;of"</span> }</i> <br>
+			<i>DEPQ = { <span class="new">(listings,&nbsp;<b>2974</b>)</span>, <span class="new">(line,&nbsp;<b>6574</b>)</span> }</i> <br>
+			<i><var>k</var> = 8</i>
+			<p class="indented">
+				The second completion to "li" is the first branch point contained in the locus with an LCP &ge; <span class="complexity">|p|</span>. In this case, it does not change the second completion, but it does change which vertical successor of the second completion is inserted into the DEPQ. In this case, <i>(0, "of")</i> and <i>(1, "league")</i> are not valid completions to <var>p</var>, both with LCP &lt; <span class="complexity">|p|</span>.
+			</p>
+		</div>
+	</div>
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">Cont...</h2>
+		<div class="textual-content">
+			<i>completions = { "list", "list&nbsp;of", <span class="new">"line"</span> }</i> <br>
+			<i>DEPQ = { <span class="new">(lisa,&nbsp;<b>1342</b>)</span>, (listings,&nbsp;<b>2974</b>), <span class="new">(little,&nbsp;<b>6371</b>)</span>, <span class="old strikethrough">(line,&nbsp;<b>6574</b>)</span> }</i> <br>
+			<i><var>k</var> = 7</i>
+			<p class="indented">
+				The rest of the algorithm continues the same way as already described.
+			</p>
+		</div>
+	</div>
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">Cont...</h2>
+		<div class="textual-content">
+			<i>completions = { "list", "list&nbsp;of", "line", <span class="new">"little"</span> }</i> <br>
+			<i>DEPQ = { (lisa,&nbsp;<b>1342</b>), (listings,&nbsp;<b>2974</b>), <span class="new">(life,&nbsp;<b>5939</b>)</span>, <span class="old strikethrough">(little,&nbsp;<b>6371</b>)</span> }</i> <br>
+			<i><var>k</var> = 6</i>
+			<p class="indented">
+
+			</p>
+		</div>
+	</div>
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">Cont...</h2>
+		<div class="textual-content">
+			<i>completions = { "list", "list&nbsp;of", "line", "little", <span class="new">"life"</span> }</i> <br>
+			<i>DEPQ = { (lisa,&nbsp;<b>1342</b>), (listings,&nbsp;<b>2974</b>), <span class="old strikethrough">(life,&nbsp;<b>5939</b>)</span> }</i> <br>
+			<i><var>k</var> = 5</i>
+			<p class="indented">
+
+			</p>
+		</div>
+	</div>
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">Cont...</h2>
+		<div class="textual-content">
+			<i>completions = { "list", "list&nbsp;of", "line", "little", "life", <span class="new">"listings"</span> }</i> <br>
+			<i>DEPQ = { <span class="new">(list&nbsp;a,&nbsp;<b>50</b>)</span>, (lisa,&nbsp;<b>1342</b>), <span class="new">(listed,&nbsp;<b>2957</b>)</span>, <span class="old strikethrough">(listings,&nbsp;<b>2974</b>)</span> }</i> <br>
+			<i><var>k</var> = 4</i>
+			<p class="indented">
+
+			</p>
+		</div>
+	</div>
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">Cont...</h2>
+		<div class="textual-content">
+			<i>completions = { "list", "list&nbsp;of", "line", "little", "life", "listings", <span class="new">"listed"</span> }</i> <br>
+			<i>DEPQ = { (list&nbsp;a,&nbsp;<b>50</b>), (lisa,&nbsp;<b>1342</b>), <span class="old strikethrough">(listed,&nbsp;<b>2957</b>)</span> }</i> <br>
+			<i><var>k</var> = 3</i>
+			<p class="indented">
+
+			</p>
+		</div>
+	</div>
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">Cont...</h2>
+		<div class="textual-content">
+			<i>completions = { "list", "list&nbsp;of", "line", "little", "life", "listings", "listed", <span class="new">"lisa"</span> }</i> <br>
+			<i>DEPQ = { (list&nbsp;a,&nbsp;<b>50</b>), <span class="new">(lisbon,&nbsp;<b>303</b>)</span>, <span class="old strikethrough">(lisa,&nbsp;<b>1342</b>)</span> }</i> <br>
+			<i><var>k</var> = 2</i>
+			<p class="indented">
+
+			</p>
+		</div>
+	</div>
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">Cont...</h2>
+		<div class="textual-content">
+			<i>completions = { "list", "list&nbsp;of", "line", "little", "life", "listings", "listed", "lisa", <span class="new">"lisbon"</span> }</i> <br>
+			<i>DEPQ = { (list&nbsp;a,&nbsp;<b>50</b>), <span class="new">(lise,&nbsp;<b>136</b>)</span>, <span class="old strikethrough">(lisbon,&nbsp;<b>303</b>)</span> }</i> <br>
+			<i><var>k</var> = 1</i>
+			<p class="indented">
+
+			</p>
+		</div>
+	</div>
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">The last completion</h2>
+		<div class="textual-content">
+			<i>completions = { "list", "list&nbsp;of", "line", "little", "life", "listings", "listed", "lisa", "lisbon", <span class="new">"lise"</span> }</i> <br>
+			<i>DEPQ = { (list&nbsp;a,&nbsp;<b>50</b>), <span class="old strikethrough">(lise,&nbsp;<b>136</b>)</span> }</i> <br>
+			<i><var>k</var> = 0</i>
+			<p class="indented">
+			</p>
+		</div>
+	</div>
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">Time Complexity Analysis (Revised)</h2>
+		<div class="textual-content">
+			<p class="indented">
+				As demonstrated, it is possible that the top-<var>k</var> search algorithm may need to skip all nodes contained directly within the locus node with an LCP &lt; <span class="complexity">|p|</span>, of which there are at most <span class="complexity">|p|</span>. Accounting for this, the time complexity for this algorithm is in <span class="complexity">O(|p| + k log k)</span>.
+			</p>
+			<p class="indented">
+				Assuming the locus node can be found in <span class="complexity">Theta(|p|)</span> time, the total time it takes to find the locus node and perform the top-<var>k</var> search is <span class="complexity">Theta(|p| + k log k)</span>.
+			</p>
+		</div>
+	</div>
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">Fin</h2>
+		<div class="textual-content">
+			<p class="indented">
+				Thank you for making it this far! If you appreciated this, you should read the paper @ <a href="https://validark.github.io/DynSDT/demo">validark.github.io/DynSDT</a>!
+			</p>
+		</div>
+	</div>
+
+
+	<!-- <div class="control-pane" hidden>
+		<h2 class="underline">Data Structure API</h2>
+		<div class="textual-content">
+			<body>
+				<p class="indented">
+					This data structure is queried with a prefix string <i>p</i> and an integer <i>k</i> representing the maximum number of completions to string <i>p</i> which should be computed.
+				</p>
+
+				<p class="indented">
+					The first step of the completion algorithm finds the locus node which represents <i>p</i> in the trie. This can be accomplished by standard trie-traversal (linear search at each layer or maintain an additional lexicographical ordering for binary searching or <a class="link" href="https://en.wikipedia.org/wiki/Bitwise_trie_with_bitmap" target="_blank" rel="noopener noreferrer">using the popcount method on an Array-Mapped Trie</a>) or via a HashMap (for fewer pointer indirections).
+				</p>
+				<p class="indented">
+					In any case, once we've found our locus node we can begin finding the completions in its subtree.
+					This demonstration will query the data structure with (<i>p</i><code> = ""</code>, <i>k</i><code> = 5</code>). In other words, we will compute the top 5 completions under the root node.
+				</p>
+			</body>
+		</div>
+	</div> -->
+
+</div>
+<script src="../paper/formatComplexity.js"></script>
+<script>
+	for (const x of document.getElementsByClassName("complexity"))
+		x.innerHTML = formatComplexity(x.innerHTML)
+</script>
+<script src="../src/sigma.core.js"></script>
+<script src="../node_modules/svgcanvas/dist/svgcanvas.js"></script>
+<script src="../src/conrad.js"></script>
+<script src="../src/utils/sigma.utils.js"></script>
+<script src="../src/utils/sigma.polyfills.js"></script>
+<script src="../src/sigma.settings.js"></script>
+<script src="../src/classes/sigma.classes.dispatcher.js"></script>
+<script src="../src/classes/sigma.classes.configurable.js"></script>
+<script src="../src/classes/sigma.classes.graph.js"></script>
+<script src="../src/classes/sigma.classes.camera.js"></script>
+<script src="../src/classes/sigma.classes.quad.js"></script>
+<script src="../src/classes/sigma.classes.edgequad.js"></script>
+<script src="../src/captors/sigma.captors.mouse.js"></script>
+<script src="../src/captors/sigma.captors.touch.js"></script>
+<script src="../src/renderers/sigma.renderers.canvas.js"></script>
+<script src="../src/renderers/sigma.renderers.webgl.js"></script>
+<script src="../src/renderers/sigma.renderers.svg.js"></script>
+<script src="../src/renderers/sigma.renderers.def.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.nodes.def.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.nodes.fast.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.edges.def.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.edges.fast.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.edges.arrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.labels.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.hovers.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.nodes.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.curve.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.arrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.curvedArrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.curve.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.arrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.curvedArrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.extremities.def.js"></script>
+<script src="../src/renderers/svg/sigma.svg.utils.js"></script>
+<script src="../src/renderers/svg/sigma.svg.nodes.def.js"></script>
+<script src="../src/renderers/svg/sigma.svg.edges.def.js"></script>
+<script src="../src/renderers/svg/sigma.svg.edges.curve.js"></script>
+<script src="../src/renderers/svg/sigma.svg.labels.def.js"></script>
+<script src="../src/renderers/svg/sigma.svg.hovers.def.js"></script>
+<script src="../src/middlewares/sigma.middlewares.rescale.js"></script>
+<script src="../src/middlewares/sigma.middlewares.copy.js"></script>
+<script src="../src/misc/sigma.misc.animation.js"></script>
+<script src="../src/misc/sigma.misc.bindEvents.js"></script>
+<script src="../src/misc/sigma.misc.bindDOMEvents.js"></script>
+<script src="../src/misc/sigma.misc.drawHovers.js"></script>
+<script src="../plugins/sigma.renderers.edgeLabels/settings.js"></script>
+<script src="../plugins/sigma.renderers.edgeLabels/sigma.canvas.edges.labels.def.js"></script>
+<script src="../plugins/sigma.renderers.customEdgeShapes/sigma.canvas.edges.dashedArrow.js"></script>
+<script src="../plugins/sigma.renderers.customEdgeShapes/sigma.canvas.edges.arcArrow.js"></script>
+<script src="../plugins/sigma.plugins.dragNodes/sigma.plugins.dragNodes.js"></script>
+<script src="../plugins/sigma.plugins.filter/sigma.plugins.filter.js"></script>
+<script src="../plugins/sigma.plugins.animate/sigma.plugins.animate.js"></script>
+<!-- <script src="../plugins/sigma.layout.forceAtlas2/worker.js"></script>
+<script src="../plugins/sigma.layout.forceAtlas2/supervisor.js"></script>
+<script src="../plugins/sigma.exporters.svg/sigma.exporters.svg.js"></script>
+<script src="../plugins/sigma.parsers.json/sigma.parsers.json.js"></script>
+<script src="../plugins/sigma.renderers.edgeLabels/settings.js"></script>
+<script src="../plugins/sigma.renderers.edgeLabels/sigma.canvas.edges.labels.def.js"></script>
+<script src="../plugins/sigma.renderers.edgeLabels/sigma.canvas.edges.labels.curve.js"></script>
+<script src="../plugins/sigma.renderers.edgeLabels/sigma.canvas.edges.labels.curvedArrow.js"></script> -->
+
+
+<!-- <script src="../plugins/sigma.plugins.dragNodes/sigma.plugins.dragNodes.js"></script> -->
+<script src="data/trie.js"></script>
+<script src="./edge-renderers.js"></script>
