@@ -767,6 +767,14 @@ a[property="schema:citation"] {
 	hyphens: none;
 }
 
+section#references > p > a:hover {
+	text-decoration: none;
+}
+
+section#references > p > a:hover > b.libre {
+	text-decoration: underline;
+}
+
 code {
 	border: 1px solid rgba(0, 0, 0, 0.1);
 	border-radius: 0.3em;
