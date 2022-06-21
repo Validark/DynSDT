@@ -70,6 +70,15 @@ span.ThinSpace:after {
 	/* content: ' '; */
 }
 
+span.ThickSpace:after {
+	content: ' ';
+}
+
+span.plus {
+	font-family: KaTeX_Typewriter;
+	line-height: 0;
+}
+
 article {
 	/* font-size: 1.166666666666667em; */
 	/* font-weight: 300; */
@@ -151,9 +160,11 @@ table > tbody > tr > td > span.complexity {
 	word-spacing: 0.25em;
 }
 
-.theta, .big-O {
+.theta,
+.big-O {
 	font-variant-caps: normal;
-	font-family: serif;
+	font-family: Georgia, Times, 'Times New Roman', serif;
+	/* Cochin */
 	line-height: 0;
 	/* display: inline-block; */
 	margin: 0;
@@ -163,7 +174,11 @@ table > tbody > tr > td > span.complexity {
 	justify-self: left; */
 	/* margin-left: -0.15em; */
 
-	font-size: 1.25em;
+	/* font-size: 1.125em;
+	vertical-align: -0.0625em; */
+
+	font-size: 1.15em;
+	/* vertical-align: -0.09375em; */
 	vertical-align: -0.075em;
 	font-style: italic;
 	/* display: inline-block; */
@@ -174,12 +189,35 @@ table > tbody > tr > td > span.complexity {
 	break-after: avoid;
 }
 
+var, .var {
+	/* margin-right: 0.025em;
+    margin-left: 0.025em; */
+	/* 0.833333333333em; */
+	/* font-size: 0.8em; */
+	/* font-family: 'Old Standard TT', "Libre Baskerville", 'Playfair Display', serif; */
+	/* font-size: 1em; */
+	font-family: "KaTeX_Math", Times, 'Times New Roman', serif;
+	font-variant-caps: normal;
+	font-style: italic;
+	/* margin-left: 0.05em;
+	margin-right: 0.05em; */
+	/* padding-left: 0; */
+	font-size: 1.075em;
+	/* vertical-align: -0.025em; */
+	/* font-weight: normal; */
 
-/* var::before {
-	content: "";
-	margin-top: -9px;
-	height: 0;
-} */
+	/* white-space: nowrap; */
+
+	/* padding: 0;
+	margin: 0; */
+	/* padding-top: -10em; */
+	/* height: max-content; */
+	line-height: 0;
+	/* transform: translateY(2.11em); */
+	/* padding-top: 1; */
+	/* font-style: oblique; */
+}
+
 /* display: block; */
 
 * {
@@ -283,29 +321,6 @@ body > section, article {
   margin: 0 auto 1em auto;
   /* max-width: 900px; */
 }
-
-/* section:target h2, section:target h3, article:target h1 {
-  color: #2196f3;
-} */
-
-/* <a class="headerlink" href="#classes" title="Permanent link">¶</a> */
-
-/*
-function auto_id_headings( $content ) {
-	$content = preg_replace_callback( '/(\<h[1-6](.*?))\>(.*)(<\/h[1-6]>)/i', function( $matches ) {
-		if ( ! stripos( $matches[0], 'id=' ) ) :
-			$heading_link = '<a href="#' . sanitize_title( $matches[3] ) . '" class="heading-link"><i class="glyphicon glyphicon-link"></i></a>';
-			$matches[0] = $matches[1] . $matches[2] . ' id="' . sanitize_title( $matches[3] ) . '">' . $heading_link . $matches[3] . $matches[4];
-		endif;
-
-		return $matches[0];
-	}, $content );
-
-    return $content;
-
-}
-add_filter( 'the_content', 'auto_id_headings' );
-*/
 
 a.heading-link {
 	text-decoration: none !important;
