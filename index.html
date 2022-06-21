@@ -157,7 +157,7 @@
 				<span class="complexity"><span class="theta">Θ</span>(<var>d</var><var>k</var><span class="ThinSpace"></span>log<span class="ThinSpace"></span><var>k</var>)</span> time.
 			</p>
 			<figure id="completion_trie">
-				<a target="_blank" rel="noopener noreferrer" href="https://example.com"><img src="./completion_trie3.svg"></a>
+				<a target="_blank" rel="noopener noreferrer" href="https://validark.github.io/DynSDT/demo/"><img src="./completion_trie3.svg"></a>
 				<figcaption>
 					<a class="internal-link" href="#completion_trie">Figure 1.</a>
 					The first step for the empty string query (<var>p</var> = “”) over a <i>Completion Trie</i> is depicted.
@@ -218,7 +218,7 @@
 				Each decomposed first-sibling node is further labeled with a <dfn>branch point</dfn> which denotes the longest common prefix length between the string it represents and its parent's.
 			</p>
 			<figure id="decomposed_trie">
-				<a target="_blank" rel="noopener noreferrer" href="https://example.com"><img src="./decomposed_trie2.svg"></a>
+				<a target="_blank" rel="noopener noreferrer" href="https://validark.github.io/DynSDT/demo/"><img src="./decomposed_trie2.svg"></a>
 				<figcaption>
 					<a href="#decomposed_trie" class="internal-link">Figure 2.</a> The <i>Completion Trie</i> of <a href="#completion_trie" class="internal-link">Figure 1</a> after decomposition.
 					Tuples are rendered in the form (LCP, node.<i>key</i>).
@@ -276,7 +276,7 @@
 					Hence, the top-<var>k</var> search algorithm over this structure is equivalent to the algorithm for <a target="_blank" rel="noopener noreferrer" href="https://www.quora.com/If-you-had-a-max-heap-with-n-elements-and-want-to-get-the-K-largest-elements-without-popping-and-rebalancing-how-would-you-do-it">finding the top-<var>k</var> nodes from a binary max-heap without mutating it</a> [<a class="citation" href="#HEAP_SELECTION">12</a>].
 				</p>
 				<figure id="heap-like_DynSDT">
-					<a target="_blank" rel="noopener noreferrer" href="https://example.com"><img src="./doubly-sorted5.svg"></a>
+					<a target="_blank" rel="noopener noreferrer" href="https://validark.github.io/DynSDT/demo/"><img src="./doubly-sorted5.svg"></a>
 					<figcaption>
 						<a href="#heap-like_DynSDT" class="internal-link">Figure 3.</a>
 						The <i>Dynamic Score-Decomposed Trie</i> of <a href="#decomposed_trie" class="internal-link">Figure 2</a> after sorting by score vertically, drawn in the LCRS representation. Tuples are rendered in the form (LCP, node.<i>key</i>, node.<i>score</i>).
