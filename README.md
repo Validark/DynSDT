@@ -1,2 +1,4 @@
-# DynSDT-Implementations
-Dynamic Score-Decomposed Tries which solve the prefix autocomplete problem
+# Paper source
+
+The files for the paper are hosted here. Yes, index.html was created with JavaScript code that automatically assigns numbers to references, sections, and figures. The published version, however, works just fine without JavaScript, and so only "progressive enhancement" scripts are left in. The only two scripts the paper runs are in index.html. One of them highlights references when you click on their number to jump to the bibliography, and the other one changes the names of the colors when switching from Dark Mode to Light mode or vice versa. The paper can change the name of the colors without JS, but text inserted by CSS can only become a part of the "shadow document" and cannot be selected or found via the find-in-page function. In practice, if you open the paper in Dark Mode and use Ctrl+Find to search for the word "cyan", that can only work when JS is used to actually insert the word in the document. CSS can only insert text visually. The only text in the paper that is truly nice to not have in the regular DOM are invisible characters/spaces and line numbers in the pseudocode blocks.
+
