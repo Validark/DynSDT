@@ -1,4 +1,13 @@
-﻿//	deletes the prefix of each key which is implied by its path from the root, reducing memory usage
+﻿// An implementation of the Dynamic Score-Decomposed Trie
+// author: @Validark
+// demo: https://validark.github.io/DynSDT/demo
+// paper: https://validark.github.io/DynSDT/
+// license: MIT
+// A drop-in replacement for the PruningRadixTrie of https://github.com/wolfgarbe/PruningRadixTrie/
+
+// ------------- DIRECTIVES -------------- //
+
+//	deletes the prefix of each key which is implied by its path from the root, reducing memory usage
 //#define COMPRESS_STRINGS
 
 //	makes Set/Delete/AddTerm private, making the structure static
