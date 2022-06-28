@@ -167,7 +167,7 @@ static class BoundedDEPQ<T>
 		return old;
 	}
 
-	// public void heapPush(T element)
+	// public static void heapPush(T element)
 	// {
 	// 	// if (capacity > 0) { // (we check this in-line in the main function)
 	// 		if (len == capacity)
