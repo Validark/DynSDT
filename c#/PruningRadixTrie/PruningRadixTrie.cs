@@ -96,10 +96,9 @@ public struct AltPtr2
 }
 
 
-// This BoundedPriorityDeque is one of two things:
-// isBasic:
-// 		true -> an insertion-sorted array.
-//		false -> a Symmetric Min-Max Heap
+// The DEPQ used by this structure is one of two things, depending on the space requirements:
+// 		small -> an insertion-sorted array.
+//		large -> a Symmetric Min-Max Heap
 //
 // Symmetric Min-Max Heap Paper:
 // https://liacs.leidenuniv.nl/~stefanovtp/courses/StudentenSeminarium/Papers/AL/SMMH.pdf
@@ -273,6 +272,7 @@ public int Count = 0;
 // The min value of topK at which a Heap-based DEPQ is used instead of an insertion sorted array
 public const int DEPQ_THRESHOLD = 125;
 
+// Whether WriteTermsToFile will actually write to the file
 private bool isCacheValid = true;
 
 public void WriteTermsToFile(String path)
@@ -458,7 +458,7 @@ public List<(String term, score_int score)> GetTopkTermsForPrefix(String prefix,
 		{ // when full, pop the minimum element automatically if we insert
 			if (score > DEPQ[0].peers[DEPQ[0].index].node.score) // data[0] is minimum element
 			{
-				if (isPriorityQueueJustASortedArray)
+				if (isPriorityQueueJustASortedArray) // just insertion sort
 				{
 					var l = 0;
 					while (
@@ -473,7 +473,7 @@ public List<(String term, score_int score)> GetTopkTermsForPrefix(String prefix,
 		}
 		else
 		{
-			if (isPriorityQueueJustASortedArray)
+			if (isPriorityQueueJustASortedArray) // just insertion sort
 			{
 				var l = 0;
 				while (
