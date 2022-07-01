@@ -159,6 +159,12 @@ button.left {
 	background-color: rgb(0, 0, 0, 0);
 }
 
+div#container > div#intro > button.right {
+	font-size: 6em;
+	height: initial;
+	width: initial;
+}
+
 .textual-content {
 	padding: 0px 12px; margin-left: 10px; margin-right: 10px;
 }
