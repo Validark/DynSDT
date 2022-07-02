@@ -123,11 +123,6 @@ public struct AltPtr2
 // `data[--len]` with default(T).
 static class BoundedDEPQ<T>
 {
-	// public static T popMaxBasic(T[] data, ref int len) => data[--len];
-
-	// I tried filling the array from right to left so we avoid shifting nodes
-	// right for the first `k` push operations but for some reason it was slower :/
-
 	public static T heapPopMax(T[] data, ref int len, IComparer<T> cmp, T replacement)
 	{
 		if (len <= 1) return replacement; // If the length is 0 or 1, there's no resifting to do
