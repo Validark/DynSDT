@@ -6,8 +6,8 @@ using System.Collections.Generic;
 
 namespace PruningRadixTrie.Benchmark
 {
-    class Program
-    {
+	class Program
+	{
 		public static List<(string, int)> ReadQueries(string path, int numberOfLinesToRead = int.MaxValue)
 		{
 			var allTerms = new List<(string term, int score)>();
@@ -49,16 +49,16 @@ namespace PruningRadixTrie.Benchmark
 			return allTerms;
 		}
 
-        public static void Benchmark()
-        {
-            if (!File.Exists("terms.txt")) ZipFile.ExtractToDirectory("terms.zip", ".");
-            PruningRadixTrie pruningRadixTrie = new PruningRadixTrie();
+		public static void Benchmark()
+		{
+			if (!File.Exists("terms.txt")) ZipFile.ExtractToDirectory("terms.zip", ".");
+			PruningRadixTrie pruningRadixTrie = new PruningRadixTrie();
 			var numAllocatedBytes = GC.GetTotalMemory(true);
-            pruningRadixTrie.ReadTermsFromFile("terms.txt");
+			pruningRadixTrie.ReadTermsFromFile("terms.txt");
 			var numAllocatedBytes2 = GC.GetTotalMemory(true);
 			Console.WriteLine("\tStructure is ~" + (numAllocatedBytes2 - numAllocatedBytes).ToString("0,,.##") + "MB.");
 			pruningRadixTrie.WriteTermsToFile("terms.txt");
-            Console.WriteLine("Benchmark started ...");
+			Console.WriteLine("Benchmark started ...");
 			int termCount = 10;
 			{
 				int rounds = 1000;
@@ -107,11 +107,11 @@ namespace PruningRadixTrie.Benchmark
 				counter.Stop();
 				Console.WriteLine(count.ToString("N0") + " random queries were performed in one second.");
 			}
-        }
+		}
 
-        static void Main(string[] args)
-        {
-            Benchmark();
-        }
-    }
+		static void Main(string[] args)
+		{
+			Benchmark();
+		}
+	}
 }
