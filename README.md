@@ -1,7 +1,7 @@
 # DynSDT Implementations
-*Dynamic Score-Decomposed Tries* to solve the scored prefix completion problem.
+*Dynamic Score-Decomposed Tries* which solve the scored prefix completion problem.
 
-Paper: [*Heap-like Dynamic Score-Decomposed Tries for Top*-𝑘 *Autocomplete*](https://validark.github.io/DynSDT/)
+Paper: [validark.github.io/DynSDT](https://validark.github.io/DynSDT), entitled $Heap$-$like$ $Dynamic$ $Score$-$Decomposed$ $Tries$ $for$ $Top$-$k$ $Autocomplete$
 
 Live Demo: [validark.github.io/DynSDT/demo](https://validark.github.io/DynSDT/demo)
 
