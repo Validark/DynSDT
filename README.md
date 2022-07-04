@@ -7,4 +7,4 @@ Live Demo: [validark.github.io/DynSDT/demo](https://validark.github.io/DynSDT/de
 
 Give me a star if you appreciate this work!
 
-Keywords: Query Autocomplete, QAC, type-ahead, ranked autosuggest, top-k autocomplete, trie decomposition.
+Keywords: Query Autocomplete, QAC, type-ahead, ranked autosuggest, top-k autocomplete, trie decomposition, Dynamic Score-Decomposed Trie.
