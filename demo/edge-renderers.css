@@ -33,8 +33,9 @@ span.complexity {
 }
 
 .control-pane {
-	width: 800px;
-	height: 320px;
+	padding-top: 0.75em;
+	width: 880px;
+	height: 352px;
 	/* transform: scale(1.5); */
 	bottom: 10px;
 	/*bottom: 10px;*/
@@ -44,7 +45,7 @@ span.complexity {
 
 	background-color: var(--DIALOG_BACKGROUND_COLOR);
 	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-
+	font-size: 15pt;
 }
 
 @media (max-width: 17in) {
@@ -70,14 +71,14 @@ span.complexity {
 h2,
 h3,
 h4 {
-	padding: 0;
+	padding: 0 !important;
 	font-variant: small-caps;
 }
 
 h2.underline {
 	/* color: var(--TEXT_COLOR); */
 	/* background: var(--BACKGROUND_COLOR); */
-	margin: 10;
+	/* margin: 10px; */
 	/* border-radius: 10px; */
 	/* padding: 10px 10px; */
 	text-align: center;
@@ -117,7 +118,6 @@ h2.underline {
 
 	/* display: flex; */
 	/* font-family: sans-serif; */
-	font-size: 16px;
 	font-stretch: 100%;
 }
 
@@ -135,29 +135,19 @@ h2.underline {
 	list-style: none;
 }
 
-button.right {
+button.right, button.left {
 	color: var(--TEXT_COLOR);
 	bottom: 10px;
 	right: 10px;
 	height: 40px;
 	width: 40px;
 	position: absolute;
-	font-size: xx-large;
+	font-size: 32pt;
 	border-color: rgb(0, 0, 0, 0);
 	background-color: rgb(0, 0, 0, 0);
 }
 
-button.left {
-	color: var(--TEXT_COLOR);
-	bottom: 10px;
-	right: 52px;
-	height: 40px;
-	width: 40px;
-	position: absolute;
-	font-size: xx-large;
-	border-color: rgb(0, 0, 0, 0);
-	background-color: rgb(0, 0, 0, 0);
-}
+button.left { right: 52px; }
 
 div#container > div#intro > button.right {
 	font-size: 6em;
@@ -177,7 +167,6 @@ button.left:before { content: '⇦' }
 button.right:before { content: '⇨' }
 
 p.indented {
-	font-size: large;
 	margin: 1em;
 	color: var(--TEXT_COLOR);
 }
