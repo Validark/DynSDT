@@ -59,16 +59,16 @@
 			<div id="example">
 				<div class="k-content">
 					<input id="countries"
-						style="width: 50%; font-size: large; background-color: #fff; border-color: rgba(118, 118, 118, 1); border-width: 1px; border-radius: 2pt;"
+						style="width: 50%; font-size: 15pt; background-color: #fff; border-color: rgba(118, 118, 118, 1); border-width: 1px; border-radius: 2pt;"
 						disabled value="&thinsp;r" />
 					<div class="k-animation-container"
 						style="width: 50%;">
 						<ul class="k-reset">
 							<li class="k-item"
-								style="font-size: large">
+								style="font-size: 15pt">
 								rubber ducky</li>
 							<li class="k-item"
-								style="font-size: large">
+								style="font-size: 15pt">
 								rare fidget toys</li>
 						</ul>
 					</div>
@@ -174,7 +174,7 @@
 			<br>
 			<i><var>k</var> = 5</i>
 			<p class="indented">
-				The node representing 'wik' matches the target score of 1220297, so it will be followed downwards in the next step. All other children are pushed to the DEPQ but because they all have scores lower than <i>(i,&nbsp;<b>62504</b>)</i> they are all discarded.
+				The node representing 'wik' matches the target score of 1220297, so it will be followed downwards in the next step. All other children are pushed to the DEPQ but because they all have scores lower than <i>(i,&nbsp;<b>62504</b>)</i> they are all discarded (not shown in the DEPQ table above).
 			</p>
 		</div>
 	</div>
@@ -529,7 +529,7 @@ results.push(node.toString())</code>
 			<i><var>k</var> = 3</i>
 
 			<p class="indented">
-				The first completion is the locus node, which in this case is the root <i>(wikipedia,&nbsp;<b>1220297</b>)</i> because <var>p</var> is the empty string. The second completion is its first branch point*, in this case <i>(list,&nbsp;<b>101139</b>)</i>. Since the first two completions have already been found, <var>k</var> is decremented twice. Next, the branch point succeeding <i>(list,&nbsp;<b>101139</b>)</i> in its vertical list is pushed to the DEPQ constrained to size <var>k</var> (which is 3 after being decremented twice), as is its first branch point.
+				The first completion is the locus node, which in this case is the root <i>(wikipedia,&nbsp;<b>1220297</b>)</i> because <var>p</var> is the empty string. The second completion is its first branch point*, in this case <i>(list,&nbsp;<b>101139</b>)</i>. Since the first two completions have already been found, <var>k</var> is decremented twice. Next, the branch point succeeding <i>(list,&nbsp;<b>101139</b>)</i> in its vertical list and its first branch point are pushed to a DEPQ constrained to size <var>k</var> (which is 3 after being decremented twice).
 			</p>
 
 			<p>
@@ -598,7 +598,7 @@ results.push(node.toString())</code>
 			<i>DEPQ = {}</i> <br>
 			<i><var>k</var> = 9</i>
 			<p class="indented">
-				To find the locus node, the algorithm starts at the root <i>(0, wikipedia)</i> and computes the LCP with between its string and <var>p</var>, in this case LCP("wikipedia", "li") = 0. Thus, the algorithm moves to the LCP matching 0 in the current node's list of branch points, which happens to be the first node in this case: <i>(0, "list")</i>. The same process is repeated until the LCP = <span class="complexity">|p|</span>. In this case, LCP("list", "li") = 2, so <i>(0, "list")</i> is the locus node. The locus node is the first completion, so it is pushed to the output list.
+				To find the locus node, the algorithm starts at the root <i>(0, wikipedia)</i> and computes the LCP with between its string and <var>p</var>, in this case LCP("wikipedia", "li") = 0. Thus, the algorithm moves to the LCP matching 0 in the current node's list of branch points, which happens to be the first node in this case: <i>(0, "list")</i>. The same process is repeated until the LCP = <span class="complexity">|p|</span> = 2. In this case, LCP("list", "li") = 2, so <i>(0, "list")</i> is the locus node. The locus node is the first completion, so it is pushed to the output list.
 			</p>
 
 			<p class="indented">
@@ -614,7 +614,7 @@ results.push(node.toString())</code>
 			<i>DEPQ = { <span class="new">(listings,&nbsp;<b>2974</b>)</span>, <span class="new">(line,&nbsp;<b>6574</b>)</span> }</i> <br>
 			<i><var>k</var> = 8</i>
 			<p class="indented">
-				The second completion to "li" is the first branch point contained in the locus with an LCP &ge; <span class="complexity">|p|</span>. In this case, it does not change the second completion, but it does change which vertical successor of the second completion is inserted into the DEPQ. In this case, <i>(0, "of")</i> and <i>(1, "league")</i> are not valid completions to <var>p</var>, both with LCP &lt; <span class="complexity">|p|</span>.
+				The second completion to "li" is the first branch point contained in the locus with an LCP &ge; <span class="complexity">|p|</span> (i.e. 2). In this case, it does not change the second completion, but it does change which vertical successor of the second completion is inserted into the DEPQ. In this case, <i>(0, "of")</i> and <i>(1, "league")</i> are not valid completions to <var>p</var>, both with LCP &lt; <span class="complexity">|p|</span>.
 			</p>
 		</div>
 	</div>
