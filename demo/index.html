@@ -51,19 +51,15 @@
 		<h2 class="underline">The Problem</h2>
 		<div class="textual-content">
 			<p class="indented">
-				This demo introduces progressively faster solutions to the autocomplete problem. The specific problem solved here is the scored prefix completion problem, which is the
-				problem of supplying a user with the top
-				<var>k</var> (usually 10 or so) highest-scored (most relevant) completions to a given prefix string <var>p</var> as a
-				query.
-				As an example, if a user types 'r' into
-				an autocompleted search bar, they should receive a list of the highest scored (most popular) strings
-				beginning with 'r':
+				This demo solves the problem of scored prefix completion, which is the problem of finding the top-<var>k</var> (usually 10 or so) highest-scored completions to a given prefix
+				string <var>p</var> in a string corpus where each string <i>term</i> has a numeric <i>score</i> denoting its relevance or popularity.
+				As an example, if a user types 'r' into an autocompleted search bar, they should receive a list of the highest scored strings beginning with 'r':
 			</p>
 
 			<div id="example">
 				<div class="k-content">
 					<input id="countries"
-						style="width: 50%; font-size: large"
+						style="width: 50%; font-size: large; background-color: #fff; border-color: rgba(118, 118, 118, 1); border-width: 1px; border-radius: 2pt;"
 						disabled value="r" />
 					<div class="k-animation-container"
 						style="width: 50%;">
