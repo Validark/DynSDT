@@ -72,6 +72,7 @@ h2,
 h3,
 h4 {
 	padding: 0 !important;
+	margin: 0 !important;
 	font-variant: small-caps;
 }
 
