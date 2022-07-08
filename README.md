@@ -1,5 +1,5 @@
 # DynSDT Implementations
-*Dynamic Score-Decomposed Tries* which solve the scored prefix completion problem.
+*Dynamic Score-Decomposed Tries* which solve the scored prefix completion problem. The C# version is the primary version at the moment. The TypeScript version was designed just to match the pseudocode from the paper.
 
 Paper: [validark.github.io/DynSDT](https://validark.github.io/DynSDT), entitled *Heap-like Dynamic Score-Decomposed Tries for Top-k Autocomplete*
 
