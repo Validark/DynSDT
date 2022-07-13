@@ -1348,9 +1348,10 @@ g.bb-legend-item.bb-legend-item-DynSDT, tr.bb-tooltip-name-DynSDT > td.name {
 	<div class="bb-tooltip-container" style="position: absolute; pointer-events: none; top: 49.4271px; left: 259.5px; display: none; visibility: hidden;"><table class="bb-tooltip"><tbody><tr><th colspan="2">9956</th></tr><tr class="bb-tooltip-name-DynSDT"><td class="name"><span style="background-color:#1f77b4"></span>DynSDT</td><td class="value"><b>Mid:</b> 6.89515ms <b>High:</b> 7.1549ms <b>Low:</b> 6.2458ms</td></tr></tbody></table></div>
 	*/
 
-	img[src$=".svg"] {
+	img[src$=".svg"]:not([src$="completion_trie3.svg"]) {
 		filter: invert(1);
 	}
+
 	div.bb-tooltip-container {
 		filter: invert(1);
 		color: #282828;
