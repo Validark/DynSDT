@@ -1,3 +1,4 @@
+@font-face{font-family:'Nimbus Roman No9 L';font-style:normal;font-weight:400;src:local('Nimbus Roman No9 L'),url('https://fonts.cdnfonts.com/s/16417/NimbusRomNo9L-Reg.woff')format('woff');}@font-face{font-family:'Nimbus Roman No9 L';font-style:normal;font-weight:500;src:local('Nimbus Roman No9 L'),url('https://fonts.cdnfonts.com/s/16417/NimbusRomNo9L-Med.woff')format('woff');}
 html {
 	font-family: sans-serif; /* 1 */
 	-ms-text-size-adjust: 100%; /* 2 */
@@ -70,7 +71,7 @@ sub {
 }
 
 html {
-	scroll-behavior: smooth;
+	/* scroll-behavior: smooth; */
 	font-size: 12pt;
 }
 
@@ -124,6 +125,24 @@ article {
 	/* font-size: 1.166666666666667em; */
 	/* font-weight: 300; */
 	/* 1.8; */
+	zoom: 150%;
+	-moz-transform: scale(1.35) translateY(195em);
+	/* -moz-transform: scale(1.5) translateY(195em); */
+}
+
+@media print {
+	article {
+		zoom: initial;
+		-moz-transform: initial;
+	}
+
+	#eliminating_log, #string_compression, #numeric_compression, #introduction, #preliminaries {
+		page-break-before: always;
+	}
+
+	.ps_header, .pseudocode {
+		break-inside: avoid-page;
+	}
 }
 
 /* body {
@@ -619,12 +638,12 @@ h3 {
 }
 
 section>h2 {
-	page-break-before: always;
+	/* page-break-before: always; */
 	page-break-after: avoid;
 	page-break-inside: avoid;
 }
 
-section[id="abstract"]>h2 {
+section#abstract>h2 {
 	page-break-before: avoid;
 	page-break-after: avoid;
 	page-break-inside: avoid;
@@ -699,8 +718,8 @@ figure:first-child {
 
 section {
 	/* padding-bottom: 6em; */
-	break-before: always;
-	break-after: always;
+	/* page-break-before: always;
+	page-break-after: always; */
 }
 
 dfn {
@@ -834,8 +853,8 @@ figure table {
 }
 
 table {
-	break-inside: avoid;
-	break-before: avoid;
+	page-break-inside: avoid;
+	page-break-before: avoid;
 	/* width: auto; */
 	margin: 2em auto;
 	margin-top: 4em;
