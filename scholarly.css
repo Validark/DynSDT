@@ -120,14 +120,16 @@ div.pseudocode i {
 	font-family: "Libre Baskerville";
 	font-size: smaller;
 } */
-
-article {
-	/* font-size: 1.166666666666667em; */
-	/* font-weight: 300; */
-	/* 1.8; */
-	zoom: 135%;
-	-moz-transform: scale(1.35) translateY(195em);
-	/* -moz-transform: scale(1.5) translateY(195em); */
+@media (min-width: 1100px) {
+	article {
+		/* font-size: 1.166666666666667em; */
+		/* font-weight: 300; */
+		/* 1.8; */
+		zoom: 133.3333333333333333333333333%;
+		-moz-transform: scale(1.333333333333333333333333333333333) translateY(195em);
+		/* transform: scale(1.333333333333333333333333333333333) translateY(195em); */
+		/* -moz-transform: scale(1.5) translateY(195em); */
+	}
 }
 
 @media print {
