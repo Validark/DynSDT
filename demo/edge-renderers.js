@@ -113,19 +113,19 @@ let decomposed_id = 0;
 			const decomposedName = map.get(node.id)
 			if (!decomposedName) throw `${node.id} has nothing to decompose into`;
 
-			trie.nodes.push({ id: `d_${decomposedName}$`, label: `"${decomposedName}$":${node.size}`, x: node.x, y: node.y, size: 1, forceLabel: 0 })
+			trie.nodes.push({ id: `d_${decomposedName}$`, label: `“${decomposedName}$”:${node.size}`, x: node.x, y: node.y, size: 1, forceLabel: 0 })
 		}
 	}
 
 	{
 		let node = trie.nodes[0]
-		trie.nodes.push({ id: `d_[ROOT]$`, label: `""`, x: node.x, y: node.y, size: 1, forceLabel: 0 })
+		trie.nodes.push({ id: `d_[ROOT]$`, label: `“”`, x: node.x, y: node.y, size: 1, forceLabel: 0 })
 		trie.edges.push({
 			source: `d_[ROOT]$`,
 			target: `d_wikipedia$`,
 			id: `d_${decomposed_id++}`,
 			type: "arrow",
-			label: `(0, "wikipedia")`,
+			label: `(0, “wikipedia”)`,
 			active_color: ORIGINAL_COLOR,
 			targetLabel: 1
 		})
@@ -146,7 +146,7 @@ let decomposed_id = 0;
 					target: `d_${target}$`,
 					id: `d_${decomposed_id++}`,
 					type: "arcArrow",
-					label: `(0, "${target}")`,
+					label: `(0, “${target}”)`,
 					active_color: ORIGINAL_COLOR,
 					targetLabel: 4
 				})
@@ -161,9 +161,9 @@ let decomposed_id = 0;
 				{
 					const lcp = LCP(target, originalSource)
 
-					trie.edges.push({ source, target: `d_${target}$`, id: `d_${decomposed_id++}`, type: `arcArrow`, label: `(${lcp}, "${target
+					trie.edges.push({ source, target: `d_${target}$`, id: `d_${decomposed_id++}`, type: `arcArrow`, label: `(${lcp}, “${target
 						// .slice(lcp)
-					}")`, active_color: ORIGINAL_COLOR, targetLabel: target === "list of" ? 4 : 3 })
+					}”)`, active_color: ORIGINAL_COLOR, targetLabel: target === "list of" ? 4 : 3 })
 				}
 				else
 				{
@@ -175,7 +175,7 @@ let decomposed_id = 0;
 						{
 							source, target: `d_${target}$`,
 							id: `d_${decomposed_id++}`, type: `arcArrow`,
-							label: `(${lcp}, "${target}")`, //.slice(LCP)
+							label: `(${lcp}, “${target}”)`, //.slice(LCP)
 							active_color: ORIGINAL_COLOR,
 							targetLabel: 7 ^ (map2.get(target) || ((++q % 2) + 3)),
 							flipMe: true
@@ -246,7 +246,7 @@ let decomposed_id = 0;
 				target,
 				id: `r_${decomposed_id++}`,
 				type: "dashedArrow",
-				label: `(${LCP(trimmedSource, trimmedTarget)}, "${trimmedTarget}")`,
+				label: `(${LCP(trimmedSource, trimmedTarget)}, “${trimmedTarget}”)`,
 				active_color: ORIGINAL_COLOR,
 				targetLabel: 1
 			})

@@ -96,7 +96,7 @@ var {
 	/* font-size: 0.8em; */
 	/* font-family: 'Old Standard TT', "Libre Baskerville", 'Playfair Display', serif; */
 	/* font-size: 1em; */
-	font-family: "KaTeX_Math", serif;
+	font-family: "KaTeX_Math", KaTeX_Main, serif;
 	font-variant-caps: normal;
 	font-style: italic;
 	font-size: 1.05em;
@@ -116,7 +116,7 @@ var {
 }
 
 .KaTeX_Main_Normal {
-	font-family: "KaTeX_Main", serif;
+	font-family: "KaTeX_Main", KaTeX_Main, serif;
 	font-style: normal;
 	font-weight: normal;
 }
@@ -135,7 +135,7 @@ var {
 }
 
 span.complexity {
-	font-family: "KaTeX_Main", serif;
+	font-family: "KaTeX_Main", KaTeX_Main, serif;
 	font-style: normal;
 	font-weight: normal;
 
@@ -163,7 +163,7 @@ table > tbody > tr > td > span.complexity {
 .theta,
 .big-O {
 	font-variant-caps: normal;
-	font-family: Georgia, Times, 'Times New Roman', serif;
+	font-family: Georgia, Times, 'Times New Roman', KaTeX_Main, serif;
 	/* Cochin */
 	line-height: 0;
 	/* display: inline-block; */
@@ -196,7 +196,7 @@ var, .var {
 	/* font-size: 0.8em; */
 	/* font-family: 'Old Standard TT', "Libre Baskerville", 'Playfair Display', serif; */
 	/* font-size: 1em; */
-	font-family: "KaTeX_Math", Times, 'Times New Roman', serif;
+	font-family: "KaTeX_Math", Times, 'Times New Roman', KaTeX_Main, serif;
 	font-variant-caps: normal;
 	font-style: italic;
 	/* margin-left: 0.05em;
@@ -226,7 +226,7 @@ var, .var {
 }
 body {
 	/* "Libre Baskerville" */
-  font-family: serif;
+  font-family: KaTeX_Main, serif;
   background: #f7f7f7;
   color: #282828;
   background-color: #eee;
@@ -727,7 +727,7 @@ table.complexity-table2 tr > td:first-of-type, table.complexity-table2 tr > th:f
 
 caption {
 	/* "Libre Baskerville", Times,  */
-  font-family: serif;
+  font-family: KaTeX_Main, serif;
   text-align: left;
   padding: 16px;
   margin-top: 16px;

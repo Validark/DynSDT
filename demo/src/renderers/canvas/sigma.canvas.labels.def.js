@@ -21,7 +21,7 @@
 	let label = node.label;
 
 	if (node.isRoot)
-		label = "(0, \"wikipedia\")"
+		label = "(0, “wikipedia”)"
 	else if (node.forceLabel === 4) {
 		label = label.split(":")[0]
 	}

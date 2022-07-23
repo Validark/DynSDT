@@ -35,7 +35,7 @@ span.complexity {
 .control-pane {
 	padding-top: 0.75em;
 	width: 880px;
-	height: 352px;
+	height: 360px;
 	/* transform: scale(1.5); */
 	bottom: 10px;
 	/*bottom: 10px;*/
@@ -46,6 +46,7 @@ span.complexity {
 	background-color: var(--DIALOG_BACKGROUND_COLOR);
 	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 	font-size: 15pt;
+	line-height: 1.25;
 }
 
 @media (max-width: 17in) {
@@ -85,7 +86,7 @@ h2.underline {
 	text-align: center;
 	font-size: 36px;
 	font-weight: 800;
-	font-family: serif;
+	font-family: KaTeX_Main;
 }
 
 .hidden {
@@ -138,10 +139,10 @@ h2.underline {
 
 button.right, button.left {
 	color: var(--TEXT_COLOR);
-	bottom: 10px;
+	bottom: -5px;
 	right: 10px;
-	height: 40px;
-	width: 40px;
+	/* height: 40px; */
+	/* width: 40px; */
 	position: absolute;
 	font-size: 32pt;
 	border-color: rgb(0, 0, 0, 0);
@@ -154,6 +155,7 @@ div#container > div#intro > button.right {
 	font-size: 6em;
 	height: initial;
 	width: initial;
+	bottom: 0px;
 }
 
 .textual-content {
@@ -168,6 +170,9 @@ button.left:before { content: '⇦' }
 button.right:before { content: '⇨' }
 
 p.indented {
-	margin: 1em;
+	margin-right: 1em;
+	margin-left: 1em;
+	/* margin-top: 0.25em; */
+	margin-bottom: 0.75em;
 	color: var(--TEXT_COLOR);
 }

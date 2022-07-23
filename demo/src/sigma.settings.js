@@ -89,7 +89,7 @@ const TRAVERSED_COLOR = getCSSColor('--TRAVERSED_COLOR')
     // {number} Defines the minimal edge's arrow display size.
     minArrowSize: 0,
     // {string}
-    font: 'serif',
+    font: 'KaTeX_Main, serif',
     // {string} Example: 'bold'
     fontStyle: '',
     // {string} Indicates how to choose the labels color. Available values:

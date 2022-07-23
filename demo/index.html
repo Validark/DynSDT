@@ -1,9 +1,12 @@
 <!DOCTYPE html>
-<html lang="en-GB">
+<html lang="en-us">
 
 <head>
 	<meta charset="utf-8">
 	<title>DynSDT demo</title>
+	<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Main-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+	<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Main-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+	<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Math-BoldItalic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
 
 	<link rel="stylesheet" href="./src/sigma.settings.css">
 	<link rel="stylesheet" href="./edge-renderers.css">
@@ -32,7 +35,7 @@
 
 				<br>
 				<br>
-				This demo heavily references the "Completion Trie", as created by:
+				This demo heavily references the “Completion Trie”, as created by:
 				<br>
 				<br>
 
@@ -53,7 +56,7 @@
 			<p class="indented">
 				This demo solves the problem of scored prefix completion, which is the problem of finding the top-<var>k</var> (usually 10 or so) highest-scored completions to a given prefix
 				string <var>p</var> in a string corpus where each string <i>term</i> has a numeric <i>score</i> denoting its relevance or popularity.
-				As an example, if a user types 'r' into an autocompleted search bar, they should receive a list of the highest scored strings beginning with 'r':
+				As an example, if a user types “r” into an autocompleted search bar, they should receive a list of the highest scored terms beginning with “r”:
 			</p>
 
 			<div id="example">
@@ -105,11 +108,11 @@
 		<h2 class="underline">Example Traversal</h2>
 		<div class="textual-content">
 			<p class="indented">
-				For example, if the given prefix <var>p</var> to complete is "li", then the edge containing "l" from the root is followed, and then the edge containing "i" is followed. Under the locus node representing "li" is all completions to "li".
+				For example, if the given prefix <var>p</var> to complete is “li”, then the edge containing “l” from the root is followed, and then the edge containing “i” is followed. Under the locus node representing “li” is all completions to “li”.
 			</p>
 
 			<p class="indented">
-				In the diagram above, the edges representing "lis", "lin", "lit", and "lif" extend from "li", and each of those subtrees must be traversed in their entirety and each score must be considered as a candidate for the list of the top-<var>k</var> scored completions. Note that this diagram is merely an abbreviated slice of the dataset containing the word frequencies of every word on Wikipedia, which contains over six million terms and thus this algorithm would be incredibly slow.
+				In the diagram above, the edges representing “lis”, “lin”, “lit”, and “lif” extend from “li”, and each of those subtrees must be traversed in their entirety and each score must be considered as a candidate for the list of the top-<var>k</var> scored completions. Note that this diagram is merely an abbreviated slice of the dataset containing the word frequencies of every word on Wikipedia, which contains over six million terms and thus this algorithm would be incredibly slow.
 			</p>
 		</div>
 	</div>
@@ -140,15 +143,15 @@
 		<div class="textual-content">
 			<!-- <i>k = 4</i> <br> -->
 			<i>completions = {}</i> <br>
-			<i>DEPQ = { <span class="new strikethrough">(f,&nbsp;<b>504768</b>)</span>, <span class="new">(i,&nbsp;<b>62504</b>)</span>, <span class="new">(t,&nbsp;<b>66985</b>), (o,&nbsp;<b>98750</b>)</span>, <span class="new">(l,&nbsp;<b>101139</b>)</span> }</i>
+			<i>DEPQ = { <span class="new strikethrough">(f,&nbsp;<b>50468</b>)</span>, <span class="new">(i,&nbsp;<b>62504</b>)</span>, <span class="new">(t,&nbsp;<b>66985</b>), (o,&nbsp;<b>98750</b>)</span>, <span class="new">(l,&nbsp;<b>101139</b>)</span> }</i>
 			<br>
 			<i><var>k</var> = 5</i>
-			<p class="indented">
-				To illustrate, this example will find the top-5 completions to the empty string (<var>p</var> = "", <var>k</var> = 5). The locus node is the root, which has a score of 1220297, representing the maximum score in the trie. All children of the root are added to the DEPQ constrained to size 4, except the node representing "w", because it has the same score as the locus node. <i>(f,&nbsp;<b>504768</b>)</i> has a score lower than the 4th highest score found thus far, and therefore it is discarded from the DEPQ.
+			<p class="indented" style="margin-bottom: 0;">
+				To illustrate, this example will find the top-5 completions to the empty string (<var>p</var> = “”, <var>k</var> = 5). The locus node is the root, which has a score of 1220297, representing the maximum score in the trie. All children of the root are added to the DEPQ constrained to size 4, except the node representing “w”, because it has the same score as the locus node. <i>(f,&nbsp;<b>50468</b>)</i> has a score lower than the 4th highest score found thus far, and therefore it is discarded from the DEPQ.
 			</p>
 
 			<p class="indented">
-				Note: You can still mouse-over any node to see its <i>(string, score)</i>. You can also click and drag the screen around and scroll to zoom.
+				Note: You can mouse-over any node to see its <i>string:score</i>. You can also click and drag the screen around and scroll to zoom.
 			</p>
 		</div>
 	</div>
@@ -161,7 +164,7 @@
 			<br>
 			<i><var>k</var> = 5</i>
 			<p class="indented">
-				Next, the process is repeated for the children of the node representing 'w'. The node representing 'wi' will be followed next, because it too has a score of 1220297. The other nodes are added to the DEPQ, but because they all have scores lower than the lowest in the DEPQ they are all discarded. Specifically, <i>(w$,&nbsp;<b>8393</b>)</i>, <i>(we,&nbsp;<b>17837</b>)</i>, <i>(wo,&nbsp;<b>30978</b>)</i> all have scores lower than <i>(i,&nbsp;<b>62504</b>)</i>.
+				Next, the process is repeated for the children of the node representing “w”. The node representing “wi” will be followed next, because it too has a score of 1220297. The other nodes are added to the DEPQ, but because they all have scores lower than the lowest in the DEPQ they are all discarded. Specifically, <i>(w$,&nbsp;<b>8393</b>)</i>, <i>(we,&nbsp;<b>17837</b>)</i>, <i>(wo,&nbsp;<b>30978</b>)</i> all have scores lower than <i>(i,&nbsp;<b>62504</b>)</i>.
 			</p>
 		</div>
 	</div>
@@ -174,21 +177,7 @@
 			<br>
 			<i><var>k</var> = 5</i>
 			<p class="indented">
-				The node representing 'wik' matches the target score of 1220297, so it will be followed downwards in the next step. All other children are pushed to the DEPQ but because they all have scores lower than <i>(i,&nbsp;<b>62504</b>)</i> they are all discarded (not shown in the DEPQ table above).
-			</p>
-		</div>
-	</div>
-
-
-	<div class="control-pane" hidden>
-		<h2 class="underline">Cont...</h2>
-		<div class="textual-content">
-			<i>completions = {}</i> <br>
-			<i>DEPQ = { (i,&nbsp;<b>62504</b>), (t,&nbsp;<b>66985</b>), (o,&nbsp;<b>98750</b>), (l,&nbsp;<b>101139</b>) }</i>
-			<br>
-			<i><var>k</var> = 5</i>
-			<p class="indented">
-				The node representing 'wiki' matches the target score of 1220297, so it will be followed downwards in the next step. All other children of the node representing 'wik' are pushed to the DEPQ, but because they all have scores lower than <i>(i,&nbsp;<b>62504</b>)</i>, it remains unchanged.
+				The node representing “wik” matches the target score of 1220297, so it will be followed downwards in the next step. All other children are pushed to the DEPQ but because they all have scores lower than <i>(i,&nbsp;<b>62504</b>)</i> they are all discarded (not shown in the DEPQ table above).
 			</p>
 		</div>
 	</div>
@@ -202,7 +191,7 @@
 			<br>
 			<i><var>k</var> = 5</i>
 			<p class="indented">
-				The node representing 'wikip' matches the target score of 1220297, so it will be followed downwards in the next step. All other children of the node representing 'wiki' are pushed to the DEPQ, but because they all have scores lower than <i>(i,&nbsp;<b>62504</b>)</i>, it remains unchanged.
+				The node representing “wiki” matches the target score of 1220297, so it will be followed downwards in the next step. All other children of the node representing “wik” are pushed to the DEPQ, but because they all have scores lower than <i>(i,&nbsp;<b>62504</b>)</i>, it remains unchanged.
 			</p>
 		</div>
 	</div>
@@ -216,7 +205,7 @@
 			<br>
 			<i><var>k</var> = 5</i>
 			<p class="indented">
-				The node representing 'wikipedi' matches the target score of 1220297, so it will be followed downwards in the next step. All other children of the node representing 'wikip' are pushed to the DEPQ, but because they all have scores lower than <i>(i,&nbsp;<b>62504</b>)</i>, it remains unchanged.
+				The node representing “wikip” matches the target score of 1220297, so it will be followed downwards in the next step. All other children of the node representing “wiki” are pushed to the DEPQ, but because they all have scores lower than <i>(i,&nbsp;<b>62504</b>)</i>, it remains unchanged.
 			</p>
 		</div>
 	</div>
@@ -230,7 +219,21 @@
 			<br>
 			<i><var>k</var> = 5</i>
 			<p class="indented">
-				The node representing 'wikipedia' matches the target score of 1220297, so it will be followed downwards in the next step. All other children of the node representing 'wikipedi' are pushed to the DEPQ, but because they all have scores lower than <i>(i,&nbsp;<b>62504</b>)</i>, it remains unchanged.
+				The node representing “wikipedi” matches the target score of 1220297, so it will be followed downwards in the next step. All other children of the node representing “wikip” are pushed to the DEPQ, but because they all have scores lower than <i>(i,&nbsp;<b>62504</b>)</i>, it remains unchanged.
+			</p>
+		</div>
+	</div>
+
+
+	<div class="control-pane" hidden>
+		<h2 class="underline">Cont...</h2>
+		<div class="textual-content">
+			<i>completions = {}</i> <br>
+			<i>DEPQ = { (i,&nbsp;<b>62504</b>), (t,&nbsp;<b>66985</b>), (o,&nbsp;<b>98750</b>), (l,&nbsp;<b>101139</b>) }</i>
+			<br>
+			<i><var>k</var> = 5</i>
+			<p class="indented">
+				The node representing “wikipedia” matches the target score of 1220297, so it will be followed downwards in the next step. All other children of the node representing “wikipedi” are pushed to the DEPQ, but because they all have scores lower than <i>(i,&nbsp;<b>62504</b>)</i>, it remains unchanged.
 			</p>
 		</div>
 	</div>
@@ -243,7 +246,7 @@
 			<br>
 			<i><var>k</var> = 5</i>
 			<p class="indented">
-				The path to 'wikipedia$' will be taken next. All other children of the node representing 'wikipedia' are pushed to the DEPQ, but because they all have scores lower than <i>(i,&nbsp;<b>62504</b>)</i>, it remains unchanged.
+				The path to “wikipedia$” will be taken next. All other children of the node representing “wikipedia” are pushed to the DEPQ, but because they all have scores lower than <i>(i,&nbsp;<b>62504</b>)</i>, it remains unchanged.
 			</p>
 		</div>
 	</div>
@@ -251,13 +254,13 @@
 	<div class="control-pane" hidden>
 		<h2 class="underline">Cont...</h2>
 		<div class="textual-content">
-			<i>completions = { <span class="new">"wikipedia"</span> }</i> <br>
+			<i>completions = { <span class="new">“wikipedia”</span> }</i> <br>
 			<i>DEPQ = { (i,&nbsp;<b>62504</b>), (t,&nbsp;<b>66985</b>), (o,&nbsp;<b>98750</b>), <span class="old strikethrough">(l,&nbsp;<b>101139</b>)</span> }</i>
 			<br>
 			<i><var>k</var> = 4</i>
 			<p class="indented">
-				The node representing 'wikipedia$' is a leaf, thus it is added to the set of completions and <var>k</var> is decremented.
-				The maximum node is then extracted from the DEPQ, which yields the highest-scored node of all of the <span style="color: white; background-color: var(--SELECTED_COLOR);">candidate nodes highlighted in this color.</span> In this case, it happens to be <i>(l,&nbsp;<b>101139</b>)</i>. Therefore, the path from the node representing 'l' will be followed next, and the score of the next completion is 101139. The DEPQ is also bounded to size 3 now.
+				The node representing “wikipedia$” is a leaf, thus it is added to the set of completions and <var>k</var> is decremented.
+				The maximum node is then extracted from the DEPQ, which yields the highest-scored node of all of the <span style="color: white; background-color: var(--SELECTED_COLOR);">candidate nodes highlighted in this color.</span> In this case, it happens to be <i>(l,&nbsp;<b>101139</b>)</i>. Therefore, the path from the node representing “l” will be followed next, and the score of the next completion is 101139. The DEPQ is also bounded to size 3 now.
 			</p>
 			<p class="indented">
 				From here on out this demo will pick up the pace and show one completion per frame.
@@ -271,12 +274,12 @@
 	<div class="control-pane" hidden>
 		<h2 class="underline">Skipping ahead</h2>
 		<div class="textual-content">
-			<i>completions = { "wikipedia", <span class="new">"list"</span> }</i> <br>
+			<i>completions = { “wikipedia”, <span class="new">“list”</span> }</i> <br>
 			<i>DEPQ = { <span class="old strikethrough">(i,&nbsp;<b>62504</b>)</span>, (t,&nbsp;<b>66985</b>), (o,&nbsp;<b>98750</b>), <span class="new">(list_,&nbsp;<b>100625</b>)</span> }</i>
 			<br>
 			<i><var>k</var> = 3</i>
 			<p class="indented">
-				Following the path of nodes with scores equalling 101139 from the node representing 'l' leads to the leaf representing 'list$', now added to the set of completions.
+				Following the path of nodes with scores equalling 101139 from the node representing “l” leads to the leaf representing “list$”, now added to the set of completions.
 
 				All of the new candidate nodes are pushed to the DEPQ, but only <i>(list_,&nbsp;<b>100625</b>)</i> makes it in. During insertion, the lowest value in the DEPQ <i>(i,&nbsp;<b>62504</b>)</i> is bumped out.
 			</p>
@@ -286,13 +289,13 @@
 	<div class="control-pane" hidden>
 		<h2 class="underline">Cont...</h2>
 		<div class="textual-content">
-			<i>completions = { "wikipedia", "list", <span class="new">"list&nbsp;of"</span> }</i> <br>
+			<i>completions = { “wikipedia”, “list”, <span class="new">“list&nbsp;of”</span> }</i> <br>
 			<i>DEPQ = { (t,&nbsp;<b>66985</b>), (o,&nbsp;<b>98750</b>), <span class="old strikethrough">(list_,&nbsp;<b>100625</b>)</span> }</i>
 			<br>
 			<i><var>k</var> = 2</i>
 			<p class="indented">
 				The next completion is found by extracting the maximum from the DEPQ, which is <i>(list_,&nbsp;<b>100625</b>)</i>. <var>k</var> is decremented again and the DEPQ is now bounded to size 2.
-				The path formed by nodes with scores equalling 100625 which starts at the node representing 'list_' is followed to its corresponding leaf, which represents "list_of$", which gets pushed to the completions list. None of the children of the nodes representing "list_", "list_o", or "list_of" have scores large enough to penetrate the DEPQ, so it remains unchanged.
+				The path formed by nodes with scores equalling 100625 which starts at the node representing “list_” is followed to its corresponding leaf, which represents “list_of$”, which gets pushed to the completions list. None of the children of the nodes representing “list_”, “list_o”, or “list_of” have scores large enough to penetrate the DEPQ, so it remains unchanged.
 			</p>
 		</div>
 	</div>
@@ -300,13 +303,13 @@
 	<div class="control-pane" hidden>
 		<h2 class="underline">Cont...</h2>
 		<div class="textual-content">
-			<i>completions = { "wikipedia", "list", "list&nbsp;of", <span class="new">"of"</span> }</i> <br>
+			<i>completions = { “wikipedia”, “list”, “list&nbsp;of”, <span class="new">“of”</span> }</i> <br>
 			<i>DEPQ = { (t,&nbsp;<b>66985</b>), <span class="old strikethrough">(o,&nbsp;<b>98750</b>)</span> }</i>
 			<br>
 			<i><var>k</var> = 1</i>
 			<p class="indented">
 				The next completion is found by extracting the maximum from the DEPQ, which is <i>(o,&nbsp;<b>98750</b>)</i>. <var>k</var> is decremented again and the DEPQ is now bounded to size 1.
-				The path formed by nodes with scores equalling 98750 which starts at the node representing 'o' is followed to its corresponding leaf, which represents "of$", which gets pushed to the completions list. Again none of the nodes along the path have scores large enough to penetrate the DEPQ, so it remains unchanged.
+				The path formed by nodes with scores equalling 98750 which starts at the node representing “o” is followed to its corresponding leaf, which represents “of$”, which gets pushed to the completions list. Again none of the nodes along the path have scores large enough to penetrate the DEPQ, so it remains unchanged.
 			</p>
 		</div>
 	</div>
@@ -315,14 +318,14 @@
 	<div class="control-pane" hidden>
 		<h2 class="underline">Cont...</h2>
 		<div class="textual-content">
-			<i>completions = { "wikipedia", "list", "list&nbsp;of", "of", <span class="new">"the"</span> }</i> <br>
+			<i>completions = { “wikipedia”, “list”, “list&nbsp;of”, “of”, <span class="new">“the”</span> }</i> <br>
 			<i>DEPQ = { <span class="old strikethrough">(t,&nbsp;<b>66985</b>)</span> }</i>
 			<br>
 			<i><var>k</var> = 0</i>
 			<p class="indented">
 				The next completion is found by extracting the maximum from the DEPQ, which is <i>(t,&nbsp;<b>66985</b>)</i>. <var>k</var> is decremented again and the DEPQ is now bounded to size 0.
 
-				The path formed by nodes with scores equalling 66985 which starts at the node representing 't' is followed to its corresponding leaf, which represents "the$", which gets pushed to the completions list. Since the DEPQ is constrained to size 0, none of the nodes along the path are inserted into the DEPQ.
+				The path formed by nodes with scores equalling 66985 which starts at the node representing “t” is followed to its corresponding leaf, which represents “the$”, which gets pushed to the completions list. Since the DEPQ is constrained to size 0, none of the nodes along the path are inserted into the DEPQ.
 			</p>
 		</div>
 	</div>
@@ -352,7 +355,7 @@
 		<h2 class="underline">Speeding up query time</h2>
 		<div class="textual-content">
 			<p class="indented">
-				When the trie is drawn in the <a style="text-decoration: underline" target="_blank" rel="noopener noreferrer" href="https://en.wikipedia.org/wiki/Left-child_right-sibling_binary_tree">left-child right sibling representation</a>, finding the top-5 completions to the empty string (<var>p</var> = "", <var>k</var> = 5) looks exactly like the <a style="text-decoration: underline;" target="_blank" rel="noopener noreferrer" href="https://en.wikipedia.org/wiki/K-way_merge_algorithm"><var>k</var>-way&nbsp;merge algorithm</a>.
+				When the trie is drawn in the <a style="text-decoration: underline" target="_blank" rel="noopener noreferrer" href="https://en.wikipedia.org/wiki/Left-child_right-sibling_binary_tree">left-child right sibling representation</a>, finding the top-5 completions to the empty string (<var>p</var> = “”, <var>k</var> = 5) looks exactly like the <a style="text-decoration: underline;" target="_blank" rel="noopener noreferrer" href="https://en.wikipedia.org/wiki/K-way_merge_algorithm"><var>k</var>-way&nbsp;merge algorithm</a>.
 			</p>
 		</div>
 	</div>
@@ -361,7 +364,7 @@
 	<div class="control-pane" hidden>
 		<h2 class="underline">Top-<var>k</var> Search Example</h2>
 		<div class="textual-content">
-			<i>completions = { <span class="new">"wikipedia"</span> }</i> <br>
+			<i>completions = { <span class="new">“wikipedia”</span> }</i> <br>
 			<i>DEPQ = { <span class="new strikethrough">(wikipediocracy,&nbsp;<b>1</b>)</span>, <span class="new strikethrough">(wikipro,&nbsp;<b>1</b>)</span>, <span class="new strikethrough">(wikim,&nbsp;<b>17</b>)</span>, <span class="new strikethrough">(wikipedia_,&nbsp;<b>18</b>)</span>, <span class="new">(wikt,&nbsp;<b>36</b>)</span>, <span class="new">(wil,&nbsp;<b>27706</b>)</span>, <span class="new">(wo,&nbsp;<b>30978</b>)</span>, <span class="new">(l,&nbsp;<b>101139</b>)</span> }</i>
 
 			<br>
@@ -389,7 +392,7 @@ results.push(node.toString())</code>
 	<div class="control-pane" hidden>
 		<h2 class="underline">Top-<var>k</var> Search Example</h2>
 		<div class="textual-content">
-			<i>completions = { "wikipedia", <span class="new">"list"</span> }</i> <br>
+			<i>completions = { “wikipedia”, <span class="new">“list”</span> }</i> <br>
 			<i>DEPQ = { <span class="old strikethrough">(wikt,&nbsp;<b>36</b>)</span>,
 
 
@@ -408,7 +411,7 @@ results.push(node.toString())</code>
 	<div class="control-pane" hidden>
 		<h2 class="underline">Top-<var>k</var> Search Example</h2>
 		<div class="textual-content">
-			<i>completions = { "wikipedia", "list", <span class="new">"list&nbsp;of"</span> }</i> <br>
+			<i>completions = { “wikipedia”, “list”, <span class="new">“list&nbsp;of”</span> }</i> <br>
 			<i>DEPQ = { (wo,&nbsp;<b>30978</b>), (o,&nbsp;<b>98750</b>), <span class="old strikethrough">(list_,&nbsp;<b>100625</b>)</span> }</i>
 
 			<br>
@@ -422,7 +425,7 @@ results.push(node.toString())</code>
 	<div class="control-pane" hidden>
 		<h2 class="underline">Top-<var>k</var> Search Example</h2>
 		<div class="textual-content">
-			<i>completions = { "wikipedia", "list", "list&nbsp;of", <span class="new">"of"</span> }</i> <br>
+			<i>completions = { “wikipedia”, “list”, “list&nbsp;of”, <span class="new">“of”</span> }</i> <br>
 			<i>DEPQ = { <span class="old strikethrough">(wo,&nbsp;<b>30978</b>)</span>, <span class="new">(t,&nbsp;<b>66985</b>)</span>, <span class="old strikethrough">(o,&nbsp;<b>98750</b>)</span> }</i>
 
 			<br>
@@ -438,7 +441,7 @@ results.push(node.toString())</code>
 	<div class="control-pane" hidden>
 		<h2 class="underline">Top-<var>k</var> Search Example</h2>
 		<div class="textual-content">
-			<i>completions = { "wikipedia", "list", "list&nbsp;of", "of", <span class="new">"the"</span> }</i> <br>
+			<i>completions = { “wikipedia”, “list”, “list&nbsp;of”, “of”, <span class="new">“the”</span> }</i> <br>
 			<i>DEPQ = { <span class="old strikethrough">(t,&nbsp;<b>66985</b>)</span> }</i>
 
 			<br>
@@ -497,7 +500,7 @@ results.push(node.toString())</code>
 		<h2 class="underline">The Dynamic Decomposed Trie</h2>
 		<div class="textual-content">
 			<p class="indented">
-				The previous trie is <dfn>decomposed</dfn> by compressing paths to maximum completions and labeling the branch points along each compressed path with their longest common prefix length (LCP) with the maximum completion. E.g. The path to "wikipedia$" is compressed into the root node, and the first-sibling along the path representing "wo" was compressed into "world", and those strings have an LCP of 1 because because they have the prefix "w" in common (which has a length of 1).
+				The previous trie is <dfn>decomposed</dfn> by compressing paths to maximum completions and labeling the branch points along each compressed path with their longest common prefix length (LCP) with the maximum completion. E.g. The path to “wikipedia$” is compressed into the root node, and the first-sibling along the path representing “wo” was compressed into “world”, and those strings have an LCP of 1 because because they have the prefix “w” in common (which has a length of 1).
 			</p>
 		</div>
 	</div>
@@ -523,7 +526,7 @@ results.push(node.toString())</code>
 	<div class="control-pane" hidden>
 		<h2 class="underline">The first two completions</h2>
 		<div class="textual-content">
-			<i>completions = { <span class="new">"wikipedia"</span>, <span class="new">"list"</span> }</i> <br>
+			<i>completions = { <span class="new">“wikipedia”</span>, <span class="new">“list”</span> }</i> <br>
 			<i>DEPQ = { <span class="new">(world,&nbsp;<b>30978</b>)</span>, <span class="new">(list&nbsp;of,&nbsp;<b>100625</b>)</span> }</i>
 			<br>
 			<i><var>k</var> = 3</i>
@@ -541,7 +544,7 @@ results.push(node.toString())</code>
 	<div class="control-pane" hidden>
 		<h2 class="underline">The third completion</h2>
 		<div class="textual-content">
-			<i>completions = { "wikipedia", "list", <span class="new">"list&nbsp;of"</span> }</i> <br>
+			<i>completions = { “wikipedia”, “list”, <span class="new">“list&nbsp;of”</span> }</i> <br>
 			<i>DEPQ = { <span class="new strikethrough">(listings,&nbsp;<b>2974</b>)</span>, (world,&nbsp;<b>30978</b>), <span class="new">(of,&nbsp;<b>98750</b>)</span>, <span class="old strikethrough">(list&nbsp;of,&nbsp;<b>100625</b>)</span> }</i>
 			<br>
 			<i><var>k</var> = 2</i>
@@ -554,7 +557,7 @@ results.push(node.toString())</code>
 	<div class="control-pane" hidden>
 		<h2 class="underline">The fourth completion</h2>
 		<div class="textual-content">
-			<i>completions = { "wikipedia", "list", "list&nbsp;of", <span class="new">"of"</span> }</i> <br>
+			<i>completions = { “wikipedia”, “list”, “list&nbsp;of”, <span class="new">“of”</span> }</i> <br>
 			<i>DEPQ = { <span class="new strikethrough">(league,&nbsp;<b>22168</b>)</span>, <span class="old strikethrough">(world,&nbsp;<b>30978</b>)</span>, <span class="new">(the,&nbsp;<b>66985</b>)</span>, <span class="old strikethrough">(of,&nbsp;<b>98750</b>)</span> }</i>
 			<br>
 			<i><var>k</var> = 1</i>
@@ -567,7 +570,7 @@ results.push(node.toString())</code>
 	<div class="control-pane" hidden>
 		<h2 class="underline">The fifth completion</h2>
 		<div class="textual-content">
-			<i>completions = { "wikipedia", "list", "list&nbsp;of", "of", <span class="new">"the"</span> }</i> <br>
+			<i>completions = { “wikipedia”, “list”, “list&nbsp;of”, “of”, <span class="new">“the”</span> }</i> <br>
 			<i>DEPQ = { <span class="old strikethrough">(the,&nbsp;<b>66985</b>)</span> }</i>
 			<br>
 			<i><var>k</var> = 0</i>
@@ -586,7 +589,7 @@ results.push(node.toString())</code>
 
 
 			<p class="indented">
-				However, because the structure was queried with the empty string, the algorithm was simplified slightly. Next, the structure will be queried with (<var>p</var> = "li", <var>k</var> = 10) to demonstrate a more realistic query.
+				However, because the structure was queried with the empty string, the algorithm was simplified slightly. Next, the structure will be queried with (<var>p</var> = “li”, <var>k</var> = 10) to demonstrate a more realistic query.
 			</p>
 		</div>
 	</div>
@@ -594,11 +597,11 @@ results.push(node.toString())</code>
 	<div class="control-pane" hidden>
 		<h2 class="underline">Finding the locus node</h2>
 		<div class="textual-content">
-			<i>completions = { <span class="new">"list"</span> }</i> <br>
+			<i>completions = { <span class="new">“list”</span> }</i> <br>
 			<i>DEPQ = {}</i> <br>
 			<i><var>k</var> = 9</i>
 			<p class="indented">
-				To find the locus node, the algorithm starts at the root <i>(0, wikipedia)</i> and computes the LCP with between its string and <var>p</var>, in this case LCP("wikipedia", "li") = 0. Thus, the algorithm moves to the LCP matching 0 in the current node's list of branch points, which happens to be the first node in this case: <i>(0, "list")</i>. The same process is repeated until the LCP = <span class="complexity">|p|</span> = 2. In this case, LCP("list", "li") = 2, so <i>(0, "list")</i> is the locus node. The locus node is the first completion, so it is pushed to the output list.
+				To find the locus node, the algorithm starts at the root <i>(0, wikipedia)</i> and computes the LCP with between its string and <var>p</var>, in this case LCP(“wikipedia”, “li”) = 0. Thus, the algorithm moves to the LCP matching 0 in the current node's list of branch points, which happens to be the first node in this case: <i>(0, “list”)</i>. The same process is repeated until the LCP = <span class="complexity">|p|</span> = 2. In this case, LCP(“list”, “li”) = 2, so <i>(0, “list”)</i> is the locus node. The locus node is the first completion, so it is pushed to the output list.
 			</p>
 
 			<p class="indented">
@@ -610,11 +613,11 @@ results.push(node.toString())</code>
 	<div class="control-pane" hidden>
 		<h2 class="underline">The second completion</h2>
 		<div class="textual-content">
-			<i>completions = { "list", <span class="new">"list&nbsp;of"</span> }</i> <br>
+			<i>completions = { "list", <span class="new">“list&nbsp;of”</span> }</i> <br>
 			<i>DEPQ = { <span class="new">(listings,&nbsp;<b>2974</b>)</span>, <span class="new">(line,&nbsp;<b>6574</b>)</span> }</i> <br>
 			<i><var>k</var> = 8</i>
 			<p class="indented">
-				The second completion to "li" is the first branch point contained in the locus with an LCP &ge; <span class="complexity">|p|</span> (i.e. 2). In this case, it does not change the second completion, but it does change which vertical successor of the second completion is inserted into the DEPQ. In this case, <i>(0, "of")</i> and <i>(1, "league")</i> are not valid completions to <var>p</var>, both with LCP &lt; <span class="complexity">|p|</span>.
+				The second completion to “li” is the first branch point contained in the locus with an LCP &ge; <span class="complexity">|p|</span> (i.e. 2). In this case, it does not change the second completion, but it does change which vertical successor of the second completion is inserted into the DEPQ. In this case, <i>(0, “of”)</i> and <i>(1, “league”)</i> are not valid completions to <var>p</var>, both with LCP &lt; <span class="complexity">|p|</span>.
 			</p>
 		</div>
 	</div>
@@ -622,7 +625,7 @@ results.push(node.toString())</code>
 	<div class="control-pane" hidden>
 		<h2 class="underline">Cont...</h2>
 		<div class="textual-content">
-			<i>completions = { "list", "list&nbsp;of", <span class="new">"line"</span> }</i> <br>
+			<i>completions = { “list”, “list&nbsp;of”, <span class="new">“line”</span> }</i> <br>
 			<i>DEPQ = { <span class="new">(lisa,&nbsp;<b>1342</b>)</span>, (listings,&nbsp;<b>2974</b>), <span class="new">(little,&nbsp;<b>6371</b>)</span>, <span class="old strikethrough">(line,&nbsp;<b>6574</b>)</span> }</i> <br>
 			<i><var>k</var> = 7</i>
 			<p class="indented">
@@ -634,7 +637,7 @@ results.push(node.toString())</code>
 	<div class="control-pane" hidden>
 		<h2 class="underline">Cont...</h2>
 		<div class="textual-content">
-			<i>completions = { "list", "list&nbsp;of", "line", <span class="new">"little"</span> }</i> <br>
+			<i>completions = { “list”, “list&nbsp;of”, “line”, <span class="new">“little”</span> }</i> <br>
 			<i>DEPQ = { (lisa,&nbsp;<b>1342</b>), (listings,&nbsp;<b>2974</b>), <span class="new">(life,&nbsp;<b>5939</b>)</span>, <span class="old strikethrough">(little,&nbsp;<b>6371</b>)</span> }</i> <br>
 			<i><var>k</var> = 6</i>
 			<p class="indented">
@@ -646,7 +649,7 @@ results.push(node.toString())</code>
 	<div class="control-pane" hidden>
 		<h2 class="underline">Cont...</h2>
 		<div class="textual-content">
-			<i>completions = { "list", "list&nbsp;of", "line", "little", <span class="new">"life"</span> }</i> <br>
+			<i>completions = { “list”, “list&nbsp;of”, “line”, “little”, <span class="new">“life”</span> }</i> <br>
 			<i>DEPQ = { (lisa,&nbsp;<b>1342</b>), (listings,&nbsp;<b>2974</b>), <span class="old strikethrough">(life,&nbsp;<b>5939</b>)</span> }</i> <br>
 			<i><var>k</var> = 5</i>
 			<p class="indented">
@@ -658,7 +661,7 @@ results.push(node.toString())</code>
 	<div class="control-pane" hidden>
 		<h2 class="underline">Cont...</h2>
 		<div class="textual-content">
-			<i>completions = { "list", "list&nbsp;of", "line", "little", "life", <span class="new">"listings"</span> }</i> <br>
+			<i>completions = { “list”, “list&nbsp;of”, “line”, “little”, “life”, <span class="new">“listings”</span> }</i> <br>
 			<i>DEPQ = { <span class="new">(list&nbsp;a,&nbsp;<b>50</b>)</span>, (lisa,&nbsp;<b>1342</b>), <span class="new">(listed,&nbsp;<b>2957</b>)</span>, <span class="old strikethrough">(listings,&nbsp;<b>2974</b>)</span> }</i> <br>
 			<i><var>k</var> = 4</i>
 			<p class="indented">
@@ -670,7 +673,7 @@ results.push(node.toString())</code>
 	<div class="control-pane" hidden>
 		<h2 class="underline">Cont...</h2>
 		<div class="textual-content">
-			<i>completions = { "list", "list&nbsp;of", "line", "little", "life", "listings", <span class="new">"listed"</span> }</i> <br>
+			<i>completions = { “list”, “list&nbsp;of”, “line”, “little”, “life”, “listings”, <span class="new">“listed”</span> }</i> <br>
 			<i>DEPQ = { (list&nbsp;a,&nbsp;<b>50</b>), (lisa,&nbsp;<b>1342</b>), <span class="old strikethrough">(listed,&nbsp;<b>2957</b>)</span> }</i> <br>
 			<i><var>k</var> = 3</i>
 			<p class="indented">
@@ -682,7 +685,7 @@ results.push(node.toString())</code>
 	<div class="control-pane" hidden>
 		<h2 class="underline">Cont...</h2>
 		<div class="textual-content">
-			<i>completions = { "list", "list&nbsp;of", "line", "little", "life", "listings", "listed", <span class="new">"lisa"</span> }</i> <br>
+			<i>completions = { “list”, “list&nbsp;of”, “line”, “little”, “life”, “listings”, “listed”, <span class="new">“lisa”</span> }</i> <br>
 			<i>DEPQ = { (list&nbsp;a,&nbsp;<b>50</b>), <span class="new">(lisbon,&nbsp;<b>303</b>)</span>, <span class="old strikethrough">(lisa,&nbsp;<b>1342</b>)</span> }</i> <br>
 			<i><var>k</var> = 2</i>
 			<p class="indented">
@@ -694,7 +697,7 @@ results.push(node.toString())</code>
 	<div class="control-pane" hidden>
 		<h2 class="underline">Cont...</h2>
 		<div class="textual-content">
-			<i>completions = { "list", "list&nbsp;of", "line", "little", "life", "listings", "listed", "lisa", <span class="new">"lisbon"</span> }</i> <br>
+			<i>completions = { “list”, “list&nbsp;of”, “line”, “little”, “life”, “listings”, “listed”, “lisa”, <span class="new">“lisbon”</span> }</i> <br>
 			<i>DEPQ = { (list&nbsp;a,&nbsp;<b>50</b>), <span class="new">(lise,&nbsp;<b>136</b>)</span>, <span class="old strikethrough">(lisbon,&nbsp;<b>303</b>)</span> }</i> <br>
 			<i><var>k</var> = 1</i>
 			<p class="indented">
@@ -706,7 +709,7 @@ results.push(node.toString())</code>
 	<div class="control-pane" hidden>
 		<h2 class="underline">The last completion</h2>
 		<div class="textual-content">
-			<i>completions = { "list", "list&nbsp;of", "line", "little", "life", "listings", "listed", "lisa", "lisbon", <span class="new">"lise"</span> }</i> <br>
+			<i>completions = { “list”, “list&nbsp;of”, “line”, “little”, “life”, “listings”, “listed”, “lisa”, “lisbon”, <span class="new">“lise”</span> }</i> <br>
 			<i>DEPQ = { (list&nbsp;a,&nbsp;<b>50</b>), <span class="old strikethrough">(lise,&nbsp;<b>136</b>)</span> }</i> <br>
 			<i><var>k</var> = 0</i>
 			<p class="indented">

@@ -1,8 +1,73 @@
-@font-face{font-family:'Nimbus Roman No9 L';font-style:normal;font-weight:400;src:local('Nimbus Roman No9 L'),url('https://fonts.cdnfonts.com/s/16417/NimbusRomNo9L-Reg.woff')format('woff');}@font-face{font-family:'Nimbus Roman No9 L';font-style:normal;font-weight:500;src:local('Nimbus Roman No9 L'),url('https://fonts.cdnfonts.com/s/16417/NimbusRomNo9L-Med.woff')format('woff');}
-html {
-	font-family: sans-serif; /* 1 */
-	-ms-text-size-adjust: 100%; /* 2 */
-	-webkit-text-size-adjust: 100%; /* 2 */
+@font-face {
+	font-family: 'JetBrains Mono';
+	src: url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff2/JetBrainsMono-Bold-Italic.woff2') format('woff2'),
+		url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff/JetBrainsMono-Bold-Italic.woff') format('woff');
+	font-weight: 700;
+	font-style: italic;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'JetBrains Mono';
+	src: url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff2/JetBrainsMono-Bold.woff2') format('woff2'),
+		url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff/JetBrainsMono-Bold.woff') format('woff');
+	font-weight: 700;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'JetBrains Mono';
+	src: url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff2/JetBrainsMono-ExtraBold-Italic.woff2') format('woff2'),
+		url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff/JetBrainsMono-ExtraBold-Italic.woff') format('woff');
+	font-weight: 800;
+	font-style: italic;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'JetBrains Mono';
+	src: url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff2/JetBrainsMono-ExtraBold.woff2') format('woff2'),
+		url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff/JetBrainsMono-ExtraBold.woff') format('woff');
+	font-weight: 800;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'JetBrains Mono';
+	src: url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff2/JetBrainsMono-Italic.woff2') format('woff2'),
+		url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff/JetBrainsMono-Italic.woff') format('woff');
+	font-weight: 400;
+	font-style: italic;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'JetBrains Mono';
+	src: url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff2/JetBrainsMono-Medium-Italic.woff2') format('woff2'),
+		url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff/JetBrainsMono-Medium-Italic.woff') format('woff');
+	font-weight: 500;
+	font-style: italic;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'JetBrains Mono';
+	src: url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff2/JetBrainsMono-Medium.woff2') format('woff2'),
+		url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff/JetBrainsMono-Medium.woff') format('woff');
+	font-weight: 500;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'JetBrains Mono';
+	src: url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff2/JetBrainsMono-Regular.woff2') format('woff2'),
+		url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff/JetBrainsMono-Regular.woff') format('woff');
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
 }
 
 article,
@@ -97,9 +162,12 @@ body {
 	/* background: #f7f7f7; */
 	color: #282828;
 	line-height: 1.5;
-
 	background-color: #eee;
 	letter-spacing: -0.375px;
+}
+
+body svg {
+	letter-spacing: 0px;
 }
 
 [style*="font-style: italic"], em, i, dfn:not(.funcname), cite, .it, caption {
@@ -120,25 +188,36 @@ div.pseudocode i {
 	font-family: "Libre Baskerville";
 	font-size: smaller;
 } */
+
+/* @media (max-width: 820px) {
+	article { transform: scale(0.9) translateY(-83em); }
+	header { transform: scale(0.9) }
+}
+
+@media (max-width: 770px) {
+	article { transform: scale(0.8) translateY(-188em); }
+	header { transform: scale(0.8) }
+} */
+
 @media (min-width: 1100px) {
-	article {
-		/* font-size: 1.166666666666667em; */
-		/* font-weight: 300; */
-		/* 1.8; */
-		zoom: 133.3333333333333333333333333%;
-		-moz-transform: scale(1.333333333333333333333333333333333) translateY(195em);
-		/* transform: scale(1.333333333333333333333333333333333) translateY(195em); */
-		/* -moz-transform: scale(1.5) translateY(195em); */
-	}
+	article { transform: scale(1.125) translateY(14in); }
+	header { transform: scale(1.125) }
+}
+
+@media (min-width: 1200px) {
+	article { transform: scale(1.333333333333333333333333333333333) translateY(31.25in); }
+	header { transform: scale(1.333333333333333333333333333333333) }
 }
 
 @media print {
 	article {
-		zoom: initial;
-		-moz-transform: initial;
+		/* zoom: initial; */
+		/* -moz-transform: initial; */
+		transform: initial;
 	}
 
-	#eliminating_log, #string_compression, #numeric_compression, #introduction, #preliminaries {
+	/* I don't know good ways to tell the PDF renderer how to figure this out for itself, so just hardcode */
+	#eliminating_log, #string_compression, #numeric_compression, #introduction, #preliminaries, #top-k_enumeration, #structural-properties, #score_placement, #Algorithm_6, #Deletion {
 		page-break-before: always;
 	}
 
@@ -626,7 +705,7 @@ section[id="references"] p {
 body>section,
 article {
 	margin: 0 auto 1em auto;
-	margin-bottom: 100vh;
+	/* margin-bottom: 100vh; */
 }
 
 h1,
@@ -763,7 +842,7 @@ a {
 	color: inherit;
 }
 
-figure img {
+figure svg {
 	border: 0;
 	page-break-before: auto;
 	page-break-after: auto;
@@ -774,7 +853,7 @@ figure img {
 	height: auto;
 }
 
-/* figure img { border: 2px dashed currentcolor; }
+/* figure svg { border: 2px dashed currentcolor; }
 article { border: 2px dashed currentcolor;} */
 
 figure {
@@ -1174,7 +1253,7 @@ Figure 2 aka #decomposed_trie keeps pushing its figcaption away!
 	}
 
 
-	figure img {
+	figure svg {
 		page-break-after: avoid !important;
 		margin-bottom: 0 !important;
 		padding-bottom: 0 !important;
@@ -1341,6 +1420,19 @@ g.bb-legend-item.bb-legend-item-DynSDT, tr.bb-tooltip-name-DynSDT > td.name {
 	display: none;
 }
 
+header {
+	background-color: white;
+	width: 21cm;
+	display: flexbox;
+	font-size: large;
+	padding: 0.5em;
+	text-align: center;
+	align-self: center;
+	margin: auto;
+	margin-bottom: 2em;
+	margin-top: 1em;
+}
+
 @media (prefers-color-scheme: dark) {
 	.bb-button .bb-zoom-reset {
 		background-color: #000 !important;
@@ -1349,10 +1441,6 @@ g.bb-legend-item.bb-legend-item-DynSDT, tr.bb-tooltip-name-DynSDT > td.name {
 	/*
 	<div class="bb-tooltip-container" style="position: absolute; pointer-events: none; top: 49.4271px; left: 259.5px; display: none; visibility: hidden;"><table class="bb-tooltip"><tbody><tr><th colspan="2">9956</th></tr><tr class="bb-tooltip-name-DynSDT"><td class="name"><span style="background-color:#1f77b4"></span>DynSDT</td><td class="value"><b>Mid:</b> 6.89515ms <b>High:</b> 7.1549ms <b>Low:</b> 6.2458ms</td></tr></tbody></table></div>
 	*/
-
-	img[src$=".svg"]:not([src$="completion_trie3.svg"]) {
-		filter: invert(1);
-	}
 
 	div.bb-tooltip-container {
 		filter: invert(1);
@@ -1367,7 +1455,7 @@ g.bb-legend-item.bb-legend-item-DynSDT, tr.bb-tooltip-name-DynSDT > td.name {
 		filter: invert(1);
 	}
 
-	article {
+	article, header {
 		background: rgb(41, 41, 41);
 	}
 

@@ -4,6 +4,7 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=0.6">
 	<title>DynSDTs for Top-k Autocomplete</title>
+	<link rel="stylesheet" href="demo/normalize.css">
 	<link rel="stylesheet" href="scholarly.css">
 	<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
 	<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
@@ -11,48 +12,18 @@
 	<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Main-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
 	<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Main-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
 	<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Math-BoldItalic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-
-	  <!-- @font-face {
-		font-family: KaTeX_Main;
-		font-style: normal;
-		font-weight: 700;
-		src: url(fonts/KaTeX_Main-Bold.woff2) format("woff2"),url(fonts/KaTeX_Main-Bold.woff) format("woff"),url(fonts/KaTeX_Main-Bold.ttf) format("truetype")
-	}
-
-	@font-face {
-		font-family: KaTeX_Main;
-		font-style: italic;
-		font-weight: 700;
-		src: url(fonts/KaTeX_Main-BoldItalic.woff2) format("woff2"),url(fonts/KaTeX_Main-BoldItalic.woff) format("woff"),url(fonts/KaTeX_Main-BoldItalic.ttf) format("truetype")
-	}
-
-	@font-face {
-		font-family: KaTeX_Main;
-		font-style: italic;
-		font-weight: 400;
-		src: url(fonts/KaTeX_Main-Italic.woff2) format("woff2"),url(fonts/KaTeX_Main-Italic.woff) format("woff"),url(fonts/KaTeX_Main-Italic.ttf) format("truetype")
-	}
-
-
-
-	@font-face {
-		font-family: KaTeX_Math;
-		font-style: italic;
-		font-weight: 700;
-		src: url(fonts/KaTeX_Math-BoldItalic.woff2) format("woff2"),url(fonts/KaTeX_Math-BoldItalic.woff) format("woff"),url(fonts/KaTeX_Math-BoldItalic.ttf) format("truetype")
-	} -->
-
-
-
 	<link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/katex.min.css" integrity="sha384-ZPe7yZ91iWxYumsBEOn7ieg8q/o+qh/hQpSaPow8T6BwALcXSCS6C6fSRPIAnTQs" crossorigin="anonymous">
 	<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
 	<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png">
 	<link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png">
 	<link rel="manifest" href="./site.webmanifest">
 </head>
+<header>
+For a simpler visual introduction to these concepts, see <a class="libre" target="_blank" rel="noopener noreferrer" href="https://validark.github.io/DynSDT/demo">https://validark.github.io/DynSDT/demo</a>
+</header>
 <body prefix="schema: http://schema.org/ xsd: http://www.w3.org/2001/XMLSchema# sa: https://ns.science.ai/">
 	<article typeof="schema:ScholarlyArticle" resource="#" style="display: block">
-		<h1>Heap-like Dynamic Score-Decomposed Tries for Top-<var>k</var> Autocomplete</h1>
+		<h1 style="padding-top: 0 !important; margin-top: 0 !important">Heap-like Dynamic Score-Decomposed Tries for Top-<var>k</var> Autocomplete</h1>
 		<div class="author-info" style="font-size: 1.5em; margin-bottom: 4em">
 			<a class="uncolored" property="schema:author" href="https://github.com/Validark" typeof="schema:Person" target="_blank" rel="noopener noreferrer">
 				<span property="schema:givenName">Niles</span>
@@ -196,7 +167,245 @@
 				<span class="complexity"><span class="theta">Θ</span>(<var>d</var><var>k</var><span class="ThinSpace"></span>log<span class="ThinSpace"></span><var>k</var>)</span> time.
 			</p>
 			<figure id="completion_trie">
-				<a target="_blank" rel="noopener noreferrer" href="https://validark.github.io/DynSDT/demo/"><img src="./completion_trie3.svg"></a>
+				<!-- <a target="_blank" rel="noopener noreferrer" href="https://validark.github.io/DynSDT/demo/"><img src="./completion_trie3.svg"></a> -->
+				<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:v="https://vecta.io/nano" preserveAspectRatio="xMidYMin slice" width="641" height="479"
+				viewBox="21 33 1120 827"
+				>
+				<style>
+					#completion_trie .B{dominant-baseline:central}
+					#completion_trie .C{text-anchor:end}
+					#completion_trie text{font-family: KaTeX_Main, serif; font-size: 24pt;}
+					#completion_trie .F{fill:#bac5e0}
+					#completion_trie .G{stroke-miterlimit:10}
+					#completion_trie .H{fill:none}
+					#completion_trie .J{fill:#fff}
+					#completion_trie .L{stroke:#bac5e0}
+					#completion_trie .M{stroke-dasharray:8, 3}
+					#completion_trie .M.O{stroke:#f81c1c}
+					#completion_trie .N{fill:#f81c1c}
+					#completion_trie .O{stroke:#000}
+					#completion_trie .P{text-anchor:middle}
+				</style>
+			<g>
+
+							<path d="M782.462 143.81 h 165.5405 M 968.0025 143.81 h 165.54050000000007" paint-order="fill stroke markers" class="G H L M"/>
+							<path d="m1135 143.81-6-3.6v7.2z" paint-order="stroke fill markers" class="F"/>
+							<path d="M966.167 244.012 h 34.762 M 1020.9290000000001 244.012 h 20.761999999999944" paint-order="fill stroke markers" class="G H L M"/>
+							<path d="m1047.69 244.012-6-3.6v7.2z" paint-order="stroke fill markers" class="F"/>
+							<path d="M874.315 244.012 h 34.762 M 925 244.012 h 24" paint-order="fill stroke markers" class="G H L M"/>
+							<path d="m955.839 244.012-6-3.6v7.2z" paint-order="stroke fill markers" class="F"/>
+							<path d="M782.462 244.012 h 34.7625 M 837.2245 244.012 h 20.762499999999932" paint-order="fill stroke markers" class="G H L M"/>
+							<path d="m863.987 244.012-6-3.6v7.2z" paint-order="stroke fill markers" class="F"/>
+							<path d="M966.167 344.214 h 34.762 M 1020.9290000000001 344.214 h 20.761999999999944" paint-order="fill stroke markers" class="G H L M"/>
+							<path d="m1047.69 344.214-6-3.6v7.2z" paint-order="stroke fill markers" class="F"/>
+							<path d="M874.315 344.214 h 33.762 M 924.077 344.214 h 25.762000000000057" paint-order="fill stroke markers" class="G H L M"/>
+							<path d="m955.839 344.214-6-3.6v7.2z" paint-order="stroke fill markers" class="F"/>
+							<path d="M782.462 344.214 h 30 M 835 344.214 h 23" paint-order="fill stroke markers" class="G H L M"/>
+							<path d="m863.987 344.214-6-3.6v7.2z" paint-order="stroke fill markers" class="F"/>
+							<path d="M782.462 244.012 v 34 M 782.462 307.949 v 19.936999999999955" paint-order="fill stroke markers" class="G H L"/>
+							<path d="m782.462 333.886 3.6-6h-7.2z" paint-order="stroke fill markers" class="F"/>
+							<path d="M782.462 143.81 v 34 M 782.462 207.747 v 19.936999999999983" paint-order="fill stroke markers" class="G H L"/>
+							<path d="m782.462 233.684 3.6-6h-7.2z" paint-order="stroke fill markers" class="F"/>
+							<path d="M415.054 143.81 h 165.54 M 600.5939999999999 143.81 h 165.54000000000008" paint-order="fill stroke markers" class="G H L M"/>
+							<path d="m772.134 143.81-6-3.6v7.2z" paint-order="stroke fill markers" class="F"/>
+							<path d="M598.758 244.012 h 27.762 M 646.52 244.012 h 27.762000000000057" paint-order="fill stroke markers" class="G H L M"/>
+							<path d="m680.282 244.012-6-3.6v7.2z" paint-order="stroke fill markers" class="F"/>
+							<path d="M506.906 244.012 h 29.762 M 556.668 244.012 h 25.762000000000057" paint-order="fill stroke markers" class="G H L M"/>
+							<path d="m588.43 244.012-6-3.6v7.2z" paint-order="stroke fill markers" class="F"/>
+							<path d="M415.054 244.012 h 29.762 M 464.816 244.012 h 25.762" paint-order="fill stroke markers" class="G H L M"/>
+							<path d="m496.578 244.012-6-3.6v7.2z" paint-order="stroke fill markers" class="F"/>
+							<path d="M598.758 344.214 h 30.762 M 649.52 344.214 h 24.762000000000057" paint-order="fill stroke markers" class="G H L M"/>
+							<path d="m680.282 344.214-6-3.6v7.2z" paint-order="stroke fill markers" class="F"/>
+							<path d="M506.906 344.214 h 30.762 M 557.668 344.214 h 24.762000000000057" paint-order="fill stroke markers" class="G H L M"/>
+							<path d="m588.43 344.214-6-3.6v7.2z" paint-order="stroke fill markers" class="F"/>
+							<path d="M415.054 344.214 h 27.762 M 462.816 344.214 h 27.762" paint-order="fill stroke markers" class="G H L M"/>
+							<path d="m496.578 344.214-6-3.6v7.2z" paint-order="stroke fill markers" class="F"/>
+							<path d="M598.758 444.417 h 29.762 M 648.52 444.417 h 25.762000000000057" paint-order="fill stroke markers" class="G H L M"/>
+							<path d="m680.282 444.417-6-3.6v7.2z" paint-order="stroke fill markers" class="F"/>
+							<path d="M506.906 444.417 h 27.762 M 554.668 444.417 h 27.762000000000057" paint-order="fill stroke markers" class="G H L M"/>
+							<path d="m588.43 444.417-6-3.6v7.2z" paint-order="stroke fill markers" class="F"/>
+							<path d="M415.054 444.417 h 29.762 M 462.816 444.417 h 27.762" paint-order="fill stroke markers" class="G H L M"/>
+							<path d="m496.578 444.417-6-3.6v7.2z" paint-order="stroke fill markers" class="F"/>
+							<path d="M598.758 544.619 h 31.762 M 648.52 544.619 h 25.762000000000057" paint-order="fill stroke markers" class="G H L M"/>
+							<path d="m680.282 544.619-6-3.6v7.2z" paint-order="stroke fill markers" class="F"/>
+							<path d="M506.906 544.619 h 34 M 556.668 544.619 h 25.762000000000057" paint-order="fill stroke markers" class="G H L M"/>
+							<path d="m588.43 544.619-6-3.6v7.2z" paint-order="stroke fill markers" class="F"/>
+							<path d="M690.61 644.821 h 31.762 M 740.3720000000001 644.821 h 25.761999999999944" paint-order="fill stroke markers" class="G H L M"/>
+							<path d="m772.134 644.821-6-3.6v7.2z" paint-order="stroke fill markers" class="F"/>
+							<path d="M598.758 644.821 h 35 M 648.52 644.821 h 25.762000000000057" paint-order="fill stroke markers" class="G H L M"/>
+							<path d="m680.282 644.821-6-3.6v7.2z" paint-order="stroke fill markers" class="F"/>
+							<path d="M506.906 644.821 h 29.762 M 556.668 644.821 h 25.762000000000057" paint-order="fill stroke markers" class="G H L M"/>
+							<path d="m588.43 644.821-6-3.6v7.2z" paint-order="stroke fill markers" class="F"/>
+
+
+							<use href="#Z" x="460" y="601.218" class="F L"/>
+
+							<path d="M506.906 745.024 h 31.762 M 556.668 745.024 h 25.762000000000057" paint-order="fill stroke markers" class="G H L M"/>
+
+
+							<path d="m588.43 745.024-6-3.6v7.2z" paint-order="stroke fill markers" class="F"/>
+							<path d="M506.906 745.024 v 34 M 506.906 808.961 v 19.937000000000012" paint-order="fill stroke markers" class="G H L"/>
+							<path d="m506.906 834.898 3.6-6h-7.2z" paint-order="stroke fill markers" class="F"/>
+							<path d="M506.906 644.821 v 34 M 506.906 708.7585 v 19.9375" paint-order="fill stroke markers" class="G H L"/>
+							<path d="m506.906 734.696 3.6-6h-7.2z" paint-order="stroke fill markers" class="F"/>
+							<path d="M506.906 544.619 v 39 M 506.906 608.556 v 19.937000000000012" paint-order="fill stroke markers" class="G H L"/>
+							<path d="m506.906 634.493 3.6-6h-7.2z" paint-order="stroke fill markers" class="F"/>
+							<path d="M415.054 544.619 h 27.762 M 464.816 544.619 h 25.762" paint-order="fill stroke markers" class="G H L M"/>
+							<path d="m496.578 544.619-6-3.6v7.2z" paint-order="stroke fill markers" class="F"/>
+							<path d="M415.054 444.417 v 34 M 415.054 508.354 v 19.936999999999955" paint-order="fill stroke markers" class="G H L"/>
+							<path d="m415.054 534.291 3.6-6h-7.2z" paint-order="stroke fill markers" class="F"/>
+							<path d="M415.054 344.214 v 38 M 415.054 406.1515 v 21.9375" paint-order="fill stroke markers" class="G H L"/>
+							<path d="m415.054 434.089 3.6-6h-7.2z" paint-order="stroke fill markers" class="F"/>
+							<path d="M415.054 244.012 v 41.937 M 415.054 305.949 v 21.936999999999955" paint-order="fill stroke markers" class="G H L"/>
+							<path d="m415.054 333.886 3.6-6h-7.2z" paint-order="stroke fill markers" class="F"/>
+							<path d="M415.054 143.81 v 35 M 415.054 205.747 v 21.936999999999983" paint-order="fill stroke markers" class="G H L"/>
+							<path d="m415.054 233.684 3.6-6h-7.2z" paint-order="stroke fill markers" class="F"/>
+							<path d="M47.645 143.81 h 165.54 M 233.185 143.81 h 165.53999999999996" paint-order="fill stroke markers" class="G H M O"/>
+							<path d="m404.726 143.81-6-3.6v7.2z" paint-order="stroke fill markers" class="N"/>
+							<path d="M231.35 244.012 h 27.762 M 279.11199999999997 244.012 h 27.762000000000057" paint-order="fill stroke markers" class="G H L M"/>
+							<path d="m312.874 244.012-6-3.6v7.2z" paint-order="stroke fill markers" class="F"/>
+							<path d="M139.497 244.012 h 27.762500000000003 M 187.2595 244.012 h 27.762500000000017" paint-order="fill stroke markers" class="G H L M"/>
+							<path d="m221.022 244.012-6-3.6v7.2z" paint-order="stroke fill markers" class="F"/>
+							<path d="M47.645 244.012 h 29.762 M 97.40700000000001 244.012 h 25.762" paint-order="fill stroke markers" class="G H M O"/>
+							<path d="m129.17 244.012-6-3.6v7.2z" paint-order="stroke fill markers" class="N"/>
+							<path d="M231.35 344.214 h 27.762 M 279.11199999999997 344.214 h 27.762000000000057" paint-order="fill stroke markers" class="G H L M"/>
+							<path d="m312.874 344.214-6-3.6v7.2z" paint-order="stroke fill markers" class="F"/>
+							<path d="M139.497 344.214 h 27.762500000000003 M 187.2595 344.214 h 27.762500000000017" paint-order="fill stroke markers" class="G H L M"/>
+							<path d="m221.022 344.214-6-3.6v7.2z" paint-order="stroke fill markers" class="F"/>
+							<path d="M47.645 344.214 h 31.762 M 99.40700000000001 344.214 h 23.762" paint-order="fill stroke markers" class="G H M O"/>
+							<path d="m129.17 344.214-6-3.6v7.2z" paint-order="stroke fill markers" class="N"/>
+							<path d="M231.35 444.417 h 27.762 M 279.11199999999997 444.417 h 27.762000000000057" paint-order="fill stroke markers" class="G H L M"/>
+							<path d="m312.874 444.417-6-3.6v7.2z" paint-order="stroke fill markers" class="F"/>
+							<path d="M139.497 444.417 h 27.762500000000003 M 187.2595 444.417 h 27.762500000000017" paint-order="fill stroke markers" class="G H L M"/>
+							<path d="m221.022 444.417-6-3.6v7.2z" paint-order="stroke fill markers" class="F"/>
+							<path d="M47.645 444.417 h 31.762 M 99.40700000000001 444.417 h 23.762" paint-order="fill stroke markers" class="G H M O"/>
+							<path d="m129.17 444.417-6-3.6v7.2z" paint-order="stroke fill markers" class="N"/>
+							<path d="M231.35 544.619 h 36 M 279.11199999999997 544.619 h 27.762000000000057" paint-order="fill stroke markers" class="G H L M"/>
+							<path d="m312.874 544.619-6-3.6v7.2z" paint-order="stroke fill markers" class="F"/>
+							<path d="M139.497 544.619 h 27.762500000000003 M 187.2595 544.619 h 27.762500000000017" paint-order="fill stroke markers" class="G H L M"/>
+							<path d="m221.022 544.619-6-3.6v7.2z" paint-order="stroke fill markers" class="F"/>
+							<path d="M47.645 544.619 h 33.762 M 105.40700000000001 544.619 h 17.762" paint-order="fill stroke markers" class="G H M O"/>
+							<path d="m129.17 544.619-6-3.6v7.2z" paint-order="stroke fill markers" class="N"/>
+							<path d="M145.76 644.821 h 37 M 285 644.821 h 20" paint-order="fill stroke markers" class="G H L M"/>
+							<path d="m312 644.821-6-3.6v7.2z" paint-order="stroke fill markers" class="F"/>
+							<path d="M47.645 644.821 h 36.8935 M 108.5385 644.821 h 20.893500000000017" paint-order="fill stroke markers" class="G H M O"/>
+							<path d="m135.432 644.821-6-3.6v7.2z" paint-order="stroke fill markers" class="N"/>
+							<path d="M47.645 745.024 h 25 M 165 745.024 h 20" paint-order="fill stroke markers" class="G H M O"/>
+							<path d="m187 745.024-6-3.6v7.2z" paint-order="stroke fill markers" class="N"/>
+							<path d="M237.612 845.226 h 29.762 M 287.374 845.226 h 25.761999999999944" paint-order="fill stroke markers" class="G H L M"/>
+							<path d="m319.136 845.226-6-3.6v7.2z" paint-order="stroke fill markers" class="F"/>
+							<path d="M139.497 845.226 h 34.8935 M 200.39050000000003 845.226 h 20.89349999999999" paint-order="fill stroke markers" class="G H L M"/>
+							<path d="m227.284 845.226-6-3.6v7.2z" paint-order="stroke fill markers" class="F"/>
+
+							<path d="M47.645 845.226 h 29.762 M 97.40700000000001 845.226 h 25.762" paint-order="fill stroke markers" class="G H M O"/>
+
+							<path d="m129.17 845.226-6-3.6v7.2z" paint-order="stroke fill markers" class="N"/>
+							<path d="M47.645 745.024 v 34 M 47.645 808.961 v 19.937000000000012" paint-order="fill stroke markers" class="G H O"/>
+							<path d="m47.645 834.898 3.6-6h-7.2z" paint-order="stroke fill markers"/>
+							<path d="M47.645 644.821 v 34 M 47.645 708.7585 v 19.9375" paint-order="fill stroke markers" class="G H O"/>
+							<path d="m47.645 734.696 3.6-6h-7.2z" paint-order="stroke fill markers"/>
+							<path d="M47.645 544.619 v 34 M 47.645 608.556 v 19.937000000000012" paint-order="fill stroke markers" class="G H O"/>
+							<path d="m47.645 634.493 3.6-6h-7.2z" paint-order="stroke fill markers"/>
+							<path d="M47.645 444.417 v 40.937 M 47.645 513.354 v 14.936999999999955" paint-order="fill stroke markers" class="G H O"/>
+							<path d="m47.645 534.291 3.6-6h-7.2z" paint-order="stroke fill markers"/>
+							<path d="M47.645 344.214 v 34 M 47.645 408.1515 v 19.9375" paint-order="fill stroke markers" class="G H O"/>
+							<path d="m47.645 434.089 3.6-6h-7.2z" paint-order="stroke fill markers"/>
+							<path d="M47.645 244.012 v 34 M 47.645 307.949 v 19.936999999999955" paint-order="fill stroke markers" class="G H O"/>
+							<path d="m47.645 333.886 3.6-6h-7.2z" paint-order="stroke fill markers"/>
+							<path d="M47.645 143.81 v 34 M 47.645 207.747 v 19.936999999999983" paint-order="fill stroke markers" class="G H O"/>
+							<path d="m47.645 233.684 3.6-6h-7.2z" paint-order="stroke fill markers"/>
+							<path d="M47.645 43.607 v 37 M 47.645 107.5445 v 19.9375" paint-order="fill stroke markers" class="G H O"/>
+							<path d="m47.645 133.482 3.6-6h-7.2z" paint-order="stroke fill markers"/><text transform="translate(964 143.81)" y="-0.5" class="B C F">t</text><text transform="translate(1012.093 244.012)" y="-0.5" class="B P F">n</text><text transform="translate(920.24 244.012)" y="-0.5" class="B C F">l</text><text transform="translate(826 244.012)" y="-0.5" class="B P F">p</text><text transform="translate(1012.093 344.214)" y="-0.5" class="B P F">c</text><text transform="translate(920.24 344.214)" y="-0.5" class="B C F">f</text><text transform="translate(831 344.214)" y="-0.5" class="B C F">_</text><text transform="translate(782.462 294.113)" y="-0.5" class="B P F">$</text><text transform="translate(782.462 193.91)" y="-0.5" class="B P F">f</text><text transform="translate(597 143.81)" y="-0.5" class="B C F">o</text><text transform="translate(644.684 244.012)" y="-0.5" class="B C F">o</text><text transform="translate(552.832 244.012)" y="-0.5" class="B C F">a</text><text transform="translate(460.98 244.012)" y="-0.5" class="B C F">e</text><text transform="translate(644.684 344.214)" y="-0.5" class="B C F">f</text><text transform="translate(552.832 344.214)" y="-0.5" class="B C F">t</text><text transform="translate(460.98 344.214)" y="-0.5" class="B C F">n</text><text transform="translate(644.684 444.417)" y="-0.5" class="B C F">e</text><text transform="translate(552.832 444.417)" y="-0.5" class="B C F">b</text><text transform="translate(460.98 444.417)" y="-0.5" class="B C F">a</text><text transform="translate(644.684 544.619)" y="-0.5" class="B C F">e</text><text transform="translate(552.832 544.619)" y="-0.5" class="B C F">i</text><text transform="translate(739 644.821)" y="-0.5" class="B C F">d</text><text transform="translate(644.684 644.821)" y="-0.5" class="B C F">f</text><text transform="translate(554 644.821)" y="-0.5" class="B C F">a</text><text transform="translate(554 745.024)" y="-0.5" class="B C F">b</text><text transform="translate(506.906 795.125)" y="-0.5" class="B P F">$</text><text transform="translate(506.906 694.923)" y="-0.5" class="B P F">f</text><text transform="translate(506.906 594.72)" y="-0.5" class="B P F">o</text><text transform="translate(460.98 544.619)" y="-0.5" class="B C F">_</text><text transform="translate(415.054 494.518)" y="-0.5" class="B P F">$</text><text transform="translate(415.054 394.315)" y="-0.5" class="B P F">t</text><text transform="translate(415.054 294.113)" y="-0.5" class="B P F">s</text><text transform="translate(415.054 193.91)" y="-0.5" class="B P F">i</text><text transform="translate(228 143.81)" y="-0.5" class="B C N">l</text><text transform="translate(277.276 244.012)" y="-0.5" class="B C F">$</text><text transform="translate(184 244.012)" y="-0.5" class="B C F">e</text><text transform="translate(93.571 244.012)" y="-0.5" class="B C N">o</text><text transform="translate(275 344.214)" y="-0.5" class="B C F">t</text><text transform="translate(184 344.214)" y="-0.5" class="B C F">s</text><text transform="translate(93.571 344.214)" y="-0.5" class="B C N">l</text><text transform="translate(276 444.417)" y="-0.5" class="B C F">e</text><text transform="translate(183 444.417)" y="-0.5" class="B C F">s</text><text transform="translate(93.571 444.417)" y="-0.5" class="B C N">t</text><text transform="translate(277.276 544.619)" y="-0.5" class="B C F">l</text><text transform="translate(185.423 544.619)" y="-0.5" class="B C F">$</text><text transform="translate(93.571 544.619)" y="-0.5" class="B P N">m</text><text transform="translate(235 644.821)" y="-0.5" class="B P F">ilipinas</text><text transform="translate(96.703 644.821)" y="-0.5" class="B P N">ro</text><text transform="translate(120 745.024)" y="-0.5" class="B P N">ocracy</text><text transform="translate(283.538 845.226)" y="-0.5" class="B C F">s</text><text transform="translate(188.555 845.226)" y="-0.5" class="B P F">fs</text><text transform="translate(95 845.226)" y="-0.5" class="B C N">_</text><text transform="translate(47.645 795.125)" y="-0.5" class="B P">$</text><text transform="translate(47.645 694.923)" y="-0.5" class="B P">a</text><text transform="translate(47.645 594.72)" y="-0.5" class="B P">edi</text><text transform="translate(47.645 494.518)" y="-0.5" class="B P">p</text><text transform="translate(47.645 394.315)" y="-0.5" class="B P">i</text><text transform="translate(47.645 294.113)" y="-0.5" class="B P">k</text><text transform="translate(47.645 193.91)" y="-0.5" class="B P">i</text><text transform="translate(47.645 93.708)" y="-0.5" class="B P">w</text><g class="F">
+							<path d="M609.086 745.024a10.328 10.328 0 1 0 0 .01z" paint-order="stroke fill markers"/>
+							<path d="M609.086 745.024a10.328 10.328 0 1 0 0 .01zm-91.852 100.202a10.328 10.328 0 1 0 0 .01zm-177.442 0a10.328 10.328 0 1 0 0 .01z" paint-order="stroke fill markers"/>
+							<use href="#B" paint-order="stroke fill markers"/>
+							<path d="M247.94 845.226a10.328 10.328 0 1 0 0 .01zm-98.115 0a10.328 10.328 0 1 0 0 .01z" paint-order="stroke fill markers"/></g>
+							<use href="#B" x="-189.967" paint-order="stroke fill markers" class="N"/>
+	<!--
+							<path d="M191.139 745.024a10.328 10.328 0 1 0 0 .01z" paint-order="stroke fill markers" class="N"/> -->
+<!-- 16.5 -->
+	<!-- 133.5 -->
+
+							<use href="#Z" x="150" y="601.218" stroke="red" fill="red"/>
+
+	<g class="F">
+							<path d="M792.79 644.821a10.328 10.328 0 1 0 0 .01z" paint-order="stroke fill markers"/>
+							<use href="#B" x="452.998" y="-200.405" paint-order="stroke fill markers"/>
+							<use href="#B" x="361.146" y="-200.405" paint-order="stroke fill markers"/>
+							<path d="M609.086 644.821a10.328 10.328 0 1 0 0 .01zm91.852-100.202a10.328 10.328 0 1 0 0 .01z" paint-order="stroke fill markers"/>
+							<use href="#B" x="361.146" y="-300.607" paint-order="stroke fill markers"/>
+
+							<path d="M609.086 544.619 m-91.852 100.202a10.328 10.328 0 1 0 0 .01z" paint-order="stroke fill markers"/>
+
+							<use href="#Z" x="275" y="501.015"></use>
+	</g>
+							<path d="M156.088 644.821a10.328 10.328 0 1 0 0 .01zm-98.115 0a10.328 10.328 0 1 0 0 .01z" paint-order="stroke fill markers" class="N"/><g class="F">
+							<path d="M517.234 544.619a10.328 10.328 0 1 0 0 .01z" paint-order="stroke fill markers"/>
+							<use href="#C" paint-order="stroke fill markers"/>
+							<use href="#D" paint-order="stroke fill markers"/>
+							<use href="#B" x="-98.115" y="-300.607" paint-order="stroke fill markers"/></g>
+							<use href="#B" x="-189.967" y="-300.607" paint-order="stroke fill markers" class="N"/><g class="F">
+							<path d="M1068.347 344.214a10.328 10.328 0 1 0 0 .01z" paint-order="stroke fill markers"/>
+							<path d="M1068.347 344.214a10.328 10.328 0 1 0 0 .01zm0-100.202a10.328 10.328 0 1 0 0 .01z" paint-order="stroke fill markers"/>
+							<path d="M1068.347 244.012a10.328 10.328 0 1 0 0 .01zM700.938 444.417a10.328 10.328 0 1 0 0 .01z" paint-order="stroke fill markers"/>
+							<use href="#B" x="361.146" y="-400.809" paint-order="stroke fill markers"/>
+							<path d="M609.086 444.417a10.328 10.328 0 1 0 0 .01zm275.556-100.203a10.328 10.328 0 1 0 0 .01zm91.853 0a10.328 10.328 0 1 0 0 .01z" paint-order="stroke fill markers"/>
+							<use href="#E" paint-order="stroke fill markers"/>
+							<use href="#B" x="361.146" y="-501.012" paint-order="stroke fill markers"/>
+							<path d="M609.086 344.214a10.328 10.328 0 1 0 0 .01zm-91.852 100.203a10.328 10.328 0 1 0 0 .01z" paint-order="stroke fill markers"/>
+							<use href="#C" y="-100.202" paint-order="stroke fill markers"/>
+							<use href="#D" y="-100.202" paint-order="stroke fill markers"/>
+							<use href="#B" x="-98.115" y="-400.809" paint-order="stroke fill markers"/></g>
+							<use href="#B" x="-189.967" y="-400.809" paint-order="stroke fill markers" class="N"/><g class="F">
+							<path d="M517.234 344.214a10.328 10.328 0 1 0 0 .01z" paint-order="stroke fill markers"/>
+							<use href="#C" y="-200.405" paint-order="stroke fill markers"/>
+							<use href="#D" y="-200.405" paint-order="stroke fill markers"/>
+							<use href="#B" x="-98.115" y="-501.012" paint-order="stroke fill markers"/></g>
+							<use href="#B" x="-189.967" y="-501.012" paint-order="stroke fill markers" class="N"/><g class="F">
+							<path d="M884.642 244.012a10.328 10.328 0 1 0 0 .01zm91.853 0a10.328 10.328 0 1 0 0 .01z" paint-order="stroke fill markers"/>
+							<use href="#E" y="-100.202" paint-order="stroke fill markers"/>
+							<path d="M609.086 244.012a10.328 10.328 0 1 0 0 .01zM792.79 143.81a10.328 10.328 0 1 0 0 .01z" paint-order="stroke fill markers"/>
+							<path d="M792.79 143.81a10.328 10.328 0 1 0 0 .01zM517.234 244.012a10.328 10.328 0 1 0 0 .01z" paint-order="stroke fill markers"/>
+							<use href="#C" y="-300.607" paint-order="stroke fill markers"/>
+							<use href="#D" y="-300.607" paint-order="stroke fill markers"/>
+							<use href="#B" x="-98.115" y="-601.214" paint-order="stroke fill markers"/></g>
+							<use href="#B" x="-189.967" y="-601.214" paint-order="stroke fill markers" class="N"/>
+
+
+							<path d="M425.382 143.81a10.328 10.328 0 1 0 0 .01z" paint-order="stroke fill markers" class="N"/>
+
+
+							<path id="Z" d="M57.973 143.81a10.328 10.328 0 1 0 0 .01z" paint-order="stroke fill markers"/>
+
+							<use href="#Z" x="0" y="100.203"></use>
+
+							<use href="#Z" x="0" y="200.406"></use>
+
+							<use href="#Z" x="0" y="300.609"></use>
+
+							<use href="#Z" x="0" y="400.812"></use>
+
+							<use href="#Z" x="0" y="501.015"></use>
+
+							<use href="#Z" x="0" y="601.218"></use>
+
+							<use href="#Z" x="0" y="701.421"></use>
+
+
+							<path d="M57.973 43.607a10.328 10.328 0 1 0 0 .01z" paint-order="stroke fill markers" class="F"/>
+							<path d="M57.973 43.607a10.328 10.328 0 1 0 0 .01z" paint-order="stroke fill markers"/>
+</g>
+	<defs>
+
+							<path id="B" d="M339.792 845.226a10.328 10.328 0 1 0 0 .01zm-91.852 0a10.328 10.328 0 1 0 0 .01z"/>
+
+							<path id="C" d="M517.234 544.619a10.328 10.328 0 1 0 0 .01zm-91.852 0a10.328 10.328 0 1 0 0 .01zm-91.852 0a10.328 10.328 0 1 0 0 .01z"/>
+
+							<path id="D" d="M333.53 544.619a10.328 10.328 0 1 0 0 .01zm-91.853 0a10.328 10.328 0 1 0 0 .01z"/>
+
+							<path id="E" d="M976.495 344.214a10.328 10.328 0 1 0 0 .01zm-91.853 0a10.328 10.328 0 1 0 0 .01zm-91.852 0a10.328 10.328 0 1 0 0 .01zm-91.852 0a10.328 10.328 0 1 0 0 .01z"/>
+	</defs></svg>
+
 				<figcaption>
 					<a class="internal-link" href="#completion_trie">Figure 1.</a>
 					The first step for the empty string query (<var>p</var> = “”) over a <i>Completion Trie</i> is depicted.
@@ -259,7 +468,148 @@
 			<figure id="decomposed_trie">
 				<!-- <a target="_blank" rel="noopener noreferrer" href="https://validark.github.io/DynSDT/demo/"> -->
 					<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:v="https://vecta.io/nano" width="642" height="475" viewBox="0 0 1570 1160" preserveAspectRatio="xMidYMin slice">
-					<style>#decomposed_trie .B,#decomposed_trie .C{fill:none;stroke:#000;stroke-miterlimit:10}#decomposed_trie text{font-family: KaTeX_Main, 'Nimbus Roman No9 L','Times New Roman',Times,serif;font-size:26pt;letter-spacing:-2px;text-anchor:middle}#decomposed_trie .C{stroke-dasharray:8,3}#decomposed_trie .K{transform:translateY(12pt);}#decomposed_trie .L{transform:translateY(-2pt);}#decomposed_trie .D{text-decoration:underline;font-weight:bold;}</style><g transform="translate(46 -136)"><path paint-order="fill stroke markers" d="M166.611 175.603Q-32.548 1280.616 293.558 1256.004" class="B"/><path paint-order="stroke fill markers" d="M299.541 1255.553l-6.254-3.138.542 7.18 5.712-4.041z"/><path paint-order="fill stroke markers" d="M307.95 1254.918h136.543" class="C"/><path paint-order="stroke fill markers" d="M450.493 1254.918l-6-3.6v7.2l6-3.6z"/><path paint-order="fill stroke markers" d="M458.926 1254.918h126.906" class="C"/><path paint-order="stroke fill markers" d="M591.832 1254.918l-6-3.6v7.2l6-3.6z"/><path paint-order="fill stroke markers" d="M166.611 175.603q-136.52 936.37 175.098 925.624" class="B"/><path paint-order="stroke fill markers" d="M347.706 1101.021l-6.121-3.391.248 7.196 5.872-3.805z"/><path paint-order="fill stroke markers" d="M166.611 175.603Q49.364 938.512 303.161 946.11" class="B"/><path paint-order="stroke fill markers" d="M309.158 946.29l-5.89-3.778-.215 7.197 6.105-3.419z"/><path paint-order="fill stroke markers" d="M317.587 946.542H511.95" class="C"/><path paint-order="stroke fill markers" d="M517.95 946.542l-6-3.6v7.2l6-3.6z"/><path paint-order="fill stroke markers" d="M166.611 175.603Q83.093 798.065 293.522 792.721" class="B"/><path paint-order="stroke fill markers" d="M299.52 792.569l-6.089-3.447.183 7.198 5.907-3.751z"/><path paint-order="fill stroke markers" d="M307.95 792.355h126.906" class="C"/><path paint-order="stroke fill markers" d="M440.856 792.355l-6-3.6v7.2l6-3.6z"/><path paint-order="fill stroke markers" d="M449.289 792.355h126.906" class="C"/><path paint-order="stroke fill markers" d="M582.195 792.355l-6-3.6v7.2l6-3.6z"/><path paint-order="fill stroke markers" d="M166.611 175.603Q121.64 642.45 293.521 638.498" class="B"/><path paint-order="stroke fill markers" d="M299.52 638.36l-6.081-3.461.165 7.198 5.916-3.737z"/><path paint-order="fill stroke markers" d="M307.95 638.167h126.906" class="C"/><path paint-order="stroke fill markers" d="M440.856 638.167l-6-3.6v7.2l6-3.6z"/><path paint-order="fill stroke markers" d="M449.289 638.167h126.906" class="C"/><path paint-order="stroke fill markers" d="M582.195 638.167l-6-3.6v7.2l6-3.6z"/><use href="#B" paint-order="fill stroke markers" class="B"/><use href="#C" paint-order="stroke fill markers"/><path paint-order="fill stroke markers" d="M307.95 483.979h126.906" class="C"/><path paint-order="stroke fill markers" d="M440.856 483.979l-6-3.6v7.2l6-3.6z"/><path paint-order="fill stroke markers" d="M449.289 483.979h126.906" class="C"/><path paint-order="stroke fill markers" d="M582.195 483.979l-6-3.6v7.2l6-3.6z"/><use href="#D" paint-order="fill stroke markers" class="B"/><use href="#E" paint-order="stroke fill markers"/><path paint-order="fill stroke markers" d="M307.95 329.791h126.906" class="C"/><path paint-order="stroke fill markers" d="M440.856 329.791l-6-3.6v7.2l6-3.6z"/><path paint-order="fill stroke markers" d="M449.289 329.791h126.906" class="C"/><path paint-order="stroke fill markers" d="M582.195 329.791l-6-3.6v7.2l6-3.6z"/><path paint-order="fill stroke markers" d="M166.611 175.603h550.923" class="C"/><path paint-order="stroke fill markers" d="M723.534 175.603l-6-3.6v7.2l6-3.6z"/><path paint-order="fill stroke markers" d="M731.967 175.603q-83.518 622.462 126.911 617.118" class="B"/><path paint-order="stroke fill markers" d="M864.876 792.569l-6.089-3.447.183 7.198 5.907-3.751z"/><use href="#B" x="706.695" y="616.752" paint-order="fill stroke markers" class="B"/><use href="#C" x="706.694" y="616.751" paint-order="stroke fill markers"/><path paint-order="fill stroke markers" d="M873.306 792.355q32.122 155.616 126.907 154.376" class="B"/><path paint-order="stroke fill markers" d="M1006.213 946.653l-6.047-3.521.094 7.199 5.952-3.678z"/><path paint-order="fill stroke markers" d="M1014.645 946.542h126.906" class="C"/><path paint-order="stroke fill markers" d="M1147.551 946.542l-6-3.6v7.2l6-3.6z"/><path paint-order="fill stroke markers" d="M1155.983 946.542h126.906" class="C"/><path paint-order="stroke fill markers" d="M1288.89 946.542l-6-3.6v7.2l6-3.6z"/><path paint-order="fill stroke markers" d="M873.306 792.355h126.906" class="C"/><path paint-order="stroke fill markers" d="M1006.212 792.355l-6-3.6v7.2l6-3.6z"/><path paint-order="fill stroke markers" d="M1014.645 792.355h126.906" class="C"/><path paint-order="stroke fill markers" d="M1147.551 792.355l-6-3.6v7.2l6-3.6z"/><path paint-order="fill stroke markers" d="M731.967 175.603q-44.971 466.847 126.91 462.895" class="B"/><path paint-order="stroke fill markers" d="M864.875 638.36l-6.081-3.461.165 7.198 5.916-3.737z"/><path paint-order="fill stroke markers" d="M873.306 638.167h126.906" class="C"/><path paint-order="stroke fill markers" d="M1006.212 638.167l-6-3.6v7.2l6-3.6z"/><path paint-order="fill stroke markers" d="M1014.645 638.167h126.906" class="C"/><path paint-order="stroke fill markers" d="M1147.551 638.167l-6-3.6v7.2l6-3.6z"/><use href="#B" x="565.356" paint-order="fill stroke markers" class="B"/><use href="#C" x="565.356" paint-order="stroke fill markers"/><path paint-order="fill stroke markers" d="M873.306 483.979h126.906" class="C"/><path paint-order="stroke fill markers" d="M1006.212 483.979l-6-3.6v7.2l6-3.6z"/><path paint-order="fill stroke markers" d="M1014.645 483.979h126.906" class="C"/><path paint-order="stroke fill markers" d="M1147.551 483.979l-6-3.6v7.2l6-3.6z"/><use href="#D" x="565.356" paint-order="fill stroke markers" class="B"/><use href="#E" x="565.356" paint-order="stroke fill markers"/><path paint-order="fill stroke markers" d="M873.306 329.791h126.906" class="C"/><path paint-order="stroke fill markers" d="M1006.212 329.791l-6-3.6v7.2l6-3.6z"/><path paint-order="fill stroke markers" d="M1014.645 329.791h126.906" class="C"/><path paint-order="stroke fill markers" d="M1147.551 329.791l-6-3.6v7.2l6-3.6z"/><path paint-order="fill stroke markers" d="M731.967 175.603h550.923" class="C"/><path paint-order="stroke fill markers" d="M1288.89 175.603l-6-3.6v7.2l6-3.6z"/><use href="#B" x="1130.711" paint-order="fill stroke markers" class="B"/><use href="#C" x="1130.711" paint-order="stroke fill markers"/><path paint-order="fill stroke markers" d="M1438.661 483.979h126.906" class="C"/><use href="#D" x="1130.711" paint-order="fill stroke markers" class="B"/><use href="#E" x="1130.711" paint-order="stroke fill markers"/><path paint-order="fill stroke markers" d="M1438.661 329.791h126.906" class="C"/><path paint-order="fill stroke markers" d="M1297.322 175.603h550.923" class="C"/><path paint-order="fill stroke markers" d="M166.611 21.415V161.17" class="B"/><path paint-order="stroke fill markers" d="M166.611 167.17l3.6-6h-7.2l3.6 6z"/><text x="313" y="1275" class="K">(9, “<tspan class="D">wikipedia</tspan> wikipedia”<tspan dx="-2">)</tspan></text><text x="463" y="1240" class="L">(9, “<tspan class="D">wikipedia</tspan>fs”<tspan dx="-2">)</tspan></text><text x="635" y="1275" class="K">(9, “<tspan class="D">wikipedia</tspan>s”<tspan dx="-2">)</tspan></text><text x="361" y="1121" class="K">(8, “<tspan class="D">wikipedi</tspan>ocracy”<tspan dx="-2">)</tspan></text><text x="330" y="967" class="K">(5, “<tspan class="D">wikip</tspan>rofessional”<tspan dx="-2">)</tspan></text><text x="531" y="930" class="L">(5, “<tspan class="D">wikip</tspan>ilipinas”<tspan dx="-2">)</tspan></text><text x="313" y="812" class="K">(4, “<tspan class="D">wiki</tspan>media”<tspan dx="-2">)</tspan></text><text x="454" y="778" class="L">(4, “<tspan class="D">wiki</tspan>”<tspan dx="-2">)</tspan></text><text x="595" y="812" class="K">(4, “<tspan class="D">wiki</tspan>leaks”<tspan dx="-2">)</tspan></text><text x="313" y="658" class="K">(3, “<tspan class="D">wik</tspan>tor”<tspan dx="-2">)</tspan></text><text x="454" y="624" class="L">(3, “<tspan class="D">wik</tspan>stroemia”<tspan dx="-2">)</tspan></text><text x="595" y="658" class="K">(3, “<tspan class="D">wik</tspan>e”<tspan dx="-2">)</tspan></text><text x="313" y="504" class="K">(2, “<tspan class="D">wi</tspan>lliam”<tspan dx="-2">)</tspan></text><text x="454" y="470" class="L">(2, “<tspan class="D">wi</tspan>sconsin”<tspan dx="-2">)</tspan></text><text x="595" y="504" class="K">(2, “<tspan class="D">wi</tspan>th”<tspan dx="-2">)</tspan></text><text x="313" y="350" class="K">(1, “<tspan class="D">w</tspan>orld”<tspan dx="-2">)</tspan></text><text x="454" y="315" class="L">(1, “<tspan class="D">w</tspan>est”<tspan dx="-2">)</tspan></text><text x="595" y="350" class="K">(1, “<tspan class="D">w</tspan>”<tspan dx="-2">)</tspan></text><text x="737" y="165" class="L">(0, “list”<tspan dx="-2">)</tspan></text><text x="888" y="778" class="L">(4, “<tspan class="D">list</tspan> of<tspan dx="8">”</tspan><tspan dx="-2">)</tspan></text><text x="1019" y="1121" class="K">(6, “<tspan class="D">list o</tspan>bservatory”<tspan dx="-2">)</tspan></text><text x="1019" y="967" class="K">(5, “<tspan class="D">list </tspan>a”<tspan dx="-2">)</tspan></text><text x="1300" y="967" class="K">(5, “<tspan class="D">list </tspan>data”<tspan dx="-2">)</tspan></text><text x="1142" y="932" class="L">(5, “<tspan class="D">list </tspan>for”<tspan dx="-2">)</tspan></text><text x="1019" y="812" class="K">(4, “<tspan class="D">list</tspan>ings”<tspan dx="-2">)</tspan></text><text x="1150" y="778" class="L">(4, “<tspan class="D">list</tspan>ed”<tspan dx="-2">)</tspan></text><text x="878" y="658" class="K">(3, “<tspan class="D">lis</tspan>a”<tspan dx="-2">)</tspan></text><text x="1019" y="624" class="L">(3, “<tspan class="D">lis</tspan>bon”<tspan dx="-2">)</tspan></text><text x="1150" y="658" class="K">(3, “<tspan class="D">lis</tspan>e”<tspan dx="-2">)</tspan></text><text x="878" y="504" class="K">(2, “<tspan class="D">li</tspan>ne”<tspan dx="-2">)</tspan></text><text x="1019" y="470" class="L">(2, “<tspan class="D">li</tspan>ttle”<tspan dx="-2">)</tspan></text><text x="1150" y="504" class="K">(2, “<tspan class="D">li</tspan>fe”<tspan dx="-2">)</tspan></text><text x="878" y="350" class="K">(1, “<tspan class="D">l</tspan>eague”<tspan dx="-2">)</tspan></text><text x="1019" y="315" class="L">(1, “<tspan class="D">l</tspan>a”<tspan dx="-2">)</tspan></text><text x="1150" y="350" class="K">(1, “<tspan class="D">l</tspan>ove”<tspan dx="-2">)</tspan></text><text x="1302" y="165" class="L">(0, “of<tspan dx="8">”</tspan><tspan dx="-2">)</tspan></text><text x="1443" y="504" class="K">(2, “<tspan class="D">of</tspan> the”<tspan dx="-2">)</tspan></text><text x="1443" y="350" class="K">(1, “<tspan class="D">o</tspan>pen”<tspan dx="-2">)</tspan></text><text x="58" y="165" text-anchor="end" class="L">(0, “wikipedia”<tspan dx="-2">)</tspan></text><use href="#F" paint-order="stroke fill markers"/><use href="#F" x="-414.38" y="154.188" paint-order="stroke fill markers"/><use href="#F" x="-555.718" y="154.188" paint-order="stroke fill markers"/><use href="#F" x="-706.694" y="154.188" paint-order="stroke fill markers"/><use href="#F" x="-658.51" paint-order="stroke fill markers"/><use href="#F" x="282.678" y="-154.188" paint-order="stroke fill markers"/><use href="#F" x="141.339" y="-154.188" paint-order="stroke fill markers"/><use href="#F" y="-154.188" paint-order="stroke fill markers"/><use href="#F" x="141.339" y="-308.375" paint-order="stroke fill markers"/><use href="#F" y="-308.375" paint-order="stroke fill markers"/><use href="#F" x="-488.261" y="-154.188" paint-order="stroke fill markers"/><use href="#F" x="-697.057" y="-154.188" paint-order="stroke fill markers"/><use href="#F" x="-141.339" y="-308.375" paint-order="stroke fill markers"/><use href="#F" x="-424.016" y="-308.375" paint-order="stroke fill markers"/><use href="#F" x="-565.355" y="-308.375" paint-order="stroke fill markers"/><use href="#F" x="-706.694" y="-308.375" paint-order="stroke fill markers"/><use href="#F" y="-462.563" paint-order="stroke fill markers"/><use href="#F" x="424.017" y="-616.751" paint-order="stroke fill markers"/><use href="#F" x="141.339" y="-616.751" paint-order="stroke fill markers"/><use href="#F" y="-616.751" paint-order="stroke fill markers"/><use href="#F" x="-141.339" y="-462.563" paint-order="stroke fill markers"/><use href="#F" x="-424.016" y="-462.563" paint-order="stroke fill markers"/><use href="#F" x="-565.355" y="-462.563" paint-order="stroke fill markers"/><use href="#F" x="-706.694" y="-462.563" paint-order="stroke fill markers"/><use href="#F" x="-141.339" y="-616.751" paint-order="stroke fill markers"/><use href="#F" x="-424.016" y="-616.751" paint-order="stroke fill markers"/><use href="#F" x="-565.355" y="-616.751" paint-order="stroke fill markers"/><use href="#F" x="-706.694" y="-616.751" paint-order="stroke fill markers"/><use href="#F" x="424.017" y="-770.939" paint-order="stroke fill markers"/><use href="#F" x="141.339" y="-770.939" paint-order="stroke fill markers"/><use href="#F" y="-770.939" paint-order="stroke fill markers"/><use href="#F" x="282.678" y="-925.127" paint-order="stroke fill markers"/><use href="#F" x="-141.339" y="-770.939" paint-order="stroke fill markers"/><use href="#F" x="-424.016" y="-770.939" paint-order="stroke fill markers"/><use href="#F" x="-565.355" y="-770.939" paint-order="stroke fill markers"/><use href="#F" x="-706.694" y="-770.939" paint-order="stroke fill markers"/><use href="#F" x="-282.677" y="-925.127" paint-order="stroke fill markers"/><use href="#F" x="-848.033" y="-925.127" paint-order="stroke fill markers"/><use href="#F" x="141.339" y="-462.563" paint-order="stroke fill markers"/><use href="#F" x="-848.033" y="-1079.315" paint-order="stroke fill markers"/></g><defs><path id="B" d="M166.611 175.603q-6.424 311.231 126.909 308.655"/><path id="C" d="M299.519 484.142l-6.068-3.483.139 7.199 5.929-3.715z"/><path id="D" d="M166.611 175.603q32.122 157.859 126.914 154.673"/><path id="E" d="M299.522 330.074l-6.118-3.396.242 7.196 5.876-3.8z"/><path id="F" d="M1023.077 1100.73a8.433 8.433 0 1 0 0 .008z"/></defs></svg>
+					<style>
+						#decomposed_trie .B, #decomposed_trie .C{fill:none;stroke:#000;stroke-miterlimit:10}
+						#decomposed_trie text{font-family: KaTeX_Main,'Times New Roman',Times,serif; font-size:26pt;letter-spacing:-2px;text-anchor:middle}
+						#decomposed_trie .C{stroke-dasharray:8,3}
+						#decomposed_trie .K{transform:translateY(12pt);}
+						#decomposed_trie .L{transform:translateY(-2pt);}
+						#decomposed_trie .D{text-decoration:underline;font-weight:bold;}
+
+					</style><g transform="translate(46 -136)">
+							<path paint-order="fill stroke markers" d="M166.611 175.603Q-32.548 1280.616 293.558 1256.004" class="B"/>
+							<path paint-order="stroke fill markers" d="M299.541 1255.553l-6.254-3.138.542 7.18 5.712-4.041z"/>
+							<path paint-order="fill stroke markers" d="M307.95 1254.918h136.543" class="C"/>
+							<path paint-order="stroke fill markers" d="M450.493 1254.918l-6-3.6v7.2l6-3.6z"/>
+							<path paint-order="fill stroke markers" d="M458.926 1254.918h126.906" class="C"/>
+							<path paint-order="stroke fill markers" d="M591.832 1254.918l-6-3.6v7.2l6-3.6z"/>
+							<path paint-order="fill stroke markers" d="M166.611 175.603q-136.52 936.37 175.098 925.624" class="B"/>
+							<path paint-order="stroke fill markers" d="M347.706 1101.021l-6.121-3.391.248 7.196 5.872-3.805z"/>
+							<path paint-order="fill stroke markers" d="M166.611 175.603Q49.364 938.512 303.161 946.11" class="B"/>
+							<path paint-order="stroke fill markers" d="M309.158 946.29l-5.89-3.778-.215 7.197 6.105-3.419z"/>
+							<path paint-order="fill stroke markers" d="M317.587 946.542H511.95" class="C"/>
+							<path paint-order="stroke fill markers" d="M517.95 946.542l-6-3.6v7.2l6-3.6z"/>
+							<path paint-order="fill stroke markers" d="M166.611 175.603Q83.093 798.065 293.522 792.721" class="B"/>
+							<path paint-order="stroke fill markers" d="M299.52 792.569l-6.089-3.447.183 7.198 5.907-3.751z"/>
+							<path paint-order="fill stroke markers" d="M307.95 792.355h126.906" class="C"/>
+							<path paint-order="stroke fill markers" d="M440.856 792.355l-6-3.6v7.2l6-3.6z"/>
+							<path paint-order="fill stroke markers" d="M449.289 792.355h126.906" class="C"/>
+							<path paint-order="stroke fill markers" d="M582.195 792.355l-6-3.6v7.2l6-3.6z"/>
+							<path paint-order="fill stroke markers" d="M166.611 175.603Q121.64 642.45 293.521 638.498" class="B"/>
+							<path paint-order="stroke fill markers" d="M299.52 638.36l-6.081-3.461.165 7.198 5.916-3.737z"/>
+							<path paint-order="fill stroke markers" d="M307.95 638.167h126.906" class="C"/>
+							<path paint-order="stroke fill markers" d="M440.856 638.167l-6-3.6v7.2l6-3.6z"/>
+							<path paint-order="fill stroke markers" d="M449.289 638.167h126.906" class="C"/>
+							<path paint-order="stroke fill markers" d="M582.195 638.167l-6-3.6v7.2l6-3.6z"/>
+							<use href="#J" paint-order="fill stroke markers" class="B"/>
+							<use href="#G" paint-order="stroke fill markers"/>
+							<path paint-order="fill stroke markers" d="M307.95 483.979h126.906" class="C"/>
+							<path paint-order="stroke fill markers" d="M440.856 483.979l-6-3.6v7.2l6-3.6z"/>
+							<path paint-order="fill stroke markers" d="M449.289 483.979h126.906" class="C"/>
+							<path paint-order="stroke fill markers" d="M582.195 483.979l-6-3.6v7.2l6-3.6z"/>
+							<use href="#H" paint-order="fill stroke markers" class="B"/>
+							<use href="#I" paint-order="stroke fill markers"/>
+							<path paint-order="fill stroke markers" d="M307.95 329.791h126.906" class="C"/>
+							<path paint-order="stroke fill markers" d="M440.856 329.791l-6-3.6v7.2l6-3.6z"/>
+							<path paint-order="fill stroke markers" d="M449.289 329.791h126.906" class="C"/>
+							<path paint-order="stroke fill markers" d="M582.195 329.791l-6-3.6v7.2l6-3.6z"/>
+							<path paint-order="fill stroke markers" d="M166.611 175.603h550.923" class="C"/>
+							<path paint-order="stroke fill markers" d="M723.534 175.603l-6-3.6v7.2l6-3.6z"/>
+							<path paint-order="fill stroke markers" d="M731.967 175.603q-83.518 622.462 126.911 617.118" class="B"/>
+							<path paint-order="stroke fill markers" d="M864.876 792.569l-6.089-3.447.183 7.198 5.907-3.751z"/>
+							<use href="#J" x="706.695" y="616.752" paint-order="fill stroke markers" class="B"/>
+							<use href="#G" x="706.694" y="616.751" paint-order="stroke fill markers"/>
+							<path paint-order="fill stroke markers" d="M873.306 792.355q32.122 155.616 126.907 154.376" class="B"/>
+							<path paint-order="stroke fill markers" d="M1006.213 946.653l-6.047-3.521.094 7.199 5.952-3.678z"/>
+							<path paint-order="fill stroke markers" d="M1014.645 946.542h126.906" class="C"/>
+							<path paint-order="stroke fill markers" d="M1147.551 946.542l-6-3.6v7.2l6-3.6z"/>
+							<path paint-order="fill stroke markers" d="M1155.983 946.542h126.906" class="C"/>
+							<path paint-order="stroke fill markers" d="M1288.89 946.542l-6-3.6v7.2l6-3.6z"/>
+							<path paint-order="fill stroke markers" d="M873.306 792.355h126.906" class="C"/>
+							<path paint-order="stroke fill markers" d="M1006.212 792.355l-6-3.6v7.2l6-3.6z"/>
+							<path paint-order="fill stroke markers" d="M1014.645 792.355h126.906" class="C"/>
+							<path paint-order="stroke fill markers" d="M1147.551 792.355l-6-3.6v7.2l6-3.6z"/>
+							<path paint-order="fill stroke markers" d="M731.967 175.603q-44.971 466.847 126.91 462.895" class="B"/>
+							<path paint-order="stroke fill markers" d="M864.875 638.36l-6.081-3.461.165 7.198 5.916-3.737z"/>
+							<path paint-order="fill stroke markers" d="M873.306 638.167h126.906" class="C"/>
+							<path paint-order="stroke fill markers" d="M1006.212 638.167l-6-3.6v7.2l6-3.6z"/>
+							<path paint-order="fill stroke markers" d="M1014.645 638.167h126.906" class="C"/>
+							<path paint-order="stroke fill markers" d="M1147.551 638.167l-6-3.6v7.2l6-3.6z"/>
+							<use href="#J" x="565.356" paint-order="fill stroke markers" class="B"/>
+							<use href="#G" x="565.356" paint-order="stroke fill markers"/>
+							<path paint-order="fill stroke markers" d="M873.306 483.979h126.906" class="C"/>
+							<path paint-order="stroke fill markers" d="M1006.212 483.979l-6-3.6v7.2l6-3.6z"/>
+							<path paint-order="fill stroke markers" d="M1014.645 483.979h126.906" class="C"/>
+							<path paint-order="stroke fill markers" d="M1147.551 483.979l-6-3.6v7.2l6-3.6z"/>
+							<use href="#H" x="565.356" paint-order="fill stroke markers" class="B"/>
+							<use href="#I" x="565.356" paint-order="stroke fill markers"/>
+							<path paint-order="fill stroke markers" d="M873.306 329.791h126.906" class="C"/>
+							<path paint-order="stroke fill markers" d="M1006.212 329.791l-6-3.6v7.2l6-3.6z"/>
+							<path paint-order="fill stroke markers" d="M1014.645 329.791h126.906" class="C"/>
+							<path paint-order="stroke fill markers" d="M1147.551 329.791l-6-3.6v7.2l6-3.6z"/>
+							<path paint-order="fill stroke markers" d="M731.967 175.603h550.923" class="C"/>
+							<path paint-order="stroke fill markers" d="M1288.89 175.603l-6-3.6v7.2l6-3.6z"/>
+							<use href="#J" x="1130.711" paint-order="fill stroke markers" class="B"/>
+							<use href="#G" x="1130.711" paint-order="stroke fill markers"/>
+							<path paint-order="fill stroke markers" d="M1438.661 483.979h126.906" class="C"/>
+							<use href="#H" x="1130.711" paint-order="fill stroke markers" class="B"/>
+							<use href="#I" x="1130.711" paint-order="stroke fill markers"/>
+							<path paint-order="fill stroke markers" d="M1438.661 329.791h126.906" class="C"/>
+							<path paint-order="fill stroke markers" d="M1297.322 175.603h550.923" class="C"/>
+							<path paint-order="fill stroke markers" d="M166.611 21.415V161.17" class="B"/>
+							<path paint-order="stroke fill markers" d="M166.611 167.17l3.6-6h-7.2l3.6 6z"/><text x="313" y="1275" class="K">(9, “<tspan class="D">wikipedia</tspan> wikipedia”<tspan dx="-2">)</tspan></text><text x="463" y="1240" class="L">(9, “<tspan class="D">wikipedia</tspan>fs”<tspan dx="-2">)</tspan></text><text x="635" y="1275" class="K">(9, “<tspan class="D">wikipedia</tspan>s”<tspan dx="-2">)</tspan></text><text x="361" y="1121" class="K">(8, “<tspan class="D">wikipedi</tspan>ocracy”<tspan dx="-2">)</tspan></text><text x="330" y="967" class="K">(5, “<tspan class="D">wikip</tspan>rofessional”<tspan dx="-2">)</tspan></text><text x="531" y="930" class="L">(5, “<tspan class="D">wikip</tspan>ilipinas”<tspan dx="-2">)</tspan></text><text x="313" y="812" class="K">(4, “<tspan class="D">wiki</tspan>media”<tspan dx="-2">)</tspan></text><text x="454" y="778" class="L">(4, “<tspan class="D">wiki</tspan>”<tspan dx="-2">)</tspan></text><text x="595" y="812" class="K">(4, “<tspan class="D">wiki</tspan>leaks”<tspan dx="-2">)</tspan></text><text x="313" y="658" class="K">(3, “<tspan class="D">wik</tspan>tor”<tspan dx="-2">)</tspan></text><text x="454" y="624" class="L">(3, “<tspan class="D">wik</tspan>stroemia”<tspan dx="-2">)</tspan></text><text x="595" y="658" class="K">(3, “<tspan class="D">wik</tspan>e”<tspan dx="-2">)</tspan></text><text x="313" y="504" class="K">(2, “<tspan class="D">wi</tspan>lliam”<tspan dx="-2">)</tspan></text><text x="454" y="470" class="L">(2, “<tspan class="D">wi</tspan>sconsin”<tspan dx="-2">)</tspan></text><text x="595" y="504" class="K">(2, “<tspan class="D">wi</tspan>th”<tspan dx="-2">)</tspan></text><text x="313" y="350" class="K">(1, “<tspan class="D">w</tspan>orld”<tspan dx="-2">)</tspan></text><text x="454" y="315" class="L">(1, “<tspan class="D">w</tspan>est”<tspan dx="-2">)</tspan></text><text x="595" y="350" class="K">(1, “<tspan class="D">w</tspan>”<tspan dx="-2">)</tspan></text><text x="737" y="165" class="L">(0, “list”<tspan dx="-2">)</tspan></text><text x="888" y="778" class="L">(4, “<tspan class="D">list</tspan> of<tspan dx="6">”</tspan><tspan dx="-2">)</tspan></text><text x="1019" y="1121" class="K">(6, “<tspan class="D">list o</tspan>bservatory”<tspan dx="-2">)</tspan></text><text x="1019" y="967" class="K">(5, “<tspan class="D">list </tspan>a”<tspan dx="-2">)</tspan></text><text x="1300" y="967" class="K">(5, “<tspan class="D">list </tspan>data”<tspan dx="-2">)</tspan></text><text x="1142" y="932" class="L">(5, “<tspan class="D">list </tspan>for”<tspan dx="-2">)</tspan></text><text x="1019" y="812" class="K">(4, “<tspan class="D">list</tspan>ings”<tspan dx="-2">)</tspan></text><text x="1150" y="778" class="L">(4, “<tspan class="D">list</tspan>ed”<tspan dx="-2">)</tspan></text><text x="878" y="658" class="K">(3, “<tspan class="D">lis</tspan>a”<tspan dx="-2">)</tspan></text><text x="1019" y="624" class="L">(3, “<tspan class="D">lis</tspan>bon”<tspan dx="-2">)</tspan></text><text x="1150" y="658" class="K">(3, “<tspan class="D">lis</tspan>e”<tspan dx="-2">)</tspan></text><text x="878" y="504" class="K">(2, “<tspan class="D">li</tspan>ne”<tspan dx="-2">)</tspan></text><text x="1019" y="470" class="L">(2, “<tspan class="D">li</tspan>ttle”<tspan dx="-2">)</tspan></text><text x="1150" y="504" class="K">(2, “<tspan class="D">li</tspan>fe”<tspan dx="-2">)</tspan></text><text x="878" y="350" class="K">(1, “<tspan class="D">l</tspan>eague”<tspan dx="-2">)</tspan></text><text x="1019" y="315" class="L">(1, “<tspan class="D">l</tspan>a”<tspan dx="-2">)</tspan></text><text x="1150" y="350" class="K">(1, “<tspan class="D">l</tspan>ove”<tspan dx="-2">)</tspan></text><text x="1302" y="165" class="L">(0, “of<tspan dx="6">”</tspan><tspan dx="-2">)</tspan></text><text x="1443" y="504" class="K">(2, “<tspan class="D">of</tspan> the”<tspan dx="-2">)</tspan></text><text x="1443" y="350" class="K">(1, “<tspan class="D">o</tspan>pen”<tspan dx="-2">)</tspan></text><text x="58" y="165" text-anchor="end" class="L">(0, “wikipedia”<tspan dx="-2">)</tspan></text>
+							<use href="#F" paint-order="stroke fill markers"/>
+							<use href="#F" x="-414.38" y="154.188" paint-order="stroke fill markers"/>
+							<use href="#F" x="-555.718" y="154.188" paint-order="stroke fill markers"/>
+							<use href="#F" x="-706.694" y="154.188" paint-order="stroke fill markers"/>
+							<use href="#F" x="-658.51" paint-order="stroke fill markers"/>
+							<use href="#F" x="282.678" y="-154.188" paint-order="stroke fill markers"/>
+							<use href="#F" x="141.339" y="-154.188" paint-order="stroke fill markers"/>
+							<use href="#F" y="-154.188" paint-order="stroke fill markers"/>
+							<use href="#F" x="141.339" y="-308.375" paint-order="stroke fill markers"/>
+							<use href="#F" y="-308.375" paint-order="stroke fill markers"/>
+							<use href="#F" x="-488.261" y="-154.188" paint-order="stroke fill markers"/>
+							<use href="#F" x="-697.057" y="-154.188" paint-order="stroke fill markers"/>
+							<use href="#F" x="-141.339" y="-308.375" paint-order="stroke fill markers"/>
+							<use href="#F" x="-424.016" y="-308.375" paint-order="stroke fill markers"/>
+							<use href="#F" x="-565.355" y="-308.375" paint-order="stroke fill markers"/>
+							<use href="#F" x="-706.694" y="-308.375" paint-order="stroke fill markers"/>
+							<use href="#F" y="-462.563" paint-order="stroke fill markers"/>
+							<use href="#F" x="424.017" y="-616.751" paint-order="stroke fill markers"/>
+							<use href="#F" x="141.339" y="-616.751" paint-order="stroke fill markers"/>
+							<use href="#F" y="-616.751" paint-order="stroke fill markers"/>
+							<use href="#F" x="-141.339" y="-462.563" paint-order="stroke fill markers"/>
+							<use href="#F" x="-424.016" y="-462.563" paint-order="stroke fill markers"/>
+							<use href="#F" x="-565.355" y="-462.563" paint-order="stroke fill markers"/>
+							<use href="#F" x="-706.694" y="-462.563" paint-order="stroke fill markers"/>
+							<use href="#F" x="-141.339" y="-616.751" paint-order="stroke fill markers"/>
+							<use href="#F" x="-424.016" y="-616.751" paint-order="stroke fill markers"/>
+							<use href="#F" x="-565.355" y="-616.751" paint-order="stroke fill markers"/>
+							<use href="#F" x="-706.694" y="-616.751" paint-order="stroke fill markers"/>
+							<use href="#F" x="424.017" y="-770.939" paint-order="stroke fill markers"/>
+							<use href="#F" x="141.339" y="-770.939" paint-order="stroke fill markers"/>
+							<use href="#F" y="-770.939" paint-order="stroke fill markers"/>
+							<use href="#F" x="282.678" y="-925.127" paint-order="stroke fill markers"/>
+							<use href="#F" x="-141.339" y="-770.939" paint-order="stroke fill markers"/>
+							<use href="#F" x="-424.016" y="-770.939" paint-order="stroke fill markers"/>
+							<use href="#F" x="-565.355" y="-770.939" paint-order="stroke fill markers"/>
+							<use href="#F" x="-706.694" y="-770.939" paint-order="stroke fill markers"/>
+							<use href="#F" x="-282.677" y="-925.127" paint-order="stroke fill markers"/>
+							<use href="#F" x="-848.033" y="-925.127" paint-order="stroke fill markers"/>
+							<use href="#F" x="141.339" y="-462.563" paint-order="stroke fill markers"/>
+							<use href="#F" x="-848.033" y="-1079.315" paint-order="stroke fill markers"/></g>
+					<defs>
+
+							<path id="J" d="M166.611 175.603q-6.424 311.231 126.909 308.655"/>
+
+							<path id="G" d="M299.519 484.142l-6.068-3.483.139 7.199 5.929-3.715z"/>
+
+							<path id="H" d="M166.611 175.603q32.122 157.859 126.914 154.673"/>
+
+							<path id="I" d="M299.522 330.074l-6.118-3.396.242 7.196 5.876-3.8z"/>
+
+							<path id="F" d="M1023.077 1100.73a8.433 8.433 0 1 0 0 .008z"/>
+					</defs></svg>
 				<!-- </a> -->
 				<figcaption>
 					<a href="#decomposed_trie" class="internal-link">Figure 2.</a> The <i>Completion Trie</i> of <a href="#completion_trie" class="internal-link">Figure 1</a> after decomposition.
@@ -273,8 +623,8 @@
 				The original trie can be derived from the LCRS trie by moving each <em>horizontal linked list</em> (of sibling nodes) into the parent node.
 				By the same token this structure could be derived from the LCRS trie by moving the <em>vertical linked lists</em> (of descendant nodes) into the parent node (after advancing horizontally by one on each level and letting the parent node hold the string representing the concatenation of the nodes that were advanced over).
 			</p>
-			<section id="description">
-				<h3><a href="#description" class="heading-link">5.1&nbsp;&nbsp;Structural Properties</a><a href="#description" class="glyphicon glyphicon-link"></a></h3>
+			<section id="structural-properties">
+				<h3><a href="#structural-properties" class="heading-link">5.1&nbsp;&nbsp;Structural Properties</a><a href="#structural-properties" class="glyphicon glyphicon-link"></a></h3>
 				<p class="indented">
 					Each node contains a string <i>key</i>, its corresponding numeric <i>score</i>, and a list of nodes with unique <i>branch points</i> which differ from <i>key</i> at different positions.
 					By construction, branch points in each node are greater than or equal to the branch point that led to that node (or 0 for the root) and less than or equal to the length of its <i>key</i>.
@@ -318,7 +668,162 @@
 					Hence, the top-<var>k</var> search algorithm over this structure is equivalent to the algorithm for <a target="_blank" rel="noopener noreferrer" href="https://www.quora.com/If-you-had-a-max-heap-with-n-elements-and-want-to-get-the-K-largest-elements-without-popping-and-rebalancing-how-would-you-do-it">finding the top-<var>k</var> nodes from a binary max-heap without mutating it</a> [<a class="citation" href="#HEAP_SELECTION">12</a>].
 				</p>
 				<figure id="heap-like_DynSDT">
-					<a target="_blank" rel="noopener noreferrer" href="https://validark.github.io/DynSDT/demo/"><img src="./doubly-sorted5.svg"></a>
+					<!-- <a target="_blank" rel="noopener noreferrer" href="https://validark.github.io/DynSDT/demo/"><img src="./doubly-sorted5.svg"></a> -->
+
+					<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:v="https://vecta.io/nano" preserveAspectRatio="xMidYMin slice" viewBox="195 134 1415 1320" width="643" height="600">
+						<style>
+						#heap-like_DynSDT .B{font-family:KaTeX_Main, serif; letter-spacing: -1px;}
+						#heap-like_DynSDT .C{font-size:22pt}
+						#heap-like_DynSDT .D{text-decoration:undefined}
+						#heap-like_DynSDT .E{text-anchor:middle}
+						#heap-like_DynSDT .F{dominant-baseline:alphabetic}
+						#heap-like_DynSDT .G{fill:#000}
+						#heap-like_DynSDT .H{fill:none}
+						#heap-like_DynSDT .I{stroke:#000}
+						#heap-like_DynSDT .J{stroke-miterlimit:10}
+						#heap-like_DynSDT .K{stroke-width:4.339}
+						#heap-like_DynSDT .L{stroke-dasharray:8,3}
+						#heap-like_DynSDT .M{fill:#fff}
+						#heap-like_DynSDT .N{dominant-baseline:central}
+						#heap-like_DynSDT tspan.LCP { text-decoration: underline; font-weight: bold; }
+						</style>
+						<g>
+							<!-- <rect x="0" y="0" width="120%" height="100%" fill="#fff" /> -->
+							<path paint-order="fill stroke markers" d="M420.105 173 v 121 M 420.105 325 v 12" class="H I J K L"/>
+
+							<use href="#K" paint-order="stroke fill markers"/>
+							<path paint-order="fill stroke markers" d="M420.105 355 v 121 M 420.105 512 v 12" class="H I J K L"/>
+							<use href="#K" y="181.68" paint-order="stroke fill markers"/>
+							<path paint-order="fill stroke markers" d="M420.105 537 v 121 M 420.105 694 v 12" class="H I J K L"/>
+							<use href="#K" y="363.359" paint-order="stroke fill markers"/>
+							<path paint-order="fill stroke markers" d="M420.105 719 v 121 M 420.105 876 v 12" class="H I J K L"/>
+							<use href="#K" y="545.039" paint-order="stroke fill markers"/>
+							<path paint-order="fill stroke markers" d="M420.105 900 v 121 M 420.105 1057 v 12" class="H I J K L"/>
+							<use href="#K" y="726.718" paint-order="stroke fill markers"/>
+							<path paint-order="fill stroke markers" d="M420.105 1082 v 121 M 420.105 1239 v 12" class="H I J K L"/>
+							<use href="#K" y="908.398" paint-order="stroke fill markers"/>
+							<path paint-order="fill stroke markers" d="M420.105 1264 v 121 M 420.105 1421 v 12" class="H I J K L"/>
+							<use href="#K" y="1090.077" paint-order="stroke fill markers"/>
+							<path paint-order="fill stroke markers" d="M1585.882 173 v 121 M 1585.882 330 v 12" class="H I J K L"/>
+							<use href="#K" x="1165.777" paint-order="stroke fill markers"/>
+							<path paint-order="fill stroke markers" d="M1585.882 355 v 121 M 1585.882 509 v 10" class="H I J K L"/>
+							<use href="#K" x="1165.777" y="181.68" paint-order="stroke fill markers"/>
+							<path paint-order="fill stroke markers" d="M1086.264 173 v 488 M 1086.264 693 v 12" class="H I J K L"/>
+							<use href="#K" x="666.159" y="363.359" paint-order="stroke fill markers"/>
+							<path paint-order="fill stroke markers" d="M1086.264 719 v 121 M 1086.264 876 v 12" class="H I J K L"/>
+							<use href="#K" x="666.159" y="545.039" paint-order="stroke fill markers"/>
+							<path paint-order="fill stroke markers" d="M1086.264 900 v 121 M 1086.264 1057 v 12" class="H I J K L"/>
+							<use href="#K" x="666.159" y="726.718" paint-order="stroke fill markers"/>
+							<path paint-order="fill stroke markers" d="M1086.264 1082 v 121 M 1086.264 1239 v 12" class="H I J K L"/>
+							<use href="#K" x="666.159" y="908.398" paint-order="stroke fill markers"/>
+							<path paint-order="fill stroke markers" d="M1585.882 719 v 114 M 1585.882 864 v 22" class="H I J K L"/>
+							<use href="#K" x="1165.777" y="545.039" paint-order="stroke fill markers"/>
+							<path paint-order="fill stroke markers" d="M1585.882 901.68 v 110 M1585.882 1044v20" class="H I J K L"/>
+							<use href="#K" x="1165.777" y="726.718" paint-order="stroke fill markers"/>
+							<path paint-order="fill stroke markers" d="M420.105 901.68H569.29" class="H I J K"/>
+							<use href="#L" paint-order="stroke fill markers"/>
+							<path paint-order="fill stroke markers" d="M586.645 901.68H735.83" class="H I J K"/>
+							<use href="#L" x="166.539" paint-order="stroke fill markers"/>
+							<path paint-order="fill stroke markers" d="M420.105 1265.039H735.83" class="H I J K"/>
+							<use href="#L" x="166.539" y="363.359" paint-order="stroke fill markers"/>
+							<path paint-order="fill stroke markers" d="M420.105 1083.359H569.29" class="H I J K"/>
+							<use href="#L" y="181.679" paint-order="stroke fill markers"/>
+							<path paint-order="fill stroke markers" d="M586.645 1083.359H735.83" class="H I J K"/>
+							<use href="#L" x="166.539" y="181.679" paint-order="stroke fill markers"/>
+							<path paint-order="fill stroke markers" d="M420.105 720H569.29" class="H I J K"/>
+							<path paint-order="stroke fill markers" d="M580.137 720l-10.847-6.508v13.016L580.137 720z"/>
+							<path paint-order="fill stroke markers" d="M586.645 720H735.83" class="H I J K"/>
+							<path paint-order="stroke fill markers" d="M746.676 720l-10.847-6.508v13.016L746.676 720z"/>
+							<path paint-order="fill stroke markers" d="M420.105 538.32H569.29" class="H I J K"/>
+							<use href="#L" y="-363.36" paint-order="stroke fill markers"/>
+							<path paint-order="fill stroke markers" d="M586.645 538.32H735.83" class="H I J K"/>
+							<use href="#L" x="166.539" y="-363.36" paint-order="stroke fill markers"/>
+							<path paint-order="fill stroke markers" d="M420.105 356.641H569.29" class="H I J K"/>
+							<use href="#L" y="-545.039" paint-order="stroke fill markers"/>
+							<path paint-order="fill stroke markers" d="M586.645 356.641H735.83" class="H I J K"/>
+							<use href="#L" x="166.539" y="-545.039" paint-order="stroke fill markers"/>
+							<path paint-order="fill stroke markers" d="M287.026 174.961h116.725" class="H I J K"/>
+							<use href="#L" x="-166.54" y="-726.719" paint-order="stroke fill markers"/>
+							<path paint-order="fill stroke markers" d="M420.105 174.961h648.804" class="H I J K"/>
+							<use href="#L" x="499.619" y="-726.719" paint-order="stroke fill markers"/>
+							<path paint-order="fill stroke markers" d="M1086.264 174.961h482.264" class="H I J K"/>
+							<use href="#L" x="999.237" y="-726.719" paint-order="stroke fill markers"/>
+							<path paint-order="fill stroke markers" d="M1086.264 1265.039h149.185" class="H I J K"/>
+							<use href="#L" x="666.158" y="363.359" paint-order="stroke fill markers"/>
+							<path paint-order="fill stroke markers" d="M1252.803 1265.039h149.185" class="H I J K"/>
+							<use href="#L" x="832.698" y="363.359" paint-order="stroke fill markers"/>
+							<path paint-order="fill stroke markers" d="M1086.264 1083.359h149.185" class="H I J K"/>
+							<use href="#L" x="666.158" y="181.679" paint-order="stroke fill markers"/>
+							<path paint-order="fill stroke markers" d="M1252.803 1083.359h149.185" class="H I J K"/>
+							<use href="#L" x="832.698" y="181.679" paint-order="stroke fill markers"/>
+							<path paint-order="fill stroke markers" d="M1086.264 901.68h149.185" class="H I J K"/>
+							<use href="#L" x="666.158" paint-order="stroke fill markers"/>
+							<path paint-order="fill stroke markers" d="M1252.803 901.68h149.185" class="H I J K"/>
+							<use href="#L" x="832.698" paint-order="stroke fill markers"/>
+							<path paint-order="fill stroke markers" d="M1086.264 720h482.264" class="H I J K"/>
+							<use href="#L" x="999.237" y="-181.68" paint-order="stroke fill markers"/>
+
+							<g transform="translate(0 -2)">
+							<text x="414" y="320" class="B C D E F G">(1, “<tspan class="LCP">w</tspan>orld”, 30978)</text>
+							<text x="414" y="503.872" class="B C D E F G">(2, “<tspan class="LCP">wi</tspan>lliam”, 27706)</text>
+							<text x="414" y="685.872" class="B C D E F G">(3, “<tspan class="LCP">wik</tspan>tor”, 36)</text>
+							<text x="414" y="867.872" class="B C D E F G">(9, “<tspan class="LCP">wikipedia</tspan> wikipedia”, 18)</text>
+							<text x="414" y="1048.872" class="B C D E F G">(4, “<tspan class="LCP">wiki</tspan>media”, 17)</text>
+							<text x="414" y="1230.872" class="B C D E F G">(5, “<tspan class="LCP">wikip</tspan>rofessional”, 1)</text>
+							<text x="414" y="1412.872" class="B C D E F G">(8, “<tspan class="LCP">wikipedi</tspan>ocracy”, 1)</text>
+
+							<text x="1520" y="322.872" class="B C D E F G">(5, “<tspan class="LCP">list </tspan>a”, 50)</text><text x="1465" y="503.872" class="B C D E F G">(6, “<tspan class="LCP">list o</tspan>bservatory”, 1)</text><text x="1080" y="685.872" class="B C D E F G">(0, “of”, 98750)</text>
+							<text x="1080" y="867.872" class="B C D E F G">(1, “<tspan class="LCP">l</tspan>eague”, 22168)</text>
+							<text x="1080" y="1048.872" class="B C D E F G">(2, “<tspan class="LCP">li</tspan>ne”, 6574)</text>
+							<text x="1080" y="1230.872" class="B C D E F G">(3, “<tspan class="LCP">lis</tspan>a”, 1342)</text>
+						</g>
+							<text x="1494" y="858" class="B C D E F G">(2, “<tspan class="LCP">of</tspan> the”, 46771)</text><text x="1500" y="1037" class="B C D E F G">(1, “<tspan class="LCP">o</tspan>pen”, 13563)</text><text x="590.238" y="923.33" class="B C D E G N">(9, “<tspan class="LCP">wikipedia</tspan>fs”, 1)</text><text x="757.238" y="889.028" class="B C D E F G">(9, “<tspan class="LCP">wikipedia</tspan>s”, 1)</text><text x="757.238" y="1286.33" class="B C D E G N">(5, “<tspan class="LCP">wikip</tspan>ilipinas”, 1)</text><text x="590.238" y="1104.33" class="B C D E G N">(4, “<tspan class="LCP">wiki</tspan>”, 17)</text><text x="757.238" y="1071.028" class="B C D E F G">(4, “<tspan class="LCP">wiki</tspan>leaks”, 8)</text><text x="590.238" y="741.33" class="B C D E G N">(3, “<tspan class="LCP">wik</tspan>stroemia”, 35)</text><text x="757.238" y="707.028" class="B C D E F G">(3, “<tspan class="LCP">wik</tspan>e”, 17)</text><text x="590.238" y="559.33" class="B C D E G N">(2, “<tspan class="LCP">wi</tspan>sconsin”, 6221)</text><text x="757.238" y="526.028" class="B C D E F G">(2, “<tspan class="LCP">wi</tspan>th”, 5918)</text><text x="590.238" y="378.33" class="B C D E G N">(1, “<tspan class="LCP">w</tspan>est”, 17837)</text><text x="757.238" y="344.028" class="B C D E F G">(1, “<tspan class="LCP">w</tspan>”, 8393)</text><text x="424.238" y="162.028" class="B C D E F G">(0, “list”, 101139)</text><text x="1090.238" y="162.028" class="B C D E F G">(4, “<tspan class="LCP">list</tspan> of”, 100625)</text><text x="1490" y="162.028" class="B C D E F G">(4, “<tspan class="LCP">list</tspan>ings”, 2974)</text><text x="1256.238" y="1287" class="B C D E G N">(3, “<tspan class="LCP">lis</tspan>bon”, 303)</text><text x="1423.238" y="1253.028" class="B C D E F G">(3, “<tspan class="LCP">lis</tspan>e”, 136)</text><text x="1256.238" y="1104.33" class="B C D E G N">(2, “<tspan class="LCP">li</tspan>ttle”, 6371)</text><text x="1423.238" y="1071.028" class="B C D E F G">(2, “<tspan class="LCP">li</tspan>fe”, 5939)</text><text x="1256.238" y="923.33" class="B C D E G N">(1, “<tspan class="LCP">l</tspan>a”, 16693)</text><text x="1423.238" y="889.028" class="B C D E F G">(1, “<tspan class="LCP">l</tspan>ove”, 10529)</text><text x="1510" y="707.028" class="B C D E F G">(0, “the”, 66985)</text><text xmlns="http://www.w3.org/2000/svg" x="291" y="205" class="B C D E F G">(0, "wikipedia", <tspan x="360" dy="32">1220297</tspan>)</text>
+							<use href="#M" paint-order="stroke fill markers"/>
+							<use href="#M" x="-166.54" paint-order="stroke fill markers"/>
+							<use href="#M" x="-333.08" paint-order="stroke fill markers"/>
+							<use href="#M" x="-999.238" y="181.679" paint-order="stroke fill markers"/>
+							<use href="#M" x="-666.159" paint-order="stroke fill markers"/>
+							<use href="#M" x="-999.238" paint-order="stroke fill markers"/>
+							<use href="#M" y="-181.68" paint-order="stroke fill markers"/>
+							<use href="#M" x="166.539" y="-181.68" paint-order="stroke fill markers"/>
+							<use href="#M" x="-166.54" y="-181.68" paint-order="stroke fill markers"/>
+							<use href="#M" x="-333.08" y="-181.68" paint-order="stroke fill markers"/>
+							<use href="#M" y="-363.359" paint-order="stroke fill markers"/>
+							<use href="#M" x="166.539" y="-363.359" paint-order="stroke fill markers"/>
+							<use href="#M" x="-166.54" y="-363.359" paint-order="stroke fill markers"/>
+							<use href="#M" x="-333.08" y="-363.359" paint-order="stroke fill markers"/>
+							<use href="#M" x="-666.159" y="-181.68" paint-order="stroke fill markers"/>
+							<use href="#M" x="-832.698" y="-181.68" paint-order="stroke fill markers"/>
+							<use href="#M" x="-999.238" y="-181.68" paint-order="stroke fill markers"/>
+							<use href="#M" x="-666.159" y="-363.359" paint-order="stroke fill markers"/>
+							<use href="#M" x="-832.698" y="-363.359" paint-order="stroke fill markers"/>
+							<use href="#M" x="-999.238" y="-363.359" paint-order="stroke fill markers"/>
+							<use href="#M" x="166.539" y="-545.039" paint-order="stroke fill markers"/>
+							<use href="#M" x="-333.08" y="-545.039" paint-order="stroke fill markers"/>
+							<use href="#M" x="166.539" y="-726.719" paint-order="stroke fill markers"/>
+							<use href="#M" x="-666.159" y="-545.039" paint-order="stroke fill markers"/>
+							<use href="#M" x="-832.698" y="-545.039" paint-order="stroke fill markers"/>
+							<use href="#M" x="-999.238" y="-545.039" paint-order="stroke fill markers"/>
+							<use href="#M" x="-666.159" y="-726.719" paint-order="stroke fill markers"/>
+							<use href="#M" x="-832.698" y="-726.719" paint-order="stroke fill markers"/>
+							<use href="#M" x="-999.238" y="-726.719" paint-order="stroke fill markers"/>
+							<use href="#M" x="166.539" y="-908.398" paint-order="stroke fill markers"/>
+							<use href="#M" x="166.539" y="-1090.078" paint-order="stroke fill markers"/>
+							<use href="#M" x="-333.08" y="-1090.078" paint-order="stroke fill markers"/>
+							<use href="#M" x="-666.159" y="-908.398" paint-order="stroke fill markers"/>
+							<use href="#M" x="-832.698" y="-908.398" paint-order="stroke fill markers"/>
+							<use href="#M" x="-999.238" y="-908.398" paint-order="stroke fill markers"/>
+							<use href="#M" x="-999.238" y="-1090.078" paint-order="stroke fill markers"/>
+							<use href="#M" x="-1132.317" y="-1090.078" paint-order="stroke fill markers"/>
+						</g>
+							<defs>
+							<path id="K" d="M420.105 350.133l6.508-10.847h-13.016l6.508 10.847z"/>
+							<path id="L" d="M580.137 901.68l-10.847-6.508v13.016l10.847-6.508z"/>
+							<path id="M" d="M1425.851 1265.039a6.508 6.508 0 1 0 0 .007z"/>
+							</defs>
+						</svg>
+
+
 					<figcaption>
 						<a href="#heap-like_DynSDT" class="internal-link">Figure 3.</a>
 						The <i>Dynamic Score-Decomposed Trie</i> of <a href="#decomposed_trie" class="internal-link">Figure 2</a> after sorting by score vertically, drawn in the LCRS representation. Tuples are rendered in the form (LCP, node.<i>key</i>, node.<i>score</i>).
@@ -587,7 +1092,136 @@
 						The promoted node adopts the LCP of its new position and the demoted node is given an LCP equal to its <i>key</i> length. Also note that the demoted node should have an empty list of branch points.
 					</p>
 					<figure id="exact_match_1">
-						<img style="overflow: hidden;" src="./exact_match.svg">
+						<!-- <img style="overflow: hidden;" src="./exact_match.svg"> -->
+						<svg version="1.1" width="640" height="250" xmlns="http://www.w3.org/2000/svg" viewBox="0 18 750 262">
+							<!-- <rect x="0" y="0" width="100%" height="100%" fill="#fff" /> -->
+							<rect x="455" y="100" width="295" height="180" fill="#ffd6d6" rx="8" ry="8" />
+							<rect x="625" y="73" width="125" height="40" fill="#ffd6d6"  rx="8" ry="8" /> <!-- d7ffe1 -->
+							<!-- <rect x="40" y="20" width="60%" height="260" fill="#eaf4ff" /> -->
+							<!-- <rect x="80" y="100" width="50%" height="160" fill="#c1e0ff" /> -->
+
+
+							<!-- <rect x="0" y="0" width="100%" height="20" fill="#fff" /> -->
+							<!-- <rect x="0" y="20" width="100%" height="20" fill="#def" /> -->
+							<!-- <rect x="0" y="40" width="100%" height="20" fill="#fff" /> -->
+							<!-- <rect x="0" y="60" width="100%" height="20" fill="#def" /> -->
+							<!-- <rect x="0" y="80" width="100%" height="20" fill="#fff" /> -->
+							<!-- <rect x="0" y="120" width="100%" height="20" fill="#fff" /> -->
+							<!-- <rect x="0" y="140" width="100%" height="20" fill="#def" /> -->
+							<!-- <rect x="0" y="160" width="100%" height="20" fill="#fff" /> -->
+							<!-- <rect x="0" y="180" width="100%" height="20" fill="#def" /> -->
+							<!-- <rect x="0" y="200" width="100%" height="20" fill="#fff" /> -->
+							<!-- <rect x="0" y="220" width="100%" height="20" fill="#def" /> -->
+							<!-- <rect x="0" y="240" width="100%" height="20" fill="#fff" /> -->
+							<!-- <rect x="0" y="260" width="100%" height="20" fill="#def" /> -->
+						<!-- ({tennis 5826}, 2) -->
+							<!-- <text x="0" y="15" class="T">branch points under "tennis" in the form (<tspan class="Italic">LCP</tspan>, <tspan class="Italic">key</tspan>, <tspan class="Italic">score</tspan>):</text> -->
+							<text x="00" y="15" class="T">(2, "<tspan class="S">te</tspan>nnis", 5826)</text>
+							<text x="40" y="35" class="T">(2, "<tspan class="S">te</tspan>levision", 4673)</text>
+							<text x="40" y="55" class="T">(4, "<tspan class="S">tenn</tspan>essee", 3461)</text>
+							<text x="40" y="75" class="T">(3, "<tspan class="S">ten</tspan>", 1452)</text>
+							<text x="40" y="95" class="T">(6, "<tspan class="S">tennis</tspan> championships", 1218)</text>
+							<text x="80" y="115" class="T">( 7, "<tspan class="S">tennis </tspan>at", 845)</text>
+							<text x="80" y="135" class="T">( 8, "<tspan class="S">tennis c</tspan>lassic", 267)</text>
+							<text x="80" y="155" class="T">( 6, "<tspan class="S">tennis</tspan>trophy", 75)</text>
+							<text x="80" y="175" class="T">(10, "<tspan class="S">tennis cha</tspan>llenge", 75)</text>
+							<text x="80" y="195" class="T">(20, "<tspan class="S">tennis championships</tspan> 2020", 68)</text>
+							<text x="80" y="215" class="T">(19, "<tspan class="S">tennis championship</tspan>", 52)</text>
+							<text x="80" y="235" class="T">(16, "<tspan class="S">tennis champions</tspan>", 7)</text>
+							<text x="80" y="255" class="T">(15, "<tspan class="S">tennis champion</tspan>", 1)</text>
+							<text x="80" y="275" class="T">( 9, "<tspan class="S">tennis ch</tspan>umps", 1)</text>
+							<text x="40" y="295" class="T">(5, "<tspan class="S">tenni</tspan>lle", 13)</text>
+
+							<!-- <text x="100%" y="8pt" class="T Italic Bold" text-anchor="end" style='font-size: 8pt;'>format: (LCP, key, score)</text> -->
+
+							<path stroke-width="1.5" d="M 262 89.5 L 298 89.5" stroke="red" fill="red"/>
+
+
+							<text x="280" y="80" class="T Bold" text-anchor="middle" fill="red">63</text>
+
+							<circle cx="290" cy="55" r="9" fill="red"/>
+							<text x="290" y="60" class="T Bold" text-anchor="middle" fill="white">1</text>
+							<text x="302" y="60" class="T Medium" text-anchor="start" fill="black">Update</text>
+
+							<path stroke-width="1.5" d="M 310 90 C 350 90, 330 110, 260 110" stroke="red" fill="transparent"/>
+							<path stroke-width="1.5" d="M 315 88 L 315 92 L 310 90 Z" stroke="red" fill="red"/>
+							<path stroke-width="1.5" d="M 265 108 L 265 112 L 260 110 Z" stroke="red" fill="red"/>
+
+
+
+							<g transform="translate(-20 17.5)">
+								<circle cx="350" cy="95" r="9" fill="red"/>
+								<text x="350" y="100" class="T Bold" text-anchor="middle" fill="white">2</text>
+								<text x="362" y="100" class="T Medium" text-anchor="start" fill="black">Swap</text>
+							</g>
+
+
+							<path stroke-width="1.5" d="M 75 110 L 75 173" stroke="red"/>
+							<path stroke-width="1.5" d="M 73 173 L 77 173 L 75 178 Z" stroke="red" fill="red"/>
+
+
+
+							<circle cx="24" cy="145" r="9" fill="red"/>
+							<text x="24" y="150" class="T Bold" text-anchor="middle" fill="white">3</text>
+							<text x="36" y="150" class="T Medium" text-anchor="start" fill="black">Sort</text>
+
+
+							<text x="375" y="15" class="T">(2, "<tspan class="S">te</tspan>nnis", 5826)</text>
+							<text x="415" y="35" class="T">(2, "<tspan class="S">te</tspan>levision", 4673)</text>
+							<text x="415" y="55" class="T">(4, "<tspan class="S">tenn</tspan>essee", 3461)</text>
+							<text x="415" y="75" class="T">(3, "<tspan class="S">ten</tspan>", 1452)</text>
+
+							<text x="415" y="95" class="T">(6, "<tspan class="S">tennis</tspan> at", 845)</text>
+							<text x="455" y="115" class="T">( 8, "tennis classic", 267)</text>
+							<text x="455" y="135" class="T">( 6, "tennistrophy", 75)</text>
+							<text x="455" y="155" class="T">(10, "tennis challenge", 75)</text>
+
+							<text x="455" y="175" class="T">(20, "tennis championships 2020", 68)</text>
+							<text x="455" y="195" class="T">(20, "tennis championships", 63)</text>
+							<text x="455" y="215" class="T">(19, "tennis championship", 52)</text>
+							<text x="455" y="235" class="T">(16, "tennis champions", 7)</text>
+							<text x="455" y="255" class="T">(15, "tennis champion", 1)</text>
+							<text x="455" y="275" class="T">( 9, "tennis chumps", 1)</text>
+
+							<text x="415" y="295" class="T">(5, "<tspan class="S">tenni</tspan>lle", 13)</text>
+
+
+							<circle cx="638" cy="85" r="9" fill="red"/>
+							<text x="638" y="90" class="T Bold" text-anchor="middle" fill="white">4</text>
+							<text x="650" y="90" class="T Medium" text-anchor="start" fill="black">Use as Queue</text>
+
+							<line x1="376" y1="-2" x2="376" y2="120%" stroke="black" stroke-dasharray="3" stroke-width="1.5"/>
+
+							<style>
+						#exact_match_1 tspan.S {
+							text-decoration: underline;
+							font-weight: bold;
+						}
+						#exact_match_1 text.T {
+							font-size: 10pt;
+							font-family: "JetBrains Mono", monospace;
+						}
+
+						#exact_match_1 text.Medium {
+							font-weight: 700;
+						}
+
+						#exact_match_1 text.Italic {
+							font-style: italic;
+						}
+
+						#exact_match_1 text.Bold {
+							font-weight: bold;
+						}
+
+						#exact_match_1 tspan.inf {
+							font-size: 17pt;
+							font-weight: 300;
+						}
+
+							</style>
+						</svg>
+
 						<figcaption>
 							<a href="#exact_match_1" class="internal-link">Figure 4.</a>
 							An example of the previous step for <a href="#Algorithm_5" class="funcname internal-link">Set</a>(“tennis&nbsp;championships”, 63) called on the Wikipedia dataset [<a class="citation" href="#WIKI_DATA">3</a>] with tuples in the format (LCP, <i>key</i>, <i>score</i>).
@@ -608,7 +1242,128 @@
 						Since the running maximums list is, by construction, sorted in ascending order of LCP, it is binary searchable in <span class="complexity"><span class="big-O">O</span>(log<span class="ThinSpace"></span><var>d</var>)</span> time.
 					</p>
 					<figure id="exact_match_revised">
-						<img style="overflow: hidden;" src="./exact_match_revised.svg">
+						<!-- <img style="overflow: hidden;" src="./exact_match_revised.svg"> -->
+						<svg version="1.1" width="641" height="211" xmlns="http://www.w3.org/2000/svg" viewBox="0 13 650 165">
+							<!-- <rect x="0" y="0" width="100%" height="100%" fill="#fff" /> -->
+
+							<text x="0" y="0" class="T Bold Italic">Running maximums list</text>
+							<text x="355" y="0" class="T Bold Italic">Queue</text>
+							<text x="0" y="20" class="T">( 7, "tennis at", 845)</text>
+							<!-- <text x="290" y="35" class="T">___________________________</text> -->
+
+							<text x="355" y="40" class="T">( 8, "tennis classic", 267)</text>
+							<text x="355" y="60" class="T">( 6, "tennistrophy", 75)</text>
+
+							<text x="355" y="80" class="T">(10, "tennis challenge", 75)</text>
+							<text x="355" y="100" class="T">(20, "tennis championships 2020", 68)</text>
+							<text x="355" y="120" class="T">(20, "tennis championships", 63)</text>
+							<text x="355" y="140" class="T">(19, "tennis championship", 52)</text>
+							<text x="355" y="160" class="T">(16, "tennis champions", 7)</text>
+							<text x="355" y="180" class="T">(15, "tennis champion", 1)</text>
+							<text x="355" y="200" class="T">( 9, "tennis chumps", 1)</text>
+
+							<!-- <g id="iter_0"> -->
+								<text x="0" y="40" class="T">( 8, "tennis classic", 267)</text>
+								<!-- from: tennis classic -->
+								<path stroke-width="1.5" d="M 355 35 Q 300 15, 180 12" stroke="red" fill="transparent"/>
+								<g transform="translate(0 -13)">
+									<path stroke-width="1.5" d="M 185 23 L 185 27 L 180 25 Z" stroke="red" fill="red"/>
+								</g>
+							<!-- </g> -->
+
+							<!-- <g id="iter_1"> -->
+								<!-- from: tennistrophy -->
+								<path stroke-width="1.5" d="M 355 55 Q 300 20, 182 20" stroke="red" fill="transparent"/>
+								<g transform="translate(0 -12)">
+									<path stroke-width="1.5" d="M 185 30 L 185 34 L 180 32 Z" stroke="red" fill="red"/>
+								</g>
+							<!-- </g> -->
+
+							<!-- <g id="iter_2"> -->
+								<!-- from: tennis challenge -->
+								<text x="0" y="80" class="T">(10, "tennis challenge", 75)</text>
+								<path stroke-width="1.5" d="M 355 75 Q 300 35, 220 35" stroke="red" fill="transparent"/>
+								<g transform="translate(0 -15)">
+									<path stroke-width="1.5" d="M 225 48 L 225 52 L 220 50 Z" stroke="red" fill="red"/>
+								</g>
+
+							<!-- <g id="iter_3"> -->
+								<!-- from: tennis championships -->
+								<text x="0" y="100" class="T">(20, "tennis championships 2020", 63)</text>
+								<path stroke-width="1.5" d="M 355 95 Q 300 75, 230 72" stroke="red" fill="transparent"/>
+								<g transform="translate(0 -15)">
+									<path stroke-width="1.5" d="M 232 85 L 232 89 L 227 87 Z" stroke="red" fill="red"/>
+								</g>
+							<!-- </g> -->
+
+							<!-- <g id="iter_4"> -->
+								<!-- from: tennis championship -->
+								<path stroke-width="1.5" d="M 355 115 Q 290 125, 289 109" stroke="red" fill="transparent"/>
+								<g transform="translate(30 0)">
+									<path stroke-width="1.5" d="M 257 109 L 261 109 L 259 105 Z" stroke="red" fill="red"/>
+								</g>
+
+								<path stroke-width="1.5" d="M 355 135 Q 275 140, 274 109" stroke="red" fill="transparent"/>
+								<g transform="translate(15 0)">
+									<path stroke-width="1.5" d="M 257 109 L 261 109 L 259 105 Z" stroke="red" fill="red"/>
+								</g>
+
+								<path stroke-width="1.5" d="M 355 155 Q 260 155, 259 109" stroke="red" fill="transparent"/>
+									<path stroke-width="1.5" d="M 257 109 L 261 109 L 259 105 Z" stroke="red" fill="red"/>
+
+								<path stroke-width="1.5" d="M 355 175 Q 245 175, 244 109" stroke="red" fill="transparent"/>
+								<g transform="translate(-15 0)">
+									<path stroke-width="1.5" d="M 257 109 L 261 109 L 259 105 Z" stroke="red" fill="red"/>
+								</g>
+							<!-- </g> -->
+
+							<!-- <g id="iter_5"> -->
+								<!-- from: tennis champions -->
+								<!--
+							<path stroke-width="1.5" d="M 385 150 Q 330 109, 262 111" stroke="red" fill="transparent"/>
+								<path stroke-width="1.5" d="M 264 109 L 264 113 L 259 111 Z" stroke="red" fill="red"/> -->
+							<!-- </g> -->
+
+							<!-- <g id="iter_6"> -->
+								<!-- from: tennis champions -->
+								<!--
+							<path stroke-width="1.5" d="M 385 170 Q 330 115, 262 117" stroke="red" fill="transparent"/>
+								<path stroke-width="1.5" d="M 264 115 L 264 119 L 259 117 Z" stroke="red" fill="red"/> -->
+							<!-- </g> -->
+
+							<!-- <g id="iter_7"> -->
+								<!-- from: tennis chumps -->
+								<path stroke-width="1.5" d="M 355 196 Q 340 70, 230 78" stroke="red" fill="transparent"/>
+								<g transform="translate(0 -16)">
+									<path stroke-width="1.5" d="M 232 92 L 232 96 L 227 94 Z" stroke="red" fill="red"/>
+								</g>
+							<!-- </g> -->
+
+							<style>
+								#exact_match_revised text.T {
+									font-size: 10pt;
+									font-family: "JetBrains Mono", monospace;
+								}
+
+								#exact_match_revised text.Medium {
+									font-weight: 700;
+								}
+
+								#exact_match_revised text.Italic {
+									font-style: italic;
+								}
+
+								#exact_match_revised text.Bold {
+									font-weight: bold;
+								}
+
+								#exact_match_revised tspan.inf {
+									font-size: 17pt;
+									font-weight: 300;
+								}
+							</style>
+						</svg>
+
 						<figcaption>
 							<a href="#exact_match_revised" class="internal-link">Figure 5.</a>
 							A continuation of <a href="#exact_match_1" class="internal-link">Figure 4</a>.
@@ -749,7 +1504,208 @@
 						</div>
 					</div>
 					<figure id="score_located">
-						<img style="overflow: hidden;" src="./score_located.svg">
+						<!-- <img style="overflow: hidden;" src="./score_located.svg"> -->
+						<svg version="1.1" width="641" height="450" xmlns="http://www.w3.org/2000/svg" viewBox="0 3 500 348">
+							<!-- <rect x="0" y="0" width="100%" height="100%" fill="#fff" /> -->
+						<text x='0' y='0' class='T'>
+						<tspan x='0' dy='12'>(1, "<tspan class="C">t</tspan>ownship", 16894)</tspan>
+						<tspan fill="red" x='0' dy='12'>(2, "<tspan class="C">te</tspan>xas", 8909)</tspan>
+							<tspan fill="red" x='40' dy='12'>(2, "<tspan class="C">te</tspan>nnis", 5826)</tspan>
+								<tspan fill="blue" x='80' dy='12'>(2, "<tspan class="C">te</tspan>levision", 4673)</tspan>
+								<tspan fill="red" x='80' dy='12'>(4, "<tspan class="C">tenn</tspan>essee", 3461)</tspan>
+								<tspan fill="red" x='80' dy='12'>(3, "<tspan class="C">ten</tspan>", 1452)</tspan>
+								<tspan fill="red" x='80' dy='12'>(6, "<tspan class="C">tennis</tspan> championships", 1218)</tspan>
+									<tspan fill="red" x='120' dy='12'>( 7, "<tspan class="C">tennis </tspan>at", 845)</tspan>
+										<tspan fill="blue" x='160' dy='12'>(7, "<tspan class="C">tennis </tspan>tournament", 190)</tspan>
+										<tspan x='160' dy='12'>(8, "<tspan class="C">tennis a</tspan>ssociation", 37)</tspan>
+											<tspan x='200' dy='12'>( 8, "<tspan class="C">tennis a</tspan>nd", 9)</tspan>
+												<tspan class="Italic" style="font-weight: 900" x='240' dy='12'>(8, "<tspan class="C" style="font-weight:900">tennis a</tspan>cademy", 8)</tspan>
+													<tspan fill="blue" x='280' dy='12'>(8, "<tspan class="C">tennis a</tspan>bruzzo", 7)</tspan>
+													<tspan fill="red" x='280' dy='12'>(9, "<tspan class="C">tennis ac</tspan>es", 1)</tspan>
+											<tspan x='200' dy='12'>(18, "<tspan class="C">tennis association</tspan>s", 1)</tspan>
+										<tspan x='160' dy='12'>(9, "<tspan class="C">tennis at</tspan>hletes", 1)</tspan>
+									<tspan x='120' dy='12'>( 8, "<tspan class="C">tennis c</tspan>lassic", 267)</tspan>
+									<tspan fill="blue" x='120' dy='12'>( 6, "<tspan class="C">tennis</tspan>trophy", 75)</tspan>
+									<tspan x='120' dy='12'>(10, "<tspan class="C">tennis cha</tspan>llenge", 75)</tspan>
+									<tspan x='120' dy='12'>(19, "<tspan class="C">tennis championship</tspan>", 52)</tspan>
+									<tspan x='120' dy='12'>(16, "<tspan class="C">tennis champions</tspan>", 7)</tspan>
+									<tspan x='120' dy='12'>(15, "<tspan class="C">tennis champion</tspan>", 1)</tspan>
+									<tspan x='120' dy='12'>( 9, "<tspan class="C">tennis ch</tspan>umps", 1)</tspan>
+								<tspan fill="red" x='80' dy='12'>(5, "<tspan class="C">tenni</tspan>lle", 13)</tspan>
+							<tspan x='40' dy='12'>(5, "<tspan class="C">texas</tspan> state", 510)</tspan>
+							<tspan x='40' dy='12'>(3, "<tspan class="C">tex</tspan>t", 290)</tspan>
+							<tspan x='40' dy='12'>(4, "<tspan class="C">texa</tspan>na", 93)</tspan>
+
+
+						<tspan x='0' dy='12'>(4, "<tspan class="C">team</tspan> in", 1232)</tspan>
+						<tspan x='0' dy='12'>(3, "<tspan class="C">tea</tspan>", 641)</tspan>
+						</text>
+
+						<!-- <g transform="translate(500 0)">
+
+						</g> -->
+							<defs>
+								<path id="arrow" stroke-width="1" d="M 0 -4 L 0 0 L -5 -2 Z" stroke="blue" fill="blue"/>
+							</defs>
+
+							<circle cx="173" cy="21" r="5.5" fill="red"/>
+							<text x="173" y="24" class="N Bold" text-anchor="middle" fill="white">1</text>
+							<text x="182" y="24" class="Q Medium" text-anchor="start" fill="black">Replace with new <tspan class="Italic" style="font-size: 10px;font-weight: 900">(2, "tennis academy", 9001)</tspan>,  <tspan x='182' dy='11'>LCP ⟵ 2</tspan></text>
+
+							<path stroke-width="1.5" d="M 163 20 L 115 20" stroke="black" fill="black"/>
+
+							<path stroke-width="1.5" d="M 115 18 L 115 22 L 110 20 Z" stroke="black" fill="black"/>
+
+
+							<g transform="translate(0 -10)">
+								<g transform="translate(14 -1)">
+									<circle cx="18" cy="43" r="5.5" fill="red"/>
+									<text x="18" y="46" class="N Bold" text-anchor="middle" fill="white">2</text>
+								</g>
+
+								<text x="0" y="56" class="Q Medium" text-anchor="start" fill="black">promote,
+								<tspan x='0' dy='11'>LCP ⟵ 6,</tspan>
+								<tspan x='0' dy='11.5'>grab LCP's &#x003c; 6</tspan>
+								<!-- <tspan x='0' dy='11'>follow LCP = 6</tspan> -->
+								</text>
+							</g>
+
+							<g transform="translate(2 0)">
+							<path stroke-width="1.25" d="M 78 45, Q 50 50, 50 43" stroke="blue" fill="transparent"/>
+							<use transform="rotate(70 48 44)" href="#arrow" x="48" y="44"/>
+							</g>
+
+							<g transform="translate(240 0)">
+								<circle cx="45" cy="80" r="5.5" fill="red"/>
+								<text x="45" y="83" class="N Bold" text-anchor="middle" fill="white">3</text>
+								<text x="54" y="83" class="Q Medium" text-anchor="start" fill="black">
+								promote "tennistrophy",
+								<!-- <tspan x='54' dy='11'> -->
+									LCP ⟵ 7
+								<!-- </tspan> -->
+
+								</text>
+							</g>
+
+							<g transform="translate(240 12)">
+								<circle cx="45" cy="80" r="5.5" fill="red"/>
+								<text x="45" y="83.5" class="N Bold" text-anchor="middle" fill="white">4</text>
+								<text x="54" y="83" class="Q Medium" text-anchor="start" fill="black">
+								promote "tennis tournament",
+								<!-- <tspan x='54' dy='11'> -->
+									LCP ⟵ 8
+								<!-- </tspan> -->
+
+								</text>
+							</g>
+
+							<g transform="translate(295 36.5)">
+								<circle cx="45" cy="80" r="5.5" fill="red"/>
+								<text x="45" y="83.5" class="N Bold" text-anchor="middle" fill="white">5</text>
+								<text x="54" y="83" class="Q Medium" text-anchor="start" fill="black">
+								LCP is unchanged, keep going
+								</text>
+							</g>
+
+							<g transform="translate(295 48.5)">
+								<circle cx="45" cy="80" r="5.5" fill="red"/>
+								<text x="45" y="83.5" class="N Bold" text-anchor="middle" fill="white">6</text>
+								<text x="54" y="83" class="Q Medium" text-anchor="start" fill="black">
+								LCP is unchanged, keep going
+								</text>
+							</g>
+
+							<g transform="translate(52.5 12)">
+								<g transform="translate(295 48.5)">
+									<circle cx="45" cy="80" r="5.5" fill="red"/>
+									<text x="45" y="83.5" class="N Bold" text-anchor="middle" fill="white">7</text>
+									<text x="54" y="83.5" class="Q Medium" text-anchor="start" fill="black">
+									delete &#x0026; promote
+									<!-- promote &#x0026; -->
+									<!-- finish up! -->
+									</text>
+								</g>
+							</g>
+
+							<g transform="translate(72 36)">
+								<g transform="translate(295 48.5)">
+									<circle cx="45" cy="80" r="5.5" fill="red"/>
+									<text x="45" y="83.5" class="N Bold" text-anchor="middle" fill="white">8</text>
+									<text x="54" y="83.5" class="Q Medium" text-anchor="start" fill="black">
+									grab rest,
+									<tspan x='54' dy='11'>
+									then finish!
+									</tspan>
+									<!-- promote &#x0026; -->
+									<!-- finish up! -->
+									</text>
+								</g>
+							</g>
+
+							<!-- <g transform="translate(110 96.5)">
+								<g transform="translate(100 1.5)">
+									<circle cx="18" cy="42.5" r="5.5" fill="red"/>
+									<text x="18" y="46" class="N Bold" text-anchor="middle" fill="white">7</text>
+								</g>
+								<text x="68" y="47.5" class="Q Medium" text-anchor="start" fill="black">finish,
+								<tspan x='0' dy='11'>grab everything else</tspan>
+								</text>
+							</g> -->
+
+							<path stroke-width="1.25" d="M 118 213, Q 88 147, 88 91" stroke="blue" fill="transparent"/>
+							<use transform="rotate(90 86 92)" href="#arrow" x="86" y="92"/>
+
+							<path stroke-width="1.25" d="M 158 105, Q 138 111, 137.5 103" stroke="blue" fill="transparent"/>
+							<use transform="rotate(70 135.5 104)" href="#arrow" x="135.5" y="104"/>
+
+							<g transform="translate(2 0)">
+							<path stroke-width="1.25" d="M 278 153, Q 250 160, 249 151" stroke="blue" fill="transparent"/>
+							<use transform="rotate(70 247 151)" href="#arrow" x="247" y="151"/>
+							</g>
+
+						  <style>
+						#score_located tspan.C {
+							text-decoration: underline;
+							font-weight: bold;
+						}
+
+						#score_located tspan.C {
+							font-weight: bold;
+						}
+
+						#score_located text.N {
+							font-size: 9px;
+							font-family: "JetBrains Mono", monospace;
+						}
+
+						#score_located text.Q {
+							font-size: 9px;
+							font-family: "JetBrains Mono", monospace;
+						}
+
+						#score_located text.T {
+						  font-size: 10px;
+						  font-family: "JetBrains Mono", monospace;
+						}
+
+						#score_located text.Italic, tspan.Italic {
+						  font-style: italic;
+						}
+
+						#score_located text.Bold, tspan.Bold {
+						  font-weight: bold;
+						}
+
+						#score_located text.Medium, tspan.Medium {
+							font-weight: 700;
+						}
+
+						#score_located text.Bold, tspan.Bold {
+							font-weight: bold;
+						}
+						  </style>
+						</svg>
+
 						<figcaption>
 							<a href="#score_located" class="internal-link">Figure 6.</a>
 							The aforementioned process for <a href="#Algorithm_5" class="funcname internal-link">Set</a><span class="nowrap">(“tennis academy”, 9001)</span>.
@@ -794,7 +1750,83 @@ if (window.matchMedia) { // if this exists, we can make the content actually par
 						</figcaption>
 					</figure>
 					<figure id="score_located2">
-						<img style="overflow: hidden;" src="./score_located2.svg">
+						<!-- <img style="overflow: hidden;" src="./score_located2.svg"> -->
+						<svg version="1.1" width="641" height="450" xmlns="http://www.w3.org/2000/svg" viewBox="0 3 500 348">
+							<!-- <rect x="0" y="0" width="100%" height="100%" fill="#fff" /> -->
+
+						<text x="0" class='T'>
+						<tspan x='0' dy='12'>(1, "<tspan class="S">t</tspan>ownship", 16894)</tspan>
+						<tspan class="Italic" style="font-weight: 900" x='0' dy='12'>(2, "<tspan class="S" style="font-weight:900">te</tspan>nnis academy", 9001)</tspan>
+
+							<tspan fill="red" x='40' dy='12'>(2, "<tspan class="S">te</tspan>xas", 8909)</tspan>
+								<tspan fill="blue" x='80' dy='12'>(2, "<tspan class="S">te</tspan>levision", 4673)</tspan>
+								<tspan x='80' dy='12'>(5, "<tspan class="S">texas</tspan> state", 510)</tspan>
+								<tspan x='80' dy='12'>(3, "<tspan class="S">tex</tspan>t", 290)</tspan>
+								<tspan x='80' dy='12'>(4, "<tspan class="S">texa</tspan>na", 93)</tspan>
+							<tspan fill="red" x='40' dy='12'>(6, "<tspan class="S">tennis</tspan>", 5826)</tspan>
+								<tspan fill="blue" x='80' dy='12'>( 6, "<tspan class="S">tennis</tspan>trophy", 75)</tspan>
+							<tspan fill="red" x='40' dy='12'>(4, "<tspan class="S">tenn</tspan>essee", 3461)</tspan>
+							<tspan fill="red" x='40' dy='12'>(3, "<tspan class="S">ten</tspan>", 1452)</tspan>
+							<tspan fill="red" x='40' dy='12'>(7, "<tspan class="S">tennis </tspan>championships", 1218)</tspan>
+								<tspan x='80' dy='12'>( 8, "<tspan class="S">tennis c</tspan>lassic", 267)</tspan>
+								<tspan fill="blue" x='80' dy='12'>( 7, "<tspan class="S">tennis </tspan>tournament", 190)</tspan>
+								<tspan x='80' dy='12'>(10, "<tspan class="S">tennis cha</tspan>llenge", 75)</tspan>
+								<tspan x='80' dy='12'>(19, "<tspan class="S">tennis championship</tspan>", 52)</tspan>
+								<tspan x='80' dy='12'>(16, "<tspan class="S">tennis champions</tspan>", 7)</tspan>
+								<tspan x='80' dy='12'>(15, "<tspan class="S">tennis champion</tspan>", 1)</tspan>
+								<tspan x='80' dy='12'>( 9, "<tspan class="S">tennis ch</tspan>umps", 1)</tspan>
+							<tspan fill="red" x='40' dy='12'>(8, "<tspan class="S">tennis a</tspan>t", 845)</tspan>
+								<tspan x='80' dy='12'>(8, "<tspan class="S">tennis a</tspan>ssociation", 37)</tspan>
+									<tspan x='120' dy='12'>( 8, "<tspan class="S">tennis a</tspan>nd", 9)</tspan>
+										<tspan fill="blue" x='160' dy='12'>(8, "<tspan class="S">tennis a</tspan>bruzzo", 7)</tspan>
+									<tspan x='120' dy='12'>(18, "<tspan class="S">tennis association</tspan>s", 1)</tspan>
+								<tspan x='80' dy='12'>(9, "<tspan class="S">tennis at</tspan>hletes", 1)</tspan>
+							<tspan fill="red" x='40' dy='12'>(5, "<tspan class="S">tenni</tspan>lle", 13)</tspan>
+							<tspan fill="red" x='40' dy='12'>(9, "<tspan class="S">tennis ac</tspan>es", 1)</tspan>
+
+
+						<tspan x='0' dy='12'>(4, "<tspan class="S">team</tspan> in", 1232)</tspan>
+						<tspan x='0' dy='12'>(3, "<tspan class="S">tea</tspan>", 641)</tspan>
+						</text>
+						  <style>
+						#score_located2 tspan.S {
+							text-decoration: underline;
+							font-weight: bold;
+						}
+
+						#score_located2 text.N {
+							font-size: 9px;
+							font-family: "JetBrains Mono", monospace;
+						}
+
+						#score_located2 text.Q {
+							font-size: 9px;
+							font-family: "JetBrains Mono", monospace;
+						}
+
+						#score_located2 text.T {
+						  font-size: 10px;
+						  font-family: "JetBrains Mono", monospace;
+						}
+
+						#score_located2 text.Italic, tspan.Italic {
+						  font-style: italic;
+						}
+
+						#score_located2 text.Bold, tspan.Bold {
+						  font-weight: bold;
+						}
+
+						#score_located2 text.Medium, tspan.Medium {
+							font-weight: 700;
+						}
+
+						#score_located2 text.Bold, tspan.Bold {
+							font-weight: bold;
+						}
+						  </style>
+						</svg>
+
 						<figcaption>
 							<a href="#score_located2" class="internal-link">Figure 7.</a>
 							The structure of <a href="#score_located" class="internal-link">Figure 6</a>
