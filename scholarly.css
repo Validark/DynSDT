@@ -1365,13 +1365,13 @@ div.pseudocode, div.ps_header>div {
 }
 
 div.pseudocode>div.non-lines, div.ps_header>div>div.non-lines {
-	line-height: 1.15em;
+	line-height: 1.15;
 	margin-top: 0.1em;
 	margin-bottom: 0.1em;
 }
 
 div.pseudocode>div:not(.non-lines), div.ps_header>div>div:not(.non-lines) {
-	line-height: 1.15em;
+	line-height: 1.15;
 	word-spacing: 0.2em;
 }
 
@@ -1391,8 +1391,13 @@ div.pseudocode>div:not(.non-lines)::before, div.ps_header>div>div:not(.non-lines
 	font-family: KaTeX_SansSerif;
 }
 
-div.pseudocode>div.non-lines>div::before, div.ps_header>div>div.non-lines>div::before {
+div.pseudocode>div.non-lines>div,
+div.ps_header>div>div.non-lines>div {
 	counter-reset: ruler;
+}
+
+div.pseudocode>div.non-lines>div::before,
+div.ps_header>div>div.non-lines>div::before {
 	content: ' ';
 }
 
