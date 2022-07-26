@@ -1375,10 +1375,10 @@ div.pseudocode>div:not(.non-lines), div.ps_header>div>div:not(.non-lines) {
 	word-spacing: 0.2em;
 }
 
-div.pseudocode>div:not(.non-lines)::before, div.ps_header>div>div:not(.non-lines)::before, div.pseudocode>div.non-lines>div::before, div.ps_header>div>div.non-lines>div::before {
-	counter-increment: ruler;
-	content: counter(ruler);
-	/* '\A0'; */
+div.pseudocode>div:not(.non-lines)::before,
+div.ps_header>div>div:not(.non-lines)::before,
+div.pseudocode>div.non-lines>div::before,
+div.ps_header>div>div.non-lines>div::before {
 	width: 1em;
 	display: inline-block;
 	text-align: right;
@@ -1391,9 +1391,10 @@ div.pseudocode>div:not(.non-lines)::before, div.ps_header>div>div:not(.non-lines
 	font-family: KaTeX_SansSerif;
 }
 
-div.pseudocode>div.non-lines>div,
-div.ps_header>div>div.non-lines>div {
-	counter-reset: ruler;
+div.pseudocode>div:not(.non-lines)::before,
+div.ps_header>div>div:not(.non-lines)::before {
+	counter-increment: ruler;
+	content: counter(ruler);
 }
 
 div.pseudocode>div.non-lines>div::before,
