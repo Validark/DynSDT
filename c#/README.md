@@ -12,6 +12,8 @@ This code is designed to work as a drop-in replacement to the [*Pruning Radix Tr
   - The following public members are not supported: `termCountLoaded UpdateMaxCounts FindAllChildTerms BinarySearchComparer BinarySearchComparer`
   - There is no `Node.cs` file (so we can have a single `using score_int = System.Int64;` directive), so if you literally drag and drop the `PruningRadixTrie` files onto your [*Pruning Radix Trie*](https://github.com/wolfgarbe/PruningRadixTrie) files, you will have to delete the old `Node.cs` file.
   - In the `csproj` file, `PruningRadixTrie.csproj` has the `TargetFramework` updated from `netstandard2.0` to `netstandard2.1`.
+  - if ${\rm S{\small et}}(t,\ s)$ or ${\rm A{\small dd}T{\small erm}}(t,\ s)$ receive null or the empty string for term $t$, it is a no-op.
+    - I am pretty sure nobody actually needs the empty string in the data structure.
 
 ## Preprocessor directives
 This implementation has a few preprocessor directives which can toggle behavior:
