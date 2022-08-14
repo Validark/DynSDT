@@ -23,7 +23,7 @@ This code is designed to work as a drop-in replacement to the [*Pruning Radix Tr
   - ${\rm D{\small elete}}$ would take 0 allocations, but of course makes one node garbage.
     - The only way to get around this would be to have some kind of pool of unused nodes, however, I've heard it is usually better to just put your faith in C#'s automagic memory management.
 - Nodes are value types, written directly into their slots in arrays. This reduces memory consumption a bit and improves memory locality, improving speed somewhat.
-  - Unfortunately, that means we can not have a pointer that points directly to a Node without unsafe code and "pinning" C#'s garbage collector
+  - Unfortunately, that means we can not have a pointer that points directly to a Node (without unsafe code and "pinning" C#'s garbage collector).
   - This means we have to keep a reference to `parentPeers` and sometimes `grandPeers` in the code, so we can update the necessary value types where they actually are in memory.
   - This means we have to watch out for cache invalidation in our "running maximums list" in the [exact match found (demotion)](https://validark.github.io/DynSDT/#exact-match) algorithm.
     - Luckily, there is actually only one list of branch points (called `peers` in the code) that can become stale, and that's when the `parentPeers` is the same array as the next one in the "running maximums list" (inverse checked on line 1109 ****& updated on line 1133) https://github.com/Validark/DynSDT/blob/a50b4d17e269230c3b68c65258b09c31b0027b6f/c%23/PruningRadixTrie/PruningRadixTrie.cs#L1106-L1134
