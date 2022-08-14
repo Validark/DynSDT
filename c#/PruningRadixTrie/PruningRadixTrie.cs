@@ -293,10 +293,22 @@ public void WriteTermsToFile(String path)
 	}
 }
 
-private static void GetAllTerms(List<(String term, score_int score)> results, Node node)
+private static void GetAllTerms(List<(String term, score_int score)> results, Node node
+#if COMPRESS_STRINGS
+, String key = ""
+#endif
+)
 {
+#if COMPRESS_STRINGS
+	results.Add((key = key + node.key, node.score));
+#else
 	results.Add((node.key, node.score));
-	foreach (var peer in node.peers) GetAllTerms(results, peer.node);
+#endif
+	foreach (var peer in node.peers) GetAllTerms(results, peer.node
+	#if COMPRESS_STRINGS
+		, key.Substring(0, peer.LCP)
+	#endif
+	);
 }
 
 // We could just use GetTopkTermsForPrefix("", termCount), but this should be faster
@@ -341,13 +353,13 @@ public List<(String term, score_int score)> GetTopkTermsForPrefix(String prefix,
 		if (!skip1.TryGetValue(prefix[0], out node)) return results;
 		if (prefixLength > 1)
 		{
-			var node2 = node;
+			var prevPeers = node.peers;
 			if (!skip2.TryGetValue((prefix[0] << 16) | prefix[1], out node)) return results;
-			prevLCP = node.peers != node2.peers ? 1 : 0;
+			prevLCP = node.peers != prevPeers ? 1 : 0; // this is the reason we have separate logic for COMPRESS_STRINGS
 		}
 	#else
 		if (
-			prefix.Length == 1
+			prefixLength == 1
 			? !skip1.TryGetValue(prefix[0], out node)
 			: !skip2.TryGetValue((prefix[0] << 16) | prefix[1], out node)
 		) return results;
@@ -591,6 +603,44 @@ public void validateTrie()
 	}
 }
 
+public void verifySubtree((Node node, int LCP)[] peers, int index)
+{
+	var terms = new List<(String term, score_int score)>();
+	GetAllTerms(terms, peers[index].node);
+
+	// Save the old tree
+	var previousRoot = this.rootPeers[0];
+
+#if FORCE_STATIC
+	var previousSkip1 = skip1;
+	var previousSkip2 = skip2;
+#endif
+	var previousTermCount = termCount;
+	termCount = 0;
+
+	// Create a new tree from the terms list we made
+	AddTerms(terms, true);
+
+	// Save this new tree
+	var tmp = this.rootPeers[0];
+
+	// Restore the old tree's state
+	termCount = previousTermCount;
+	this.rootPeers[0] = previousRoot;
+
+#if FORCE_STATIC
+	skip1 = previousSkip1;
+	skip2 = previousSkip2;
+#endif
+
+	// Verify that the old tree matches the new tree at the position we decided to reconstruct the tree
+	// TODO: if string compression is enabled, this first check will fail in most cases
+	if (tmp.node.key == peers[index].node.key && tmp.node.score == peers[index].node.score)
+	{
+		assertTreeIsTheSame(tmp.node.peers, peers[index].node.peers);
+	}
+}
+
 private void assertTreeIsTheSame((Node node, int LCP)[] n1, (Node node, int LCP)[] n2)
 {
 	var l = n1.Length;
@@ -644,10 +694,8 @@ private static int InsertionSortIndexRight((Node node, int LCP)[] arr, int index
 private static int ImmutableSortedArrayPush(ref (Node node, int LCP)[] arr, (Node node, int LCP) value)
 {
 	var len = arr.Length;
-	var newArray = new (Node node, int LCP)[len + 1];
-	Array.Copy(arr, newArray, len);
-	arr = newArray;
-	return InsertionSortIndexLeft(newArray, len, value);
+	Array.Resize(ref arr, len + 1);
+	return InsertionSortIndexLeft(arr, len, value);
 }
 
 private static void ImmutableArrayRemove<T>(ref T[] arr, int index)
@@ -783,7 +831,7 @@ bool Delete(String key)
 
 	// nodesToPush is now the queue of nodes to insert into the tree, but we skip the first index
 	if (nodesToPush.Length > 1)
-		PushNodes(
+		ReinsertNodesIntoTree(
 			nodesToPush
 			, (nodesToPush[0].LCP, new AltPtr2 { peers = parentPeers, index = indexInParent })
 			, 1
@@ -805,14 +853,37 @@ private score_int GetScoreForString(String key)
 	var indexInParent = 0; // the place we're looking
 	var node = parentPeers[indexInParent].node;
 
-	var LCP = 0; // Longest Common Prefix
-
 	if (node.key == null) // Degenerate case: trie is empty
 		return 0;
 
+#if COMPRESS_STRINGS
+	var prevLCP = 0;
+#endif
+
+#if FORCE_STATIC
+	var LCP = keyLength == 1 ? 1 : 2; // Longest Common Prefix
+
+	#if COMPRESS_STRINGS
+		if (!skip1.TryGetValue(key[0], out node)) return 0;
+		if (keyLength > 1)
+		{
+			var prevPeers = node.peers;
+			if (!skip2.TryGetValue((key[0] << 16) | key[1], out node)) return 0;
+			prevLCP = node.peers != prevPeers ? 1 : 0; // this is the reason we have separate logic for COMPRESS_STRINGS
+		}
+	#else
+		if (
+			keyLength == 1
+			? !skip1.TryGetValue(key[0], out node)
+			: !skip2.TryGetValue((key[0] << 16) | key[1], out node)
+		) return 0;
+	#endif
+#else
+	var LCP = 0; // Longest Common Prefix
+#endif
+
 	while (true)
 	{
-		var prevLCP = LCP;
 		var nodeKeyLength = node.key.Length;
 
 	#if COMPRESS_STRINGS
@@ -841,6 +912,10 @@ private score_int GetScoreForString(String key)
 			return 0;
 
 		node = parentPeers[indexInParent].node;
+
+	#if COMPRESS_STRINGS
+		prevLCP = LCP;
+	#endif
 	}
 }
 
@@ -855,13 +930,35 @@ void AddTerm(String term, score_int score)
 	Set(term, (long)Math.Min(newScore, (ulong)score_int.MaxValue));
 }
 
-#if FORCE_STATIC
-private
-#else
-public
-#endif
+#if DEBUG_METHODS
+	#if FORCE_STATIC
+		private
+	#else
+		public
+	#endif
 void Set(String term, score_int score)
 {
+	Set(term, score, out var _, out var _);
+}
+#endif
+
+#if FORCE_STATIC
+	private
+#else
+	public
+#endif
+void Set(String term, score_int score
+#if DEBUG_METHODS
+// For debugging, these indicate the top slot we changed, use with verifySubtree(myPeers, myIndex);
+// myPeers is `null` when all we did was the trivial case of just appending an element to a list
+, out (Node node, int LCP)[] myPeers, out int myIndex
+#endif
+)
+{
+#if DEBUG_METHODS
+	myPeers = null;
+	myIndex = 0;
+#endif
 	if (term == null || term.Length == 0) return;
 	isCacheValid = false;
 	var termLength = term.Length;
@@ -910,12 +1007,16 @@ void Set(String term, score_int score)
 		if (score > node.score)
 		{	// if score is higher than the observed node's, insert new Node in its place
 			// and then traverse `node` to find the peers for new Node
-			var newPeers = FindBranchPointsInNode(node, prevLCP, LCP, term);
+			var newPeers = FindBranchPointsInNodeSubtree(node, prevLCP, LCP, term);
 
 		#if COMPRESS_STRINGS
 			term = term.Substring(prevLCP);
 		#endif
 
+		#if DEBUG_METHODS
+			myPeers = parentPeers;
+			myIndex = // grabs the return value from the next line
+		#endif
 			InsertionSortIndexLeft(
 				parentPeers,
 				indexInParent,
@@ -959,14 +1060,19 @@ void Set(String term, score_int score)
 	// promote nodesToPush[0] because it has a higher score than the one being inserted
 	indexInParent = InsertionSortIndexRight(parentPeers, indexInParent, (nodesToPush[0].node, prevLCP));
 
-	// This overwrites nodesToPush[0] with the new Node and sorts
+#if DEBUG_METHODS
+	myPeers = parentPeers;
+	myIndex = indexInParent;
+#endif
+
 #if COMPRESS_STRINGS
 	term = String.Empty;
 #endif
+	// This overwrites nodesToPush[0] with the new Node and sorts
 	InsertionSortIndexRight(nodesToPush, 0, (new Node(term, score), termLength));
 	// nodesToPush is now the queue of nodes to insert into the tree
 
-	PushNodes(
+	ReinsertNodesIntoTree(
 		nodesToPush
 		, (LCP, new AltPtr2 { peers = parentPeers, index = indexInParent })
 		, 0
@@ -977,7 +1083,7 @@ void Set(String term, score_int score)
 	);
 }
 
-private static void PushNodes(
+private static void ReinsertNodesIntoTree(
 	(Node node, int LCP)[] queue
 	, (int LCP, AltPtr2 ptr) firstMaximum
 	, int indexInQueue
@@ -1146,9 +1252,9 @@ private static int findBranch((Node node, int LCP)[] peers, int LCP)
 	return -1;
 }
 
-// Fill newPeers with the peers intended for `term`
-// If a node representing `term` is found somewhere in the trie, delete it
-private (Node node, int LCP)[] FindBranchPointsInNode(Node node, int prevLCP, int LCP, String term)
+// Returns an array of peers for `term`, found within the subtree of Node
+// If a node representing `term` is found somewhere in the trie, it is deleted
+private (Node node, int LCP)[] FindBranchPointsInNodeSubtree(Node node, int prevLCP, int LCP, String term)
 {	// if (LCP == termLen && LCP == node.key.Length) <- This is impossible
 	var termLength = term.Length;
 	var maximumPossibleCapacityOfNewPeers = termLength + 1 - prevLCP; // [1, inf)
@@ -1351,7 +1457,11 @@ private
 #else
 public
 #endif
-void AddTerms(List<(String term, score_int score)> terms)
+void AddTerms(List<(String term, score_int score)> terms
+#if DEBUG_METHODS
+, bool disallowDeduplication = false
+#endif
+)
 {
 	var count = terms.Count;
 	if (count == 0) return;
@@ -1402,11 +1512,30 @@ void AddTerms(List<(String term, score_int score)> terms)
 
 				if (needsDeduplicating)
 				{
+				#if DEBUG_METHODS
+					if (disallowDeduplication)
+					{ // pretty sure this is impossible
+						throw new Exception("Found a duplicate term in the constructed data structure...?");
+					}
+				#endif
 					count = map.Count;
 					terms.Clear();
 					foreach (var pair in map) terms.Add((pair.Key, pair.Value));
 				}
+
+			#if DEBUG_METHODS
+				// We want a stable sort!
+				var v = 0;
+				List<(string term, score_int score, int index)> tmpTerms = terms.ConvertAll((x) => (x.term, x.score, ++v));
+				tmpTerms.Sort((a, b) => {
+					var x = b.score.CompareTo(a.score);
+					if (x == 0) return a.index - b.index; // if scores are equal, order from least to greatest original index
+					return x;
+				});
+				terms = tmpTerms.ConvertAll(x => (x.term, x.score));
+			#else
 				terms.Sort((a, b) => b.score.CompareTo(a.score));
+			#endif
 				break;
 			}
 
