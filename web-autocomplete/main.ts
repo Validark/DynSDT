@@ -18,7 +18,7 @@ const action_descriptor = window.localStorage.getItem("emails" + "_DynSDT")
 }
 
 await caches.open("emails").then(cache => cache.put("/emails", new Response(EMAIL_DATA)));
-const action_descriptor2 = action_descriptor.slice(0, -13) + "cache"
+const action_descriptor2 = action_descriptor.replace("local storage", "cache")
 console.time(action_descriptor2);
 const tree = (await DynSDT.fromCache("emails"))!;
 console.timeEnd(action_descriptor2);
