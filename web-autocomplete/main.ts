@@ -5,8 +5,8 @@ const TOP_K = 10;
 window.localStorage.getItem("emails") || window.localStorage.setItem("emails", EMAIL_DATA);
 
 const action_descriptor = window.localStorage.getItem("emails" + "_DynSDT")
-	? "get 10k emails from local storage and build structure"
-	: "get 10k emails and pre-built structure from local storage";
+	? "get 10k emails and pre-built structure from local storage"
+	: "get 10k emails from local storage and build structure";
 {
 	console.time(action_descriptor);
 	const tree = DynSDT.fromLocalStorage("emails")!;
