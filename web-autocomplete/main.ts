@@ -7,22 +7,25 @@ window.localStorage.getItem("emails") || window.localStorage.setItem("emails", E
 const action_descriptor = window.localStorage.getItem("emails" + "_DynSDT")
 	? "get 10k emails from local storage and build structure"
 	: "get 10k emails and pre-built structure from local storage";
-console.time(action_descriptor);
-const tree = DynSDT.fromLocalStorage("emails")!;
-console.timeEnd(action_descriptor);
+{
+	console.time(action_descriptor);
+	const tree = DynSDT.fromLocalStorage("emails")!;
+	console.timeEnd(action_descriptor);
 
-console.time("save data structure and 10k emails to local storage");
-tree.saveToLocalStorage("emails");
-console.timeEnd("save data structure and 10k emails to local storage");
+	console.time("save data structure and 10k emails to local storage");
+	tree.saveToLocalStorage("emails");
+	console.timeEnd("save data structure and 10k emails to local storage");
+}
 
 await caches.open("emails").then(cache => cache.put("/emails", new Response(EMAIL_DATA)));
-console.time(action_descriptor);
-await DynSDT.fromCache("emails")
-console.timeEnd(action_descriptor);
+const action_descriptor2 = action_descriptor.slice(0, -13) + "cache"
+console.time(action_descriptor2);
+const tree = (await DynSDT.fromCache("emails"))!;
+console.timeEnd(action_descriptor2);
 
-console.time("save data structure and 10k emails to local storage");
+console.time("save data structure and 10k emails to cache");
 await tree.saveToCache("emails");
-console.timeEnd("save data structure and 10k emails to local storage");
+console.timeEnd("save data structure and 10k emails to cache");
 
 for (let i = 0; i < 10; i++) // warm up :)
 	tree.GetTopKForPrefix("s", TOP_K);
