@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+	<meta charset="utf-8">
+	<title>DynSDT web demo</title>
+
+	<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+	<link rel="manifest" href="../site.webmanifest">
+	<script src="./data.js"></script>
+</head>
+
+<body>
+	<div style="width:50%">
+	This demo is a minimal simulation of the email draft window which provides autocompletion facilities for selecting emails from known contacts. This simulation has 10k fake emails with fake first and last names, and typing in the text box instantly completes a prefix search, autocompleting any first/last name or email. This is a demo to showcase that the <a href="https://validark.github.io/DynSDT"><i>Dynamic Score-Decomposed Trie</i></a> can service real queries in real-time, even when deduplication is needed because three terms in the data structure must map to a single contact (first/last name & email).
+	<br>
+	<br>
+
+	One of the nice features of this data structure is that it can be updated in real-time using the algorithms described <a href="https://validark.github.io/DynSDT">here</a> on the client's machine and quickly serialized and deserialized from the client's localStorage.
+
+	Once a client sends an email, all of the contacts being sent that email can have their `score` updated, which is the `timestamp` of the last time they have been contacted, which moves all the nodes that map to those clients to the top of the heap-like data structure, and can be serialized to localStorage afterwards. Press F12 to check the time delays.
+
+	<br>
+	<br>
+
+	This demo only performs prefix search on the first name, last name, and email of all emails stored in the corpus. At present, it does not split the email into multiple chunks like Gmail does, so one would not be able to search for some part of the email after a `.` or a `+` or a `@` symbol, like Gmail allows. This is possible to support but I simply did not design the demo to be feature-complete.
+
+	<br>
+	<br>
+
+	This demo also does not currently support refining previous queries like one can do in Gmail. E.g. one can type "@gmail " and be prefix searching in a list of all contacts with gmail providers. This should be easy enough to support for a real-world application, either through brute-force for small lists of contacts, or through producing a data structure to speed up queries for the specific refinement called for by prior prefix queries.
+
+	<br>
+	<br>
+	For a simple introduction to how this algorithm works and how the data structure looks, see <a href="https://validark.github.io/DynSDT/demo">this link</a>.
+	<br>
+	<br>
+	</div>
+	<div style="display: flex">
+		<p>To:</p>
+		<form autocomplete="off">
+			<input type="text" name="q" id="q" />
+			<div id="result">
+				<ul id="result_list">
+				</ul>
+			</div>
+		</form>
+	</div>
+
+	<!-- <button>Send email!</button> -->
+</body>
+
+<script src="./DynSDT.js"></script>
+<script src="./main.js"></script>
+
+<style>
+#result {
+  /* border: 1px solid #ccc; */
+  /* padding: 3px; */
+  margin-top: 1px;
+}
+
+#result ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+#result ul li {
+  padding: 4px 0;
+  padding-left: 4px;
+  padding-right: 8px;
+
+  border-left: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+}
+
+#result ul li[hovered] {
+	background-color: #eee;
+}
+
+#result ul {
+  border-bottom: 1px solid #ccc;
+  border-top: 1px solid #ccc;
+}
+
+input#q+div#result {
+	visibility: hidden;
+}
+
+input#q:focus+div#result>ul#result_list {
+	visibility: visible;
+}
+
+ul#result_list:active {
+	visibility: visible;
+}
+
+#result ul li:hover {
+  background: #eee;
+}
+
+p {
+	margin: 0;
+	margin-right: 4pt;
+	margin-top: 2pt;
+}
+
+body, input, #result ul li {
+	font-family: sans-serif;
+	font-size: 14pt;
+}
+
+button {
+	font-size: 14pt;
+}
+</style>
+
+</html>
