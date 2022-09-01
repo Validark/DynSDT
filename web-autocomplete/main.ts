@@ -1,31 +1,36 @@
 declare const EMAIL_DATA: string;
 (async () => {
+// window.localStorage.clear();
+// for (const key of await caches.keys())
+// 	caches.delete(key);
+
 const TOP_K = 10;
+const DynSDT_CACHE = "DynSDT_Cache";
 
-window.localStorage.getItem("emails") || window.localStorage.setItem("emails", EMAIL_DATA);
+window.localStorage.getItem(DynSDT_CACHE) || window.localStorage.setItem(DynSDT_CACHE, EMAIL_DATA);
 
-const action_descriptor = window.localStorage.getItem("emails" + "_DynSDT")
+const action_descriptor = window.localStorage.getItem(DynSDT_CACHE + "_DynSDT")
 	? "get 10k emails and pre-built structure from local storage"
 	: "get 10k emails from local storage and build structure";
+
 {
 	console.time(action_descriptor);
-	const tree = DynSDT.fromLocalStorage("emails")!;
+	const tree = DynSDT.fromLocalStorage(DynSDT_CACHE)!;
 	console.timeEnd(action_descriptor);
 
 	console.time("save data structure and 10k emails to local storage");
-	tree.saveToLocalStorage("emails");
+	tree.saveToLocalStorage(DynSDT_CACHE);
 	console.timeEnd("save data structure and 10k emails to local storage");
 }
-
-await caches.open("emails").then(cache => cache.put("/emails", new Response(EMAIL_DATA)));
 const action_descriptor2 = action_descriptor.replace("local storage", "cache")
 console.time(action_descriptor2);
-const tree = (await DynSDT.fromCache("emails"))!;
+const tree = (await DynSDT.fromCache(DynSDT_CACHE)) ?? new DynSDT(EMAIL_DATA);
 console.timeEnd(action_descriptor2);
 
 console.time("save data structure and 10k emails to cache");
-await tree.saveToCache("emails");
-console.timeEnd("save data structure and 10k emails to cache");
+tree.saveToCache(DynSDT_CACHE)
+	.then(() => console.timeEnd("save data structure and 10k emails to cache"))
+	.catch(reason => console.error(reason));
 
 for (let i = 0; i < 10; i++) // warm up :)
 	tree.GetTopKForPrefix("s", TOP_K);

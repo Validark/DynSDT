@@ -57,6 +57,28 @@ function sortContactsIfUnsorted(contacts: Array<Contact>) { // verify that conta
 	return contacts;
 }
 
+function deserializeContacts(text: string) {
+	const objects: Array<string> = text.split(',');
+	const length = objects.length >> 2;
+	const contacts = new Array<Contact>(length);
+	let j = 0;
+	for (let i = 0; i < length; i++, j += 4) {
+		contacts[i] = {
+			first_name: objects[j]!,
+			last_name: objects[j + 1]!,
+			email: objects[j + 2]!,
+			timestamp: +objects[j + 3]!,
+		};
+	}
+	return contacts;
+}
+
+function serializeContacts(contacts: Array<Contact>) {
+	return contacts
+		.map(e => `${e.first_name},${e.last_name},${e.email},${e.timestamp}`)
+		.join()
+}
+
 class DynSDT {
 	/** Overallocate by this many slots during initialization to allow for growth without having to resize */
 	public static OVER_ALLOCATE_BY = 20;
@@ -69,77 +91,55 @@ class DynSDT {
 
 	public async saveToCache(cacheName: string) {
 		return caches.open(cacheName)
-			.then(cache => {
-				return Promise.all([
+			.then(cache =>
+				Promise.all([
 					cache.put("/structure", new Response(this.nodes)),
-					cache.put("/emails", new Response(
-						this.contacts
-							.map(e => `${e.first_name},${e.last_name},${e.email},${e.timestamp}`)
-							.join()
-						))
-					]);
-			});
+					cache.put("/emails", new Response(serializeContacts(this.contacts)))
+				])
+			);
 	}
 
-	public static async fromCache(cacheName: string, contacts?: Array<Contact>) {
-		const cacheOpened = caches.open(cacheName);
-		const contactsPromise = contacts ??
-			cacheOpened
-				.then(cache => cache.match("/emails"))
-				.then(data => data?.text())
-				.then(text => {
-					if (text === undefined) return;
-					const objects: Array<string> = text.split(',');
-					const length = (objects.length / 4) | 0;
-					const contacts = new Array<Contact>(length);
-					let j = 0;
-					for (let i = 0; i < length; i++, j += 4) {
-						contacts[i] = {
-							first_name: objects[j]!,
-							last_name: objects[j + 1]!,
-							email: objects[j + 2]!,
-							timestamp: +objects[j + 3]!,
-						};
-					}
-					return contacts;
-				})
+	public static async fromCache(cacheName: string) {
+		return caches.open(cacheName)
+			.then(cache =>
+				Promise.all([
+					cache.match("/emails")
+						.then(data => data?.text())
+						.then(text => text && deserializeContacts(text)),
 
-		const cache = await cacheOpened
-			.then(cache => cache.match("/structure"))
-			.then(data => data?.arrayBuffer())
-			.then(buffer => buffer && new Uint16Array(buffer));
+					cache.match("/structure")
+						.then(data => data?.arrayBuffer())
+						.then(buffer => buffer && new Uint16Array(buffer))
+				])
+			)
+			.then(([contacts, cache]) => {
+				if (!contacts) return;
+				if (cache === undefined) return new DynSDT(contacts);
 
-		contacts = await contactsPromise;
-		if (contacts === undefined) return undefined;
-		if (cache === undefined) return new DynSDT(contacts);
+				const self = Object.create(DynSDT.prototype) as DynSDT;
+				self.contacts = contacts;
 
-		const self = Object.create(DynSDT.prototype) as DynSDT;
-		self.contacts = contacts;
+				// This is (often) the heaviest part of this function.
+				// We *could* cache this too, but it would be a lot of data without much actual time savings
+				self.terms = generateTerms(contacts);
 
-		// This is (often) the heaviest part of this function.
-		// We *could* cache this too, but it would be a lot of data without much actual time savings
-		self.terms = generateTerms(contacts);
+				let i = cache.length
+				for (; i > 0; --i) if (cache[i - 1] !== 0) break;
 
-		let i = cache.length
-		for (; i > 0; --i) if (cache[i - 1] !== 0) break;
-
-		// i points to the last 0 (else it's the length);
-		// calculate how many 0's were at the end, divided by 3 to get how many nodes could be stored
-		self.availableSlots = (cache.length - i) / 3 | 0;
-		self.nodes = cache;
-		self.root = 0; // TODO:
-		return self;
+				// i points to the last 0 (else it's the length);
+				// calculate how many 0's were at the end, divided by 3 to get how many nodes could be stored
+				self.availableSlots = (cache.length - i) / 3 | 0;
+				self.nodes = cache;
+				self.root = 0; // TODO:
+				return self;
+			})
 	}
 
 	public saveToLocalStorage(cacheName: string) {
 		// convert to Int16Array because we use 2**16-1 to be our "null pointer", which is 65535
 		// `65535` is 5 characters, whereas `-1` is 2 characters :)
 		window.localStorage.setItem(cacheName + "_DynSDT", new Int16Array(this.nodes) as never);
-		window.localStorage.setItem(cacheName,
-			this.contacts
-				.map(e => `${e.first_name},${e.last_name},${e.email},${e.timestamp}`)
-				.join()
-		);
+		window.localStorage.setItem(cacheName, serializeContacts(this.contacts));
 	}
 
 	/** Takes in a string `key` to access inside window.localStorage.
@@ -147,30 +147,15 @@ class DynSDT {
 	 * localStorage.getItem(key) -> where the contacts are stored.
 	 * `contacts` can optionally be passed in instead of being read from the cache.
 	 */
-	public static fromLocalStorage(cacheName: string, contacts?: Array<Contact>) {
-		if (contacts === undefined) {
-			const contactsCache = window.localStorage.getItem(cacheName);
-			if (contactsCache === null) return undefined;
-			const objects: Array<string> = contactsCache.split(',');
-			const length = (objects.length / 4) | 0;
-			contacts = new Array(length);
-			let j = 0;
-			for (let i = 0; i < length; i++, j += 4) {
-				contacts[i] = {
-					first_name: objects[j]!,
-					last_name: objects[j + 1]!,
-					email: objects[j + 2]!,
-					timestamp: +objects[j + 3]!,
-				};
-			}
-		}
-
-		if (contacts === undefined) return undefined;
+	public static fromLocalStorage(cacheName: string) {
+		const contactsCache = window.localStorage.getItem(cacheName);
+		if (contactsCache === null) return undefined;
 
 		const cache = window.localStorage.getItem(cacheName + "_DynSDT");
-		if (cache === null) return new DynSDT(contacts);
+		if (cache === null) return new DynSDT(contactsCache);
 
 		const self = Object.create(DynSDT.prototype) as DynSDT;
+		const contacts = deserializeContacts(contactsCache)
 		self.contacts = contacts;
 
 		// This is (often) the heaviest part of this function.
@@ -189,15 +174,15 @@ class DynSDT {
 		self.availableSlots = this.OVER_ALLOCATE_BY;
 
 		self.nodes = new Uint16Array(uncompressedArray);
-		self.root = 0; // TODO:
+		self.root = 0; // TODO: If Set/Update methods are added, the root could be some other node
 		return self;
 	}
 
 	private getNext(node: number) { return this.nodes[node * 3 + 2]!; }
 	private setNext(node: number, next: number) { return this.nodes[node * 3 + 2] = next; }
 	private getDown(node: number) { return this.nodes[node * 3 + 1]!; }
-	private setDown(node: number, down: number) { return this.nodes[node * 3 + 1] = down; }
 	private getLCP(node: number) { return this.nodes[node * 3]!; }
+	private setDown(node: number, down: number) { return this.nodes[node * 3 + 1] = down; }
 	private setLCP(node: number, next: number) { return this.nodes[node * 3] = next; }
 	private getScore(node: number) { return this.contacts[(node / 3) | 0]!.timestamp; }
 	private getContactNode(node: number) { return this.contacts[(node / 3) | 0]!; }
@@ -213,7 +198,8 @@ class DynSDT {
 		};
 	}
 
-	constructor(contacts: Array<Contact>) {
+	constructor(contacts: string | Array<Contact>) {
+		if (typeof contacts === "string") contacts = deserializeContacts(contacts);
 		this.contacts = sortContactsIfUnsorted(contacts);
 		const terms = this.terms = generateTerms(contacts);
 		this.nodes = new Uint16Array(3 * (terms.length + this.availableSlots));
@@ -337,95 +323,9 @@ class DynSDT {
 			return this.topKAddSuccessiveNodes(prefixLength, node, results, len, set); // if `node` already existed, grab its successors instead
 
 		let i = len - +isFull; // When full, plan on inserting in the last index, otherwise insert in the next index
-		for (; score > this.getScore(results[i - 1]!); --i)
+		for (; i > 0 && score > this.getScore(results[i - 1]!); --i)
 			results[i] = results[i - 1]!; // shift elements as needed to maintain descending order (by score)
 		results[i] = node;
 		return len + 1 - +isFull;
 	}
-
-
-	// private reorder(node: number, parent: DynSDT<T> | number) {
-	// 	const { score } = node;
-	// 	let n = parent.next!;
-	// 	// if (n === undefined) return parent.next = node;
-
-	// 	if (score > n.score) {
-	// 		const { down } = node;
-	// 		node.down = n;
-
-	// 		while (n.down !== node) n = n.down!;
-	// 		n.down = down;
-
-	// 		parent.next = node;
-
-	// 		return;
-	// 	}
-	// 	else if (n === node) {
-	// 		// TODO:
-	// 	}
-
-	// 	while (true) {
-	// 		if (score > n.down!.score) {
-	// 			if (n === node) return;
-	// 			const { down } = node;
-
-	// 			let r = n.down!;
-	// 			node.down = r;
-	// 			n.down = node;
-
-	// 			do r = r.down!; while (r.down !== node);
-	// 			r.down = down;
-	// 			return;
-	// 		}
-	// 		else if (n === node) {
-	// 			// TODO:
-	// 		}
-
-	// 		n = n.down!;
-	// 	}
-	// }
-
-	// private demote(node: DynSDTNode, parent: DynSDT<T> | DynSDTNode) {
-	// 	const { score } = node;
-
-	// 	if (node.next === undefined || score >= node.next.score) {
-	// 		this.reorder(node, parent);
-	// 		return;
-	// 	}
-	// }
-
-
-	// private promote(term: string, score: number, id: number) {
-	// }
-
-	// UpdateTerm(term: string, score: number, id: number) {
-	// 	let parent: DynSDT<T> | DynSDTNode = this;
-	// 	let node = this.next
-	// 	let LCP = 0;
-
-	// 	while (node !== undefined) {
-	// 		if (node.LCP !== LCP) {
-	// 			node = node.down;
-	// 			continue;
-	// 		}
-
-	// 		for ( // Calculate Longest Common Prefix between `node.term` and `term`
-	// 			let key = node.term, len = Math.min(term.length, key.length);
-	// 			LCP < len && term[LCP] === key[LCP];
-	// 			LCP++
-	// 		);
-
-	// 		if (LCP === term.length && LCP === node.term.length && id === node.data_index) {
-	// 			node.score = score;
-	// 			this.demote(node, parent);
-	// 		}
-
-	// 		if (score > node.score) {
-	// 			this.promote(term, score, id);
-	// 		}
-
-	// 		parent = node;
-	// 		node = node.next;
-	// 	}
-	// }
 }
