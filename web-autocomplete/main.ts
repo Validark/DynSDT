@@ -7,30 +7,30 @@ declare const EMAIL_DATA: string;
 const TOP_K = 10;
 const DynSDT_CACHE = "DynSDT_Cache";
 
-window.localStorage.getItem(DynSDT_CACHE) || window.localStorage.setItem(DynSDT_CACHE, EMAIL_DATA);
+console.time("Getting 10k emails and pre-built structure from local storage");
+let tree = DynSDT.fromLocalStorage(DynSDT_CACHE)!; // we have to abuse the nonNull assertion operator here so that functions which capture this variable rightfully assume it is always defined for their usage.
 
-const action_descriptor = window.localStorage.getItem(DynSDT_CACHE + "_DynSDT")
-	? "get 10k emails and pre-built structure from local storage"
-	: "get 10k emails from local storage and build structure";
+if (tree === undefined) {
+	console.time("Building tree from scratch with 10k emails. Please refresh the page to see how long it takes to load from localStorage/caches!");
+	tree = new DynSDT(EMAIL_DATA);
+	console.timeEnd("Building tree from scratch with 10k emails. Please refresh the page to see how long it takes to load from localStorage/caches!");
+} else
+	console.timeEnd("Getting 10k emails and pre-built structure from local storage");
 
-{
-	console.time(action_descriptor);
-	const tree = DynSDT.fromLocalStorage(DynSDT_CACHE)!;
-	console.timeEnd(action_descriptor);
+console.time("Save data structure and 10k emails to local storage");
+tree.saveToLocalStorage(DynSDT_CACHE);
+console.timeEnd("Save data structure and 10k emails to local storage");
 
-	console.time("save data structure and 10k emails to local storage");
-	tree.saveToLocalStorage(DynSDT_CACHE);
-	console.timeEnd("save data structure and 10k emails to local storage");
+console.log("");
+
+console.time("Getting 10k emails and pre-built structure from cache");
+if ((await DynSDT.fromCache(DynSDT_CACHE)) !== undefined) {
+	console.timeEnd("Getting 10k emails and pre-built structure from cache");
 }
-const action_descriptor2 = action_descriptor.replace("local storage", "cache")
-console.time(action_descriptor2);
-const tree = (await DynSDT.fromCache(DynSDT_CACHE)) ?? new DynSDT(EMAIL_DATA);
-console.timeEnd(action_descriptor2);
 
-console.time("save data structure and 10k emails to cache");
-tree.saveToCache(DynSDT_CACHE)
-	.then(() => console.timeEnd("save data structure and 10k emails to cache"))
-	.catch(reason => console.error(reason));
+console.time("Save data structure and 10k emails to cache");
+await tree.saveToCache(DynSDT_CACHE);
+console.timeEnd("Save data structure and 10k emails to cache");
 
 for (let i = 0; i < 10; i++) // warm up :)
 	tree.GetTopKForPrefix("s", TOP_K);
@@ -66,10 +66,11 @@ function onInput(this: HTMLInputElement, _?: KeyboardEvent) {
 			previous_query = "";
 		}
 
-		console.time("topK query")
+		const queryDescriptor = `topK query "${prefix}"${" ".repeat(10 - prefix.length)}`;
+		console.time(queryDescriptor);
 		previous_locus = tree.GetLocusForPrefix(prefix, previous_locus, previous_query.length);
 		query_results = tree.GetTopKForPrefix(prefix, TOP_K, previous_locus, receivers);
-		console.timeEnd("topK query")
+		console.timeEnd(queryDescriptor);
 	} else {
 		query_results = empty_array;
 		previous_locus = tree.root;
@@ -182,4 +183,18 @@ function isFullyFormedEmail(email: string) {
 	let i = email.indexOf("@");
 	return i !== -1 && email.includes(".", i + 1);
 }
+
+console.log("")
+console.log("Testing save speed:")
+
+for (let i = 0; i < 5; i++) {
+	console.time("\tlocal storage");
+	tree.saveToLocalStorage(DynSDT_CACHE);
+	console.timeEnd("\tlocal storage");
+	console.time("\tcache        ");
+	await tree.saveToCache(DynSDT_CACHE);
+	console.timeEnd("\tcache        ");
+}
+
+console.log("");
 })()
