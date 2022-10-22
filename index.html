@@ -19,7 +19,9 @@
 	<link rel="manifest" href="./site.webmanifest">
 </head>
 <header>
-For a simpler visual introduction to these concepts, see <a class="libre" target="_blank" rel="noopener noreferrer" href="https://validark.github.io/DynSDT/demo">https://validark.github.io/DynSDT/demo</a>
+For a simpler visual introduction to these concepts, see <a class="libre" target="_blank" rel="noopener noreferrer" href="https://validark.github.io/DynSDT/demo">https://validark.github.io/DynSDT/demo</a>.
+<br>
+Written in 2022, not published yet.
 </header>
 <body prefix="schema: http://schema.org/ xsd: http://www.w3.org/2001/XMLSchema# sa: https://ns.science.ai/">
 	<article typeof="schema:ScholarlyArticle" resource="#" style="display: block">
@@ -88,17 +90,23 @@ For a simpler visual introduction to these concepts, see <a class="libre" target
 				section. Note that this paper presents their algorithms with a few improvements: namely using a double-ended priority queue bounded to size <var>k</var> rather than an unbounded max-heap, and not inserting nodes into the priority queue that are guaranteed to be extracted immediately after.
 			</p>
 			<p class="indented">
-				In [<a class="citation" href="#COMPLETION">22</a>], Hsu &amp; Ottaviano also introduced the <i>Score-Decomposed Trie</i> [<a class="citation" href="#COMPLETION">22</a>, <a class="citation" href="#OttavianoThesis">23</a>], which is a succinct representation of a decomposed <i>Completion Trie</i>.
-				Explained briefly, tries can be succinctly encoded by traversing the tree and encoding its shape in a bitmap with roughly 2<var>n</var> bits [<a class="citation" href="#SuccinctPractice">20</a>].
+				Also in [<a class="citation" href="#COMPLETION">22</a>], Hsu &amp; Ottaviano introduced the <i>Score-Decomposed Trie</i> [<a class="citation" href="#COMPLETION">22</a>, <a class="citation" href="#OttavianoThesis">23</a>] as a succinct representation of the <i>Completion Trie</i>.
+				Basically, tries can be <em>succinctly</em> encoded by traversing the tree and encoding its shape in a bitmap with roughly 2<var>n</var> bits [<a class="citation" href="#SuccinctPractice">20</a>].
 				One technique is to perform a depth-first traversal and encode a 1 each time the algorithm descends and a 0 each time it ascends [<a class="citation" href="#SuccinctPractice">20</a>].
 				All traversal operations over the original structure can then be simulated on the resulting bitmap, so long as the data held in each succinct “node” can be mapped to by some auxiliary structure(s).
-				Due to simulated tree traversal operations being slower than pointer-chasing, the <i>Score-Decomposed Trie</i> of [<a class="citation" href="#COMPLETION">22</a>] had about half the throughput of their <i>Completion Trie</i> (on older hardware), however,
-				it required about half the space and was competitive with gzip for massive datasets.
-				The other limitation
-				is that succinct data structures are (almost [<a class="citation" href="#DynPDT">17</a>]) always static, rendering them unsuitable for highly dynamic settings.
+				
+				The main advantage of succinct data structures is in their space efficiency, with the <i>Score-Decomposed Trie</i> achieving space competitive with gzip on massive datasets [<a class="citation" href="#COMPLETION">22</a>].
+				
+<!-- 				had about half the throughput of their <i>Completion Trie</i> (on older hardware), however, -->
+
+				The downside is that succinct data structures are typically (but not always [<a class="citation" href="#DynPDT">17</a>]) static, generally rendering them unsuitable for highly dynamic settings.
+				
+				Despite bearing a similar name, the structure presented in this paper is not succinct and has a stricter invariant
+<!-- 				and thus is not merely the non-succinct equivalent of -->
+				than the <i>Score-Decomposed Trie</i>.
 			</p>
 			<p class="indented">
-				The structure presented in this paper is not succinct, but is still Score-Decomposed because it is derived from the score-based path decomposition of conventional tries. It is not the first data structure in this category, since the <i>Dynamic Path-Decomposed Trie</i> of Kanda et al. [<a class="citation" href="#DynPDT">17</a>, <a class="citation" href="#OldDynPDT">16</a>] is another such non-succinct path-decomposed trie, albeit for a different problem.
+				Surprisingly, the structure presented in this paper is one of the first non-succinct path-decomposed tries, behind the <i>Dynamic Path-Decomposed Trie</i> of Kanda et al. [<a class="citation" href="#DynPDT">17</a>, <a class="citation" href="#OldDynPDT">16</a>], although their structure is not specialized for the same problem.
 			</p>
 		</section>
 		<section id="preliminaries">
@@ -157,7 +165,7 @@ For a simpler visual introduction to these concepts, see <a class="libre" target
 				Since there are <span class="complexity"><span class="theta">Θ</span>(<var>d</var><var>k</var>)</span>
 				visited levels of size <var>b</var>, there are a total of <span class="complexity"><span class="theta">Θ</span>(<var>b</var><var>d</var><var>k</var>)</span>
 				nodes pushed to the DEPQ, each taking <span class="complexity"><span class="theta">Θ</span>(log<span class="ThinSpace"></span><var>k</var>)</span> worst-case time.
-				Note that <var>b</var> is at most the size of the alphabet and <var>d</var> is at most the length of the string completions.
+				Note that <var>b</var> is at most the size of the alphabet and <var>d</var> is at most the average length of the completions to <var>p</var>.
 			</p>
 			<p class="indented">
 				Hsu &amp; Ottaviano further improve the top-<var>k</var> search time by sorting each node's children by <i>score</i>, so that
@@ -461,8 +469,8 @@ For a simpler visual introduction to these concepts, see <a class="libre" target
 			<h2><a href="#dynamic_score-decomposed_tries" class="heading-link">5.&nbsp;&nbsp;Dynamic Score-Decomposed Tries</a><a href="#dynamic_score-decomposed_tries" class="glyphicon glyphicon-link"></a></h2>
 			<p class="indented">
 				The <dfn>Dynamic Score-Decomposed Trie</dfn>
-				is a (non-succinct, pointer-based) data structure based on the path decomposition of normal tries.
-				When constructed from a normal trie, the path to each maximum completion is compressed into a single decomposed node by concatenating the substrings and keeping a list of all the first-sibling nodes along the path.
+				is a (non-succinct, pointer-based) data structure based on the path decomposition of conventional tries.
+				When constructed from a conventional trie, the path to each maximum completion is compressed into a single decomposed node by concatenating the substrings and keeping a list of all the first-sibling nodes along the path.
 				Each decomposed first-sibling node is stored inside a <dfn>branch point</dfn> which also contains the longest common prefix length (LCP) between the string it represents and its parent's.
 			</p>
 			<figure id="decomposed_trie">
@@ -830,7 +838,7 @@ For a simpler visual introduction to these concepts, see <a class="libre" target
 					</figcaption>
 				</figure>
 				<p class="indented">
-					This structure also has the benefit of using only <var>n</var> nodes for <var>n</var> strings, as opposed to conventional tries, which require far more intermediary nodes and therefore more allocations and cache misses.
+					This structure also has the benefit of using only <var>n</var> nodes for <var>n</var> strings, as opposed to conventional tries, which require far more intermediary nodes and therefore more allocations, memory usage, and cache misses.
 				</p>
 			</section>
 			<section id="top-k_enumeration">
@@ -1867,17 +1875,17 @@ if (window.matchMedia) { // if this exists, we can make the content actually par
 			</p>
 			<section id="preliminary-references">
 				<h3><a href="#preliminary-references" class="heading-link">8.1&nbsp;&nbsp;Preliminary data structures</a><a href="#preliminary-references" class="glyphicon glyphicon-link"></a></h3>
-				<p id="PREFIX_TREE"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://dl.acm.org/doi/pdf/10.1145/1457838.1457895">[4]&nbsp;&nbsp;René de la Briandais. (1959). File searching using variable length keys. In Western Joint Computer Conference, IRE-AIEE-ACM '59 (Western), <span class="nowrap">295–298</span>, New York, NY, 42 USA, 1959. ACM.</a></p>
-				<p id="TRIE"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://dl.acm.org/doi/pdf/10.1145/367390.367400">[5]&nbsp;&nbsp;Edward Fredkin. (1960). Trie memory.
+				<p id="PREFIX_TREE"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://dl.acm.org/doi/pdf/10.1145/1457838.1457895">[4]&nbsp;&nbsp;de la Briandais, René. (1959). File searching using variable length keys. In Western Joint Computer Conference, IRE-AIEE-ACM '59 (Western), <span class="nowrap">295–298</span>, New York, NY, 42 USA, 1959. ACM.</a></p>
+				<p id="TRIE"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://dl.acm.org/doi/pdf/10.1145/367390.367400">[5]&nbsp;&nbsp;Fredkin, Edward. (1960). Trie memory.
 					Communications of the ACM 3, 9 (1960), <span class="nowrap">490–499</span>.<br>
 				</a></p>
 				<p id="LCRS"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://dl.acm.org/doi/pdf/10.1145/366552.366600">[6]&nbsp;&nbsp;Sussenguth, Edward H. (1963). Use of tree structures for processing files.
 					Communications of the ACM 6 (5): <span class="nowrap">272–279</span>.</a></p>
-				<p id="FLOYD"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://dl.acm.org/doi/pdf/10.1145/355588.365103">[7]&nbsp;&nbsp;FLOYD, R. W. (1964), Algorithm 245, Treesort 3. Communications of the ACM 7, 701.<br>
+				<p id="FLOYD"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://dl.acm.org/doi/pdf/10.1145/355588.365103">[7]&nbsp;&nbsp;Floyd, Robert W. (1964), Algorithm 245, Treesort 3. Communications of the ACM 7, 701.<br>
 				</a></p>
 				<p id="HEAP"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://dl.acm.org/doi/pdf/10.1145/512274.512284">[8]&nbsp;&nbsp;Williams, J. W. J. (1964). Algorithm 232: Heapsort. Communications of the ACM 7, <span class="nowrap">347–348</span>.<br>
 				</a></p>
-				<p id="A*"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://www.cs.auckland.ac.nz/courses/compsci709s2c/resources/Mike.d/astarNilsson.pdf">[9]&nbsp;&nbsp;Hart, P., Nilsson, N., &amp; Raphael, B.
+				<p id="A*"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://www.cs.auckland.ac.nz/courses/compsci709s2c/resources/Mike.d/astarNilsson.pdf">[9]&nbsp;&nbsp;Hart, Peter &amp; Nilsson, Nils J. &amp; Raphael, Bertram.
 					(1968). A Formal Basis for the Heuristic Determination of Minimum Cost Paths.
 					IEEE Transactions on Systems Science and Cybernetics, 4(2), <span class="nowrap">100–107</span>.
 					10.1109/tssc.1968.300136.<br>
@@ -1886,10 +1894,10 @@ if (window.matchMedia) { // if this exists, we can make the content actually par
 					(1986). Min-Max Heaps and Generalized Priority Queues. Communications of the ACM 29, no. 10. <span class="nowrap">996–1000</span>.</a></p>
 				<p id="RADIX"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://archive.org/details/textcompression00bell/page/238/mode/1up?view=theater">[11]&nbsp;&nbsp;Bell, Timothy &amp; Cleary, John &amp; Witten, Ian. (1990). Text Compression. <span class="nowrap">238–239</span>.
 					10.1007/978-0-387-39940-9_1151.</a></p>
-				<p id="HEAP_SELECTION"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://www.sciencedirect.com/sdfe/reader/pii/S0890540183710308">[12]&nbsp;&nbsp;Frederickson, Greg. N. (1993). An Optimal Algorithm for Selection in a Min-Heap. Information and Computation.
+				<p id="HEAP_SELECTION"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://www.sciencedirect.com/sdfe/reader/pii/S0890540183710308/pdf">[12]&nbsp;&nbsp;Frederickson, Greg. N. (1993). An Optimal Algorithm for Selection in a Min-Heap. Information and Computation.
 					104(2). <span class="nowrap">197–214</span>.
 					10.1006/inco.1993.1030.</a></p>
-				<p id="ROPES"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://www.cs.tufts.edu/comp/150FP/archive/hans-boehm/ropes.pdf">[13]&nbsp;&nbsp;Boehm, Hans-J., Atkinson, Russ &amp; Plass, Michael (1995). Ropes: An Alternative to Strings. Software: Practice and Experience, 25(12), <span class="nowrap">1315–1330</span>.
+				<p id="ROPES"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://www.cs.tufts.edu/comp/150FP/archive/hans-boehm/ropes.pdf">[13]&nbsp;&nbsp;Boehm, Hans-J. &amp; Atkinson, Russ &amp; Plass, Michael (1995). Ropes: An Alternative to Strings. Software: Practice and Experience, 25(12), <span class="nowrap">1315–1330</span>.
 					10.1002/spe.4380251203.<br>
 				</a></p>
 				<p id="SYMMETRIC_MIN-MAX_HEAP"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://liacs.leidenuniv.nl/~stefanovtp/courses/StudentenSeminarium/Papers/AL/SMMH.pdf">[14]&nbsp;&nbsp;Arvind, A. &amp; Rangan, C. (1999).
