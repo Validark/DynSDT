@@ -1237,12 +1237,12 @@ Written in 2022, not published yet.
 						</figcaption>
 					</figure>
 					<p class="indented">
-						To reinsert each node from the queue, the nai<span class="umlaut"></span>ve algorithm starts at the promoted node and iteratively computes the LCP and follows the corresponding branch points until one does not exist or until the dequeued node's <i>score</i> is higher than the current branch point's.
+						To reinsert each node from the queue, the naı<span class="umlaut_i"></span>ve algorithm starts at the promoted node and iteratively computes the LCP and follows the corresponding branch points until one does not exist or until the dequeued node's <i>score</i> is higher than the current branch point's.
 						If no branch point matches the target LCP, the dequeued node is insertion sorted into the current list of branch points.
 						Otherwise, if the proper location for the dequeued node's <i>score</i> was found, the node formerly occupying that location is supplanted and insertion sorted directly into the dequeued node's branch points. The dequeued node is then inserted in the proper location and insertion sorted upwards. (Note that the supplanted node's LCP is guaranteed to not be present in the dequeued node. The reason for that is more apparent with the improved algorithm.)
 					</p>
 					<p class="indented">
-						Unfortunately, the nai<span class="umlaut"></span>ve algorithm is quite wasteful as it often performs the same tree traversal for each dequeued node and unnecessarily recalculates LCP's. Two observations improve this algorithm: Firstly, the LCP of any two nodes in a list of branch points is equal to the minimum of their LCP's (with the containing node). Secondly, nodes from the queue are always reinserted into one of the previous nodes in the queue or the promoted node due to the <strong>trie property</strong>.
+						Unfortunately, the naı<span class="umlaut_i"></span>ve algorithm is quite wasteful as it often performs the same tree traversal for each dequeued node and unnecessarily recalculates LCP's. Two observations improve this algorithm: Firstly, the LCP of any two nodes in a list of branch points is equal to the minimum of their LCP's (with the containing node). Secondly, nodes from the queue are always reinserted into one of the previous nodes in the queue or the promoted node due to the <strong>trie property</strong>.
 					</p>
 					<p class="indented">
 						With these observations, a better algorithm emerges that employs the use of a running maximums list, which holds a reference to each node from the queue that had the maximum LCP when it was encountered. The algorithm starts by pushing the promoted node to the running maximums list with its original LCP.
