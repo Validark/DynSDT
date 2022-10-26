@@ -1237,12 +1237,12 @@ Written in 2022, not published yet.
 						</figcaption>
 					</figure>
 					<p class="indented">
-						To reinsert each node from the queue, the naïve algorithm starts at the promoted node and iteratively computes the LCP and follows the corresponding branch points until one does not exist or until the dequeued node's <i>score</i> is higher than the current branch point's.
+						To reinsert each node from the queue, the nai<span class="umlaut"></span>ve algorithm starts at the promoted node and iteratively computes the LCP and follows the corresponding branch points until one does not exist or until the dequeued node's <i>score</i> is higher than the current branch point's.
 						If no branch point matches the target LCP, the dequeued node is insertion sorted into the current list of branch points.
 						Otherwise, if the proper location for the dequeued node's <i>score</i> was found, the node formerly occupying that location is supplanted and insertion sorted directly into the dequeued node's branch points. The dequeued node is then inserted in the proper location and insertion sorted upwards. (Note that the supplanted node's LCP is guaranteed to not be present in the dequeued node. The reason for that is more apparent with the improved algorithm.)
 					</p>
 					<p class="indented">
-						Unfortunately, the naïve algorithm is quite wasteful as it often performs the same tree traversal for each dequeued node and unnecessarily recalculates LCP's. Two observations improve this algorithm: Firstly, the LCP of any two nodes in a list of branch points is equal to the minimum of their LCP's (with the containing node). Secondly, nodes from the queue are always reinserted into one of the previous nodes in the queue or the promoted node due to the <strong>trie property</strong>.
+						Unfortunately, the nai<span class="umlaut"></span>ve algorithm is quite wasteful as it often performs the same tree traversal for each dequeued node and unnecessarily recalculates LCP's. Two observations improve this algorithm: Firstly, the LCP of any two nodes in a list of branch points is equal to the minimum of their LCP's (with the containing node). Secondly, nodes from the queue are always reinserted into one of the previous nodes in the queue or the promoted node due to the <strong>trie property</strong>.
 					</p>
 					<p class="indented">
 						With these observations, a better algorithm emerges that employs the use of a running maximums list, which holds a reference to each node from the queue that had the maximum LCP when it was encountered. The algorithm starts by pushing the promoted node to the running maximums list with its original LCP.
@@ -1875,7 +1875,7 @@ if (window.matchMedia) { // if this exists, we can make the content actually par
 			</p>
 			<section id="preliminary-references">
 				<h3><a href="#preliminary-references" class="heading-link">8.1&nbsp;&nbsp;Preliminary data structures</a><a href="#preliminary-references" class="glyphicon glyphicon-link"></a></h3>
-				<p id="PREFIX_TREE"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://dl.acm.org/doi/pdf/10.1145/1457838.1457895">[4]&nbsp;&nbsp;de la Briandais, René. (1959). File searching using variable length keys. In Western Joint Computer Conference, IRE-AIEE-ACM '59 (Western), <span class="nowrap">295–298</span>, New York, NY, 42 USA, 1959. ACM.</a></p>
+				<p id="PREFIX_TREE"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://dl.acm.org/doi/pdf/10.1145/1457838.1457895">[4]&nbsp;&nbsp;de la Briandais, Rene<span class="accent"></span>. (1959). File searching using variable length keys. In Western Joint Computer Conference, IRE-AIEE-ACM '59 (Western), <span class="nowrap">295–298</span>, New York, NY, 42 USA, 1959. ACM.</a></p>
 				<p id="TRIE"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://dl.acm.org/doi/pdf/10.1145/367390.367400">[5]&nbsp;&nbsp;Fredkin, Edward. (1960). Trie memory.
 					Communications of the ACM 3, 9 (1960), <span class="nowrap">490–499</span>.<br>
 				</a></p>
@@ -1890,7 +1890,7 @@ if (window.matchMedia) { // if this exists, we can make the content actually par
 					IEEE Transactions on Systems Science and Cybernetics, 4(2), <span class="nowrap">100–107</span>.
 					10.1109/tssc.1968.300136.<br>
 				</a></p>
-				<p id="DEPQ"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://www.researchgate.net/profile/M-Atkinson/publication/220424085_Min-Max_Heaps_and_Generalized_Priority_Queues/links/00b49514bc2c945127000000/Min-Max-Heaps-and-Generalized-Priority-Queues.pdf">[10]&nbsp;&nbsp;Atkinson, M. D. &amp; Sack, Jörg-Rüdiger &amp; Santoro, Nicola &amp; Strothotte, Thomas.
+				<p id="DEPQ"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://www.researchgate.net/profile/M-Atkinson/publication/220424085_Min-Max_Heaps_and_Generalized_Priority_Queues/links/00b49514bc2c945127000000/Min-Max-Heaps-and-Generalized-Priority-Queues.pdf">[10]&nbsp;&nbsp;Atkinson, M. D. &amp; Sack, Jo<span class="umlaut"></span>rg-Ru<span class="umlaut"></span>diger &amp; Santoro, Nicola &amp; Strothotte, Thomas.
 					(1986). Min-Max Heaps and Generalized Priority Queues. Communications of the ACM 29, no. 10. <span class="nowrap">996–1000</span>.</a></p>
 				<p id="RADIX"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://archive.org/details/textcompression00bell/page/238/mode/1up?view=theater">[11]&nbsp;&nbsp;Bell, Timothy &amp; Cleary, John &amp; Witten, Ian. (1990). Text Compression. <span class="nowrap">238–239</span>.
 					10.1007/978-0-387-39940-9_1151.</a></p>
@@ -1913,7 +1913,7 @@ if (window.matchMedia) { // if this exists, we can make the content actually par
 				<h3><a href="#Non-succinct_DynPDT" class="heading-link">8.2&nbsp;&nbsp;Non-succinct Decomposed Tries</a><a href="#Non-succinct_DynPDT" class="glyphicon glyphicon-link"></a></h3>
 				<p id="OldDynPDT"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://kampersanda.github.io/pdf/SPIRE2017.pdf">[16]&nbsp;&nbsp;Kanda, Shunsuke &amp; Morita, Kazuhiro &amp; Fuketa, Masao. (2017). Practical Implementation of Space-Efficient Dynamic Keyword Dictionaries. <span class="nowrap">221–233</span>.
 					10.1007/978-3-319-67428-5_19.</a></p>
-				<p id="DynPDT"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://arxiv.org/pdf/1906.06015.pdf">[17]&nbsp;&nbsp;Kanda, Shunsuke &amp; Köppl, Dominik &amp; Tabei, Yasuo &amp; Morita, Kazuhiro &amp; Fuketa, Masao. (2020). Dynamic Path-decomposed Tries. ACM Journal of Experimental Algorithmics. 25. <span class="nowrap">1–28</span>.
+				<p id="DynPDT"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://arxiv.org/pdf/1906.06015.pdf">[17]&nbsp;&nbsp;Kanda, Shunsuke &amp; Ko<span class="umlaut"></span>ppl, Dominik &amp; Tabei, Yasuo &amp; Morita, Kazuhiro &amp; Fuketa, Masao. (2020). Dynamic Path-decomposed Tries. ACM Journal of Experimental Algorithmics. 25. <span class="nowrap">1–28</span>.
 					10.1145/3418033.</a></p>
 			</section>
 			<section id="autocomplete-references">
@@ -1925,9 +1925,9 @@ if (window.matchMedia) { // if this exists, we can make the content actually par
 					Proceedings - Annual IEEE Symposium on Foundations of Computer Science, FOCS.
 					<span class="nowrap">713–722</span>.
 					10.1109/FOCS.2009.19.</a></p>
-				<p id="SuccinctPractice"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://www.researchgate.net/profile/Diego-Arroyuelo-2/publication/220982101_Succinct_Trees_in_Practice/links/54601edc0cf2c1a63bfdc158/Succinct-Trees-in-Practice.pdf">[20]&nbsp;&nbsp;Arroyuelo, Diego &amp; Cánovas Barroso, Rodrigo &amp; Navarro, Gonzalo &amp; Sadakane, Kunihiko. (2010). Succinct Trees in Practice. 2010 Proceedings of the 12th Workshop on Algorithm Engineering and Experiments, ALENEX 2010. <span class="nowrap">84–97</span>.
+				<p id="SuccinctPractice"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://www.researchgate.net/profile/Diego-Arroyuelo-2/publication/220982101_Succinct_Trees_in_Practice/links/54601edc0cf2c1a63bfdc158/Succinct-Trees-in-Practice.pdf">[20]&nbsp;&nbsp;Arroyuelo, Diego &amp; Ca<span class="accent"></span>novas Barroso, Rodrigo &amp; Navarro, Gonzalo &amp; Sadakane, Kunihiko. (2010). Succinct Trees in Practice. 2010 Proceedings of the 12th Workshop on Algorithm Engineering and Experiments, ALENEX 2010. <span class="nowrap">84–97</span>.
 					10.1137/1.9781611972900.9.</a></p>
-				<p id="MATANI"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://arxiv.org/pdf/2110.15535.pdf">[21]&nbsp;&nbsp;Mátáni, Dhrúv. (2011). An <span class="complexity"><span class="big-O">O</span>(<var>k</var><span class="ThinSpace"></span>log<span class="ThinSpace"></span><var>n</var>)</span>
+				<p id="MATANI"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://arxiv.org/pdf/2110.15535.pdf">[21]&nbsp;&nbsp;Ma<span class="accent"></span>ta<span class="accent"></span>ni, Dhru<span class="accent"></span>v. (2011). An <span class="complexity"><span class="big-O">O</span>(<var>k</var><span class="ThinSpace"></span>log<span class="ThinSpace"></span><var>n</var>)</span>
 					algorithm for prefix based ranked autocomplete. ArXiv (2021), abs/2110.15535.</a></p>
 				<p id="COMPLETION"><a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/TopKCompletion.pdf">[22]&nbsp;&nbsp;Hsu, Bo-June &amp; Ottaviano, Giuseppe.
 					(2013). Space-efficient Data Structures for Top-<var>k</var> Completion. WWW 2013 - Proceedings of the 22nd International Conference on World Wide Web. <span class="nowrap">583–594</span>.
