@@ -556,7 +556,8 @@ span.accent:after {
     content: 'ˊ';
 }
 
-span.umlaut:after {
+span.umlaut:after,
+span.umlaut_i:after {
     content: '¨';
 }
 
