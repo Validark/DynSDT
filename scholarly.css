@@ -552,6 +552,22 @@ span.ThickSpace:after {
 	content: ' ';
 }
 
+span.accent:after {
+    content: 'ˊ';
+}
+
+span.umlaut:after {
+    content: '¨';
+}
+
+span.accent,
+span.umlaut {
+    display: inline-block;
+    left: -0.5em;
+    width: 0;
+    position: relative;
+}
+
 em {
 	/* font-style: normal; */
 	font-style: italic;
