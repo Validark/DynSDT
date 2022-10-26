@@ -561,11 +561,21 @@ span.umlaut:after {
 }
 
 span.accent,
-span.umlaut {
+span.umlaut,
+span.umlaut_i {
     display: inline-block;
-    left: -0.5em;
     width: 0;
     position: relative;
+}
+
+span.accent,
+span.umlaut
+{
+    left: -0.5em;
+}
+
+span.umlaut_i {
+    left: -2.375em;
 }
 
 em {
