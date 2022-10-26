@@ -557,8 +557,12 @@ span.accent:after {
 }
 
 span.umlaut:after,
-span.umlaut_i:after {
+span.naive_i_umlaut:after {
     content: '¨';
+}
+
+span.naive_i:after {
+    content: 'ı';
 }
 
 span.accent,
