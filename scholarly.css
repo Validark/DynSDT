@@ -563,7 +563,8 @@ span.umlaut_i:after {
 
 span.accent,
 span.umlaut,
-span.umlaut_i {
+span.naive_i,
+span.naive_i_umlaut {
     display: inline-block;
     width: 0;
     position: relative;
@@ -575,8 +576,12 @@ span.umlaut
     left: -0.5em;
 }
 
-span.umlaut_i {
-    left: -2.375em;
+span.naive_i {
+    left: -3.18125em;
+}
+
+span.naive_i_umlaut {
+    left: -3.3em;
 }
 
 em {
