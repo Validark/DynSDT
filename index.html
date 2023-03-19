@@ -470,8 +470,8 @@ Written in 2022, not published yet.
 			<p class="indented">
 				The <dfn>Dynamic Score-Decomposed Trie</dfn>
 				is a (non-succinct, pointer-based) data structure based on the path decomposition of conventional tries.
-				When constructed from a conventional trie, the path to each maximum completion is compressed into a single decomposed node by concatenating the substrings and keeping a list of all the first-sibling nodes along the path.
-				Each decomposed first-sibling node is stored inside a <dfn>branch point</dfn> which also contains the longest common prefix length (LCP) between the string it represents and its parent's.
+				When constructing from a conventional trie, the path to the first leaf is compressed into a single decomposed node by concatenating the substrings and keeping a list of all the first-sibling nodes encountered along the path.
+				Each encountered first-sibling node is likewise decomposed and stored inside a <dfn>branch point</dfn> which also contains the longest common prefix length (LCP) between the string it represents and its parent's.
 			</p>
 			<figure id="decomposed_trie">
 				<!-- <a target="_blank" rel="noopener noreferrer" href="https://validark.github.io/DynSDT/demo/"> -->
