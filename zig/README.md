@@ -22,3 +22,14 @@ consider using a lock-free implementation that relies on arrays of nodes, such t
 changed array and its parents up to the root can be copied and then the root pointer can be updated
 atomically to the new copy, or the work can be repeated if another thread updated the structure first.
 I suppose one _could_ dream up a similar scheme with the LCRS linked-lists, but that would be pretty crazy. -->
+
+
+## How to run this
+
+First, unzip the zip files. Then [make sure you have Zig installed](https://github.com/ziglang/zig#installation). Building and running is pretty straightforward:
+
+```
+zig build -Doptimize=ReleaseFast run
+```
+
+You can omit `run` if you do not want to run it immediately. This will produce a binary in `/zig-out/bin/exe`. It should work on all platforms supported by LLVM (I have some inline assembly I am using temporarily while I wait for Zig to get a `@mulCarryless` intrinsic, but I check the target platform for support and only emit it for x86_64 and aarch64 platforms that support it. I have an alternate implementation that's slightly less efficient than a hardware carryless multiply but works just fine.)
