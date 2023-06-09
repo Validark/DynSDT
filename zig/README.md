@@ -33,3 +33,5 @@ zig build -Doptimize=ReleaseFast run
 ```
 
 You can omit `run` if you do not want to run it immediately. This will produce a binary in `/zig-out/bin/exe`. It should work on all platforms supported by LLVM (I have some inline assembly I am using temporarily while I wait for Zig to get a `@mulCarryless` intrinsic, but I check the target platform for support and only emit it for x86_64 and aarch64 platforms that support it. I have an alternate implementation that's slightly less efficient than a hardware carryless multiply but works just fine.)
+
+You can play with configuration variables at the top of the main.zig file but not all of them do something to change the array implementation. They should work properly for the LCRS version, however.
