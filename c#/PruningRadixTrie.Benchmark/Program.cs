@@ -7,22 +7,22 @@ using System.Collections.Generic;
 namespace PruningRadixTrie.Benchmark
 {
 	static class ExtensionsClass
-    {
-        private static Random rng = new Random();
+	{
+		private static Random rng = new Random();
 
-        public static void Shuffle<T>(this IList<T> list)
-        {
-            int n = list.Count;
-            while (n > 1)
-            {
-                int k = rng.Next(n);
-                n -= 1;
-                T value = list[k];
-                list[k] = list[n];
-                list[n] = value;
-            }
-        }
-    }
+		public static void Shuffle<T>(this IList<T> list)
+		{
+			int n = list.Count;
+			while (n > 1)
+			{
+				int k = rng.Next(n);
+				n -= 1;
+				T value = list[k];
+				list[k] = list[n];
+				list[n] = value;
+			}
+		}
+	}
 
 	class Program
 	{
@@ -100,7 +100,8 @@ namespace PruningRadixTrie.Benchmark
 					// List<(string term, long score)> results = null;
 					sw.Restart();
 					for (int loop = 0; loop < rounds; loop++)
-						/* results = */pruningRadixTrie.GetTopkTermsForPrefix(prefix, termCount);
+						/* results = */
+						pruningRadixTrie.GetTopkTermsForPrefix(prefix, termCount);
 					sw.Stop();
 					Console.WriteLine("queried \"" + prefix + '"' + new string(' ', queryString.Length - prefix.Length + 1) + "in " + sw.ElapsedTicks.ToString(tickFormatter) + " µs");
 					// if (results != null)
@@ -116,8 +117,8 @@ namespace PruningRadixTrie.Benchmark
 				var queriesCount = queries.Count;
 				var TICKS_PER_SECOND = Stopwatch.Frequency;
 				Stopwatch counter = Stopwatch.StartNew();
-  				var count = 0;
-				for (var index = 0; counter.ElapsedTicks < TICKS_PER_SECOND; )
+				var count = 0;
+				for (var index = 0; counter.ElapsedTicks < TICKS_PER_SECOND;)
 				{
 					var myTerm = queries[index];
 					++count;
@@ -149,12 +150,19 @@ namespace PruningRadixTrie.Benchmark
 
 		public static void Test()
 		{
-			if (!File.Exists("terms.txt")) ZipFile.ExtractToDirectory("terms.zip", ".");
+			// if (!File.Exists("terms.txt")) ZipFile.ExtractToDirectory("terms.zip", ".");
 			var numAllocatedBytes = GC.GetTotalMemory(true);
 			PruningRadixTrie trie = new PruningRadixTrie();
-			trie.ReadTermsFromFile("terms.txt");
+			trie.ReadTermsFromFile("terms_sorted.txt");
 			var numAllocatedBytes2 = GC.GetTotalMemory(true);
 			Console.WriteLine("\tStructure is ~" + (numAllocatedBytes2 - numAllocatedBytes).ToString("0,,.##") + "MB.");
+
+			var results = trie.GetTopkTermsForPrefix("", 20);
+
+			foreach (var result in results)
+			{
+				Console.WriteLine(result.term + " " + result.score);
+			}
 
 			var setters = new List<(String term, long score)>() {
 				("tennis championships 2020", 50),
@@ -184,6 +192,8 @@ namespace PruningRadixTrie.Benchmark
 			{
 				maxTermLength = Math.Max(maxTermLength, term.Length);
 			}
+
+			if (1 == 1) return;
 			Console.WriteLine("Fuzzing time!");
 			for (var i = 0; ; i++)
 			{ // Fuzz forever, until we stop the program, the longest I ran this was 11166182 iterations

@@ -1,0 +1,6 @@
+/zig/random_stuff/*
+/zig/zig-out
+/zig/zig-cache
+/zig/.vscode/settings.json
+**/All_Amazon_Meta.json
+**/All_Amazon_Meta.json.gz
