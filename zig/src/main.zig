@@ -622,7 +622,7 @@ const DynSDT = struct {
                     return buffer[self.term_start..][0..self.term_len];
                 }
 
-                pub fn full_term(self: CompletionTrieNode, buffer: string, char_depth: str_buf_int) []const u8 {
+                pub fn full_term(self: CompletionTrieNode, buffer: string, char_depth: term_len_int) []const u8 {
                     return buffer[self.term_start - char_depth ..][0 .. self.term_len + char_depth];
                 }
             };
@@ -2604,22 +2604,48 @@ fn printInt(arr: u64) void {
     printArr(@bitCast([8]u8, arr));
 }
 
-inline fn speedTest(trie: anytype, queries: anytype) void {
+inline fn speedTest(allocator: Allocator, trie: anytype, queries: anytype, comptime precompute_locus: bool) !void {
+    // precompute the locus nodes of all queries
+    const loci = blk: {
+        if (precompute_locus) {
+            const locus_t1 = std.time.nanoTimestamp();
+            const loci = try allocator.alloc(struct { node_index_int, term_len_int }, queries.len);
+            for (queries, loci) |query, *locus| {
+                const ret = trie.getLocusIndexForPrefix(query);
+                switch (@TypeOf(trie)) {
+                    *const DynSDT.SlicedDynSDT.CompletionTrie, *DynSDT.SlicedDynSDT.CompletionTrie, DynSDT.SlicedDynSDT.CompletionTrie => locus.* = .{ ret.index, ret.char_depth },
+                    else => locus.* = .{ ret, @intCast(term_len_int, query.len) },
+                }
+            }
+            // DynSDT.SlicedDynSDT.CompletionTrie
+            const locus_t2 = std.time.nanoTimestamp();
+            std.debug.print("Found the locus node for all queries in {}\n", .{std.fmt.fmtDurationSigned(@intCast(i64, locus_t2 - locus_t1))});
+
+            break :blk loci;
+        }
+    };
+    defer if (precompute_locus) allocator.free(loci);
+
     var results: [10][*:0]const u8 = undefined;
+
     {
         var i: u32 = 0;
         // var num_queries: u32 = 1;
         var mask: u32 = 1;
         for (0..0) |_|
             mask |= mask << 1;
-        while (i < 21) : (i += 1) {
+        while (i < 24) : (i += 1) {
             const end_time = std.time.nanoTimestamp() + 1000000000;
             var iterations: u32 = 0;
             var k: u32 = 0;
             // while (true) {
             while (true) {
                 // const t1 = std.time.nanoTimestamp();
-                _ = trie.topKCompletionsToPrefix(queries[k], &results);
+                if (precompute_locus) {
+                    _ = trie.topKCompletionsToLocus(loci[k][0], loci[k][1], &results);
+                } else {
+                    _ = trie.topKCompletionsToPrefix(queries[k], &results);
+                }
                 // const t2 = std.time.nanoTimestamp();
                 // std.debug.print("Got answer in {}ns: ", .{t2 - t1});
 
@@ -2645,7 +2671,6 @@ inline fn speedTest(trie: anytype, queries: anytype) void {
             // num_queries *= 10;
         }
     }
-    // if (1 == 1) return;
 
     {
         var NUM_QUERIES: u64 = 100000;
@@ -2654,7 +2679,11 @@ inline fn speedTest(trie: anytype, queries: anytype) void {
             const start_time = std.time.milliTimestamp();
             var i: u32 = 0;
             while (i < NUM_QUERIES) : (i += 1) {
-                _ = trie.topKCompletionsToPrefix(queries[i], &results);
+                if (precompute_locus) {
+                    _ = trie.topKCompletionsToLocus(loci[i][0], loci[i][1], &results);
+                } else {
+                    _ = trie.topKCompletionsToPrefix(queries[i], &results);
+                }
             }
             const total_time = std.time.milliTimestamp() - start_time;
             std.debug.print("Performed {} queries in {}ms\n", .{ NUM_QUERIES, total_time });
@@ -2769,139 +2798,9 @@ pub fn main() !void {
 
     // std.debug.print("All queries returned the same results!!\n", .{});
 
-    const TRY_PRECOMPUTING_LOCUS_NODES = false;
-    const TEST_ARR_VERSIONS = false;
-    const SPEED_TEST_DEFAULT_IMPL = true;
-    _ = SPEED_TEST_DEFAULT_IMPL;
-
-    speedTest(&dynSDT, queries);
-    speedTest(&completion_trie, queries);
-    speedTest(&arr_trie, queries);
-
-    var results: [10][*:0]const u8 = undefined;
-
-    if (TRY_PRECOMPUTING_LOCUS_NODES) {
-        // precompute the locus nodes of all queries
-        var locus_t1 = std.time.nanoTimestamp();
-        var loci = try allocator.alloc(struct { node_index_int, term_len_int }, queries.len);
-        defer allocator.free(loci);
-        for (queries, loci) |query, *locus| {
-            const ret = dynSDT.getLocusIndexForPrefix(query);
-            locus.* = if (BITWISE) ret else .{ ret, @intCast(term_len_int, query.len) };
-        }
-        var locus_t2 = std.time.nanoTimestamp();
-        std.debug.print("Found the locus node for all queries in {}\n", .{std.fmt.fmtDurationSigned(locus_t2 - locus_t1)});
-
-        {
-            var i: u32 = 0;
-            // var num_queries: u32 = 1;
-            var mask: u32 = 1;
-            for (0..5) |_|
-                mask |= mask << 1;
-            while (i < 24) : (i += 1) {
-                const end_time = std.time.nanoTimestamp() + 1000000000;
-                var iterations: u32 = 0;
-                var k: u32 = 0;
-                // while (true) {
-                while (true) {
-                    // const t1 = std.time.nanoTimestamp();
-
-                    _ = dynSDT.topKCompletionsToLocus(loci[k][0], loci[k][1], &results);
-                    // const t2 = std.time.nanoTimestamp();
-                    // std.debug.print("Got answer in {}ns: ", .{t2 - t1});
-
-                    // std.debug.print("try std.testing.expect({} == trie.topKCompletionsToPrefix(\"{s}\", &results));\nfor ([{}]string{{ ", .{ num_results, queries[iterations], num_results });
-                    iterations += 1;
-                    k += 1;
-                    k &= mask;
-
-                    // if (num_results > 0) {
-                    //     std.debug.print("\"{s}\"", .{results[0]});
-                    //     for (results[1..num_results]) |result| {
-                    //         std.debug.print(", \"{s}\"", .{result});
-                    //     }
-                    //     std.debug.print(" }}) |str, i| try std.testing.expectEqualStrings(str, results[i]);\n", .{});
-                    // }
-                    // if (iterations == 200) break;
-                    if (std.time.nanoTimestamp() > end_time) break;
-                }
-                std.debug.print("{}: ", .{mask + 1});
-                printCommifiedNumber(iterations);
-                std.debug.print(" iterations in one second!\n", .{});
-                mask |= mask << 1;
-                // num_queries *= 10;
-            }
-        }
-
-        {
-            var NUM_QUERIES: u64 = 100000;
-
-            while (NUM_QUERIES <= 1000000) : (NUM_QUERIES += 100000) {
-                const start_time = std.time.milliTimestamp();
-                var i: u32 = 0;
-                while (i < NUM_QUERIES) : (i += 1) {
-                    _ = dynSDT.topKCompletionsToLocus(loci[i][0], loci[i][1], &results);
-                }
-                const total_time = std.time.milliTimestamp() - start_time;
-                std.debug.print("Performed {} queries in {}ms\n", .{ NUM_QUERIES, total_time });
-            }
-        }
-    }
-
-    if (TEST_ARR_VERSIONS) {
-        var i: u32 = 0;
-        // var num_queries: u32 = 1;
-        var mask: u32 = 1;
-        for (0..5) |_|
-            mask |= mask << 1;
-        while (i < 24) : (i += 1) {
-            const end_time = std.time.nanoTimestamp() + 1000000000;
-            var iterations: u32 = 0;
-            var k: u32 = 0;
-            // while (true) {
-            while (true) {
-                // const t1 = std.time.nanoTimestamp();
-                _ = arr_trie.topKCompletionsToPrefix(queries[k], &results);
-                // const t2 = std.time.nanoTimestamp();
-                // std.debug.print("Got answer in {}ns: ", .{t2 - t1});
-
-                // std.debug.print("try std.testing.expect({} == trie.topKCompletionsToPrefix(\"{s}\", &results));\nfor ([{}]string{{ ", .{ num_results, queries[iterations], num_results });
-                iterations += 1;
-                k += 1;
-                k &= mask;
-
-                // if (num_results > 0) {
-                //     std.debug.print("\"{s}\"", .{results[0]});
-                //     for (results[1..num_results]) |result| {
-                //         std.debug.print(", \"{s}\"", .{result});
-                //     }
-                //     std.debug.print(" }}) |str, i| try std.testing.expectEqualStrings(str, results[i]);\n", .{});
-                // }
-                // if (iterations == 200) break;
-                if (std.time.nanoTimestamp() > end_time) break;
-            }
-            std.debug.print("{}: ", .{mask + 1});
-            printCommifiedNumber(iterations);
-            std.debug.print(" iterations in one second!\n", .{});
-            mask |= mask << 1;
-            // num_queries *= 10;
-        }
-    }
-
-    if (TEST_ARR_VERSIONS) {
-        var NUM_QUERIES: u64 = 100000;
-
-        while (NUM_QUERIES <= 1000000) : (NUM_QUERIES += 100000) {
-            const start_time = std.time.milliTimestamp();
-            var i: u32 = 0;
-            while (i < NUM_QUERIES) : (i += 1) {
-                _ = arr_trie.topKCompletionsToPrefix(queries[i], &results);
-            }
-            const total_time = std.time.milliTimestamp() - start_time;
-            std.debug.print("Performed {} queries in {}ms\n", .{ NUM_QUERIES, total_time });
-        }
-    }
-
+    try speedTest(allocator, &dynSDT, queries, true);
+    try speedTest(allocator, &completion_trie, queries, true);
+    // try speedTest(allocator, &arr_trie, queries, true);
     // for (results) |result| std.debug.print("{s}\n", .{result});
 
     // std.debug.print("{} {}\n", .{ trie.locus_finding_time, trie.topk_search_time });
