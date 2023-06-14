@@ -23,6 +23,8 @@ changed array and its parents up to the root can be copied and then the root poi
 atomically to the new copy, or the work can be repeated if another thread updated the structure first.
 I suppose one _could_ dream up a similar scheme with the LCRS linked-lists, but that would be pretty crazy. -->
 
+This version does not yet support the dynamic updates of the structure.
+
 
 ## How to run this
 
