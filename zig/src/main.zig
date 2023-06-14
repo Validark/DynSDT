@@ -539,6 +539,7 @@ const DynSDT = struct {
         // const @"next/LCP" = packed struct(u0) {};
 
         LCP: term_len_int = 0,
+        term_len: term_len_int,
         down: node_index_int = NULL,
         next: node_index_int = NULL,
         term_start: str_buf_int,
@@ -549,11 +550,13 @@ const DynSDT = struct {
 
         pub fn term(self: Node, buffer: string) [*:0]const u8 {
             return @ptrCast([*:0]const u8, buffer[self.term_start..].ptr);
+            // return buffer[self.term_start..][0..self.term_len :0].ptr;
         }
 
-        pub fn init(term_start: str_buf_int) Node {
+        pub fn init(term_start: str_buf_int, term_len: term_len_int) Node {
             return Node{
                 .term_start = term_start,
+                .term_len = term_len,
                 // .@"next/LCP" = .{},
                 // .@"down/term_len" = @"down/term_len"{ .term_len = term_len },
                 .next4chars = if (STORE_4_TERM_BYTES_IN_NODE) 0,
@@ -563,6 +566,7 @@ const DynSDT = struct {
         pub fn initSentinel(term_start: usize) Node { // FIXME: probably make the parameter a `str_buf_int`
             return Node{
                 .term_start = @intCast(str_buf_int, term_start),
+                .term_len = 0,
                 // .@"down/term_len" = @"down/term_len"{ .term_len = 0 },
                 // .@"next/LCP" = .{ .LCP = std.math.maxInt(term_len_int) },
                 .LCP = std.math.maxInt(term_len_int),
@@ -600,6 +604,391 @@ const DynSDT = struct {
         nodes: []Node,
         scores: []score_int,
         str_buffer: []u8,
+
+        const CompletionTrie = struct {
+            node_list: std.ArrayListUnmanaged(CompletionTrieNode),
+            str_buffer: []u8,
+            roots: [256]node_index_int,
+
+            const CompletionTrieNode = struct {
+                term_start: str_buf_int,
+                term_len: term_len_int,
+                score: score_int,
+                next: node_index_int = NULL,
+                down: node_index_int = NULL,
+                // branch_points: []CompletionTrieNode,
+
+                pub fn term(self: CompletionTrieNode, buffer: string) []const u8 {
+                    return buffer[self.term_start..][0..self.term_len];
+                }
+
+                pub fn full_term(self: CompletionTrieNode, buffer: string, char_depth: str_buf_int) []const u8 {
+                    return buffer[self.term_start - char_depth ..][0 .. self.term_len + char_depth];
+                }
+            };
+
+            pub fn deinit(self: *CompletionTrie, allocator: Allocator) void {
+                self.node_list.deinit(allocator);
+                self.* = undefined;
+            }
+
+            const DEPQ_TYPE = struct { index: node_index_int, char_depth: term_len_int };
+
+            pub fn getLocusIndexForPrefix(self: *const CompletionTrie, noalias prefix: string_t) DEPQ_TYPE {
+                const nodes: []CompletionTrieNode = self.node_list.items;
+                const str_buffer = self.str_buffer;
+                std.debug.assert(prefix.len > 0);
+                var char_depth: term_len_int = 0;
+                var cur_i = self.roots[prefix[0]];
+                if (cur_i == NULL) return .{ .index = NULL, .char_depth = undefined };
+                var term1 = prefix;
+                if (SHOULD_PRINT) std.debug.print("term1: {s}\n", .{term1});
+
+                var term2_start: str_buf_int = nodes[cur_i].term_start;
+                if (SHOULD_PRINT) std.debug.print("term2: {s}\n", .{nodes[cur_i].term(self.str_buffer)});
+                var term2_end: str_buf_int = term2_start + nodes[cur_i].term_len;
+
+                while (true) {
+                    while (true) {
+                        term1 = term1[1..];
+                        if (SHOULD_PRINT) std.debug.print("term1: {s}\n", .{term1});
+                        if (0 == if (USE_NULL_TERMINATED_STRINGS) term1[0] else term1.len) return .{ .index = cur_i, .char_depth = char_depth };
+                        term2_start += 1;
+                        if (term2_start >= term2_end) break;
+                        if (term1[0] != str_buffer[term2_start]) return .{ .index = NULL, .char_depth = undefined };
+                    }
+
+                    char_depth += nodes[cur_i].term_len;
+                    cur_i = nodes[cur_i].down;
+
+                    while (true) {
+                        if (cur_i == NULL) return .{ .index = NULL, .char_depth = undefined };
+                        term2_start = nodes[cur_i].term_start;
+                        if (SHOULD_PRINT) std.debug.print("term2: {s}\n", .{nodes[cur_i].term(self.str_buffer)});
+                        term2_end = term2_start + nodes[cur_i].term_len;
+                        if (term2_end > term2_start and term1[0] == str_buffer[term2_start]) break;
+                        cur_i = nodes[cur_i].next;
+                    }
+                }
+            }
+
+            // fn insert_cur_i(nodes: []const Node, scores: []const score_int, depq_len_: u8, str_buffer: string, parent_i: node_index_int, results: *[10][*:0]const u8, LCP: term_len_int, depq: *[4 + 1]node_index_int, depq_1_indexed: *[5 + 1]node_index_int, k: u8) u8 {
+
+            //     // printDEPQ(self.nodes.items, self.scores.items, depq, depq_len_, str_buffer, results, k, "insert_cur_i");
+            //     const cur_i = verticalSuccessor(nodes, LCP, parent_i);
+
+            //     if (cur_i != NULL) { // we could check if cur_i > depq[0]
+            //         if (SHOULD_PRINT) std.debug.print("{{ {:0>7}, {:0>7}, {:0>7}, {:0>7}, {:0>7}, {:0>7} }}, cur_i: {:0>7} \n", .{ depq_1_indexed[0], depq_1_indexed[1], depq_1_indexed[2], depq_1_indexed[3], depq_1_indexed[4], depq_1_indexed[5], cur_i });
+            //         if (SHOULD_PRINT) std.debug.print("score: {}\n", .{scores[cur_i]});
+            //         var i: u8 = 0;
+            //         const cur_i_score = scores[cur_i];
+            //         while (true) {
+            //             // { 3, 5, 6, 7, 9 } insert 6
+            //             var j = i + 1;
+            //             if (cur_i_score <= scores[depq_1_indexed[j]]) break;
+            //             depq_1_indexed[i] = depq_1_indexed[j];
+            //             i = j;
+            //         }
+            //         depq_1_indexed[i] = cur_i;
+            //         if (SHOULD_PRINT) std.debug.print("{{ {:0>7}, {:0>7}, {:0>7}, {:0>7}, {:0>7}, {:0>7} }} \n", .{ depq_1_indexed[0], depq_1_indexed[1], depq_1_indexed[2], depq_1_indexed[3], depq_1_indexed[4], depq_1_indexed[5] });
+            //     }
+
+            //     return insert_next_i(nodes, scores, depq_len_ - 1, str_buffer, results, LCP, depq, depq_1_indexed, k);
+            // }
+
+            // fn insert_next_i(nodes: []const Node, scores: []const score_int, depq_len: u8, str_buffer: string, results: *[10][*:0]const u8, LCP: term_len_int, depq: *[4 + 1]node_index_int, depq_1_indexed: *[5 + 1]node_index_int, k: u8) u8 {
+            //     // printDEPQ(self.nodes.items, self.scores.items, depq, depq_len, str_buffer, results, k, "insert_next_i");
+
+            //     var cur_i = depq[depq_len];
+
+            //     // If the DEPQ is full but only because we already have so many completions. E.g. if we found
+            //     // 8 completions already then we only need 2 more if topK=10. Because k has not been incremented
+            //     // yet, when k=7, we would consider depq_len=2 to be full.
+            //     // e.g. { 45, _ } -> 48, 49
+            //     // std.debug.assert(depq_len <= 9 - k);
+            //     if (SHOULD_PRINT) std.debug.print("pushing {} to results[{}]\n", .{ cur_i, k });
+
+            //     results[if (K_DEC) 10 - k else k] = nodes[cur_i].term(str_buffer);
+            //     var l = if (K_DEC) k - 1 else k + 1;
+            //     if (l == if (K_DEC) 0 else 10) return 10;
+            //     var next_i = horizontalSuccessor(nodes, cur_i);
+
+            //     if (next_i != NULL) { // we could check if (next_i > depq[0]
+            //         // std.debug.print("{{ {:0>7}, {:0>7}, {:0>7}, {:0>7}, {:0>7}, {:0>7} }}, next_i: {:0>7} \n", .{ depq_1_indexed[0], depq_1_indexed[1], depq_1_indexed[2], depq_1_indexed[3], depq_1_indexed[4], depq_1_indexed[5], next_i });
+            //         var i: u8 = 0;
+            //         const next_i_score = scores[next_i];
+            //         while (true) {
+            //             // { 5, 6, 7, 8, 9 } insert 8
+            //             var j = i + 1; // 2
+            //             if (next_i_score <= scores[depq_1_indexed[j]]) break;
+            //             depq_1_indexed[i] = depq_1_indexed[j];
+            //             i = j; // 1
+            //         }
+            //         depq_1_indexed[i] = next_i;
+            //         // std.debug.print("{{ {:0>7}, {:0>7}, {:0>7}, {:0>7}, {:0>7}, {:0>7} }} \n", .{ depq_1_indexed[0], depq_1_indexed[1], depq_1_indexed[2], depq_1_indexed[3], depq_1_indexed[4], depq_1_indexed[5] });
+            //         // if (SHOULD_PRINT) printFinalState(depq_len, depq, next_i, k);
+            //     }
+
+            //     return insert_cur_i(nodes, scores, depq_len, str_buffer, cur_i, results, LCP, depq, depq_1_indexed, l);
+            // }
+
+            pub fn topKCompletionsToPrefix(self: *const CompletionTrie, noalias prefix: string_t, noalias results: *[10][*:0]const u8) u8 {
+                const locus_and_LCP = @call(.always_inline, CompletionTrie.getLocusIndexForPrefix, .{ self, prefix });
+                const locus: node_index_int = locus_and_LCP.index;
+                const char_depth = locus_and_LCP.char_depth;
+                return @call(.always_inline, CompletionTrie.topKCompletionsToLocus, .{ self, locus, char_depth, results });
+            }
+
+            fn printDEPQ(self: *const CompletionTrie, nodes: []const CompletionTrieNode, depq: *[10]DEPQ_TYPE, depq_len: u8, results: anytype, k: u8) void {
+                if (!SHOULD_PRINT) return;
+                const chars = self.str_buffer;
+                if (depq_len != 0) {
+                    std.debug.print("depq: [{}]{{ (\"{s}\", \"{s}\", {})", .{ depq_len, nodes[depq[0].index].full_term(chars, depq[0].char_depth), nodes[depq[0].index].term(chars), nodes[depq[0].index].score });
+                    var i: u8 = 0;
+                    while (true) {
+                        i += 1;
+                        if (i == depq_len) break;
+                        std.debug.print(", (\"{s}\", \"{s}\", {})", .{ nodes[depq[i].index].full_term(chars, depq[i].char_depth), nodes[depq[i].index].term(chars), nodes[depq[i].index].score });
+                    }
+                    std.debug.print(" }}\n", .{});
+                } else {
+                    std.debug.print("depq: [0]{{ }}\n", .{});
+                }
+
+                if (0 < if (K_DEC) 10 - k else k) {
+                    std.debug.print("           results: [{}]{{ \"{s}\"", .{ if (K_DEC) 10 - k else k, results[0] });
+                    var i: u8 = 0;
+                    while (true) {
+                        i += 1;
+                        if (i == if (K_DEC) 10 - k else k) break;
+                        std.debug.print(", \"{s}\"", .{results[i]});
+                    }
+                    std.debug.print(" }}\n\n", .{});
+                } else {
+                    std.debug.print("           results: [0]{{ }}\n", .{});
+                }
+            }
+
+            // cur_i = self.getLocusIndexForPrefix(cur_i, LCP, prefix, nodes, str_buffer);
+
+            /// Fills up a given array of strings with completions to a given prefix string, if present in the structure,
+            /// and returns the number of completions that were written.
+            /// The completions will be in descending sorted order by score, so the "most relevant" completions will
+            /// come first. The algorithm is explained here: https://validark.github.io/DynSDT/#top-k_enumeration
+            /// The data structure owns the memory within the individual strings.
+            pub fn topKCompletionsToLocus(self: *const CompletionTrie, locus: node_index_int, locus_char_depth: term_len_int, noalias results: *[10][*:0]const u8) u8 {
+                const nodes: []CompletionTrieNode = self.node_list.items;
+                const str_buffer = self.str_buffer;
+                var k: u8 = if (K_DEC) 10 else 0;
+
+                std.debug.assert(nodes[0].score == std.math.minInt(score_int));
+                std.debug.assert(nodes[1].score == std.math.maxInt(score_int));
+                var depq_1_indexed: [10 + 1]DEPQ_TYPE = undefined;
+                depq_1_indexed[0] = .{ .index = 0, .char_depth = 0 };
+                var depq: *[10]DEPQ_TYPE = depq_1_indexed[1..];
+                inline for (depq) |*p| p.* = .{ .index = 1, .char_depth = 0 };
+
+                var next_i = NULL;
+                var depq_len: u8 = 0;
+                var cur_i = locus;
+                // var term_start: str_buf_int = undefined;
+                var char_depth: term_len_int = locus_char_depth;
+
+                while (true) {
+                    // term_start = nodes[cur_i].term_start - char_depth;
+                    while (true) {
+                        if (next_i != NULL) {
+                            const next_i_score = nodes[next_i].score;
+                            const has_empty_slots = depq_len != (if (K_DEC) k else 9 - k);
+                            var i: u8 = 0;
+                            if (has_empty_slots) {
+                                i = depq_len;
+                                while (true) {
+                                    if (next_i_score >= nodes[depq_1_indexed[i].index].score) break;
+                                    depq_1_indexed[i + 1] = depq_1_indexed[i];
+                                    std.debug.assert(i != 0);
+                                    i -= 1;
+                                }
+                            } else {
+                                while (true) {
+                                    var j = i + 1;
+                                    if (next_i_score <= nodes[depq_1_indexed[j].index].score) break;
+                                    depq_1_indexed[i] = depq_1_indexed[j];
+                                    i = j;
+                                }
+                            }
+                            depq_1_indexed[i + @boolToInt(has_empty_slots)] = .{ .index = next_i, .char_depth = char_depth };
+                            depq_len += @boolToInt(has_empty_slots);
+                            self.printDEPQ(nodes, depq, depq_len, results, if (K_DEC) 10 - k else k);
+                        }
+                        if (nodes[cur_i].down == NULL) break;
+                        char_depth += nodes[cur_i].term_len;
+                        cur_i = nodes[cur_i].down;
+                        next_i = nodes[cur_i].next;
+                    }
+
+                    results[if (K_DEC) 10 - k else k] = str_buffer[nodes[cur_i].term_start - char_depth ..][0 .. char_depth + nodes[cur_i].term_len :0];
+                    // results[if (K_DEC) 10-k else k] = str_buffer[term_start..][0 .. char_depth + nodes[cur_i].term_start + nodes[cur_i].term_len :0];
+                    k = if (K_DEC) k - 1 else k + 1;
+                    depq_len = std.math.sub(@TypeOf(depq_len), depq_len, 1) catch return if (K_DEC) 10 - k else k;
+                    self.printDEPQ(nodes, depq, depq_len, results, if (K_DEC) 10 - k else k);
+                    cur_i = depq[depq_len].index;
+                    char_depth = depq[depq_len].char_depth;
+                    next_i = nodes[cur_i].next;
+                }
+            }
+        };
+
+        fn makeCompletionTrieRecursive(
+            self: *const SlicedDynSDT,
+            allocator: Allocator,
+            list: *std.ArrayListUnmanaged(CompletionTrie.CompletionTrieNode),
+            parent_slot: *node_index_int,
+            top_LCP: str_buf_int,
+            // is_root: bool,
+        ) !void {
+            const root_i = parent_slot.*;
+            if (root_i == NULL) return;
+            const nodes = self.nodes;
+            const chars = self.str_buffer;
+            _ = chars;
+            // if (!is_root) {
+            //     const parent_node = @fieldParentPtr(CompletionTrie.CompletionTrieNode, "next", parent_slot);
+            //     std.debug.print("key: \"{s}\", score: {}, next: {s}, LCP: {}\n", .{
+            //         chars[parent_node.term_start..][0..parent_node.term_len],
+            //         parent_node.score,
+            //         self.nodes[parent_node.next].term(chars),
+            //         top_LCP,
+            //     });
+            // }
+
+            const root: Node = nodes[root_i];
+            const score: score_int = self.scores[root_i];
+            const root_term_start: str_buf_int = root.term_start;
+            const list_start_index: usize = list.items.len;
+
+            var prev_down: *node_index_int = parent_slot;
+            var selected_LCP: std.meta.Int(.unsigned, @typeInfo(term_len_int).Int.bits * 2) = 0;
+            var last_min_LCP: @TypeOf(selected_LCP) = undefined;
+            var prev_selected_i = NULL;
+            var selected_i = NULL;
+
+            // {
+            //     var cur_i = root.next;
+            //     while (cur_i != NULL) : (cur_i = nodes[cur_i].down) {
+            //         std.debug.print("{}, {s}\n", .{ nodes[cur_i].LCP, nodes[cur_i].term(chars) });
+            //     }
+            // }
+
+            // Selection sort.... oof?
+            while (true) : (prev_selected_i = selected_i) {
+                selected_i = NULL;
+                last_min_LCP = selected_LCP;
+                selected_LCP = root.term_len;
+
+                {
+                    var cur_i = root.next;
+
+                    while (cur_i != NULL) : (cur_i = nodes[cur_i].down) {
+                        const LCP = nodes[cur_i].LCP;
+                        if (last_min_LCP < LCP and LCP <= selected_LCP) {
+                            selected_LCP = LCP;
+                            selected_i = cur_i;
+                        }
+                    }
+                }
+
+                if (last_min_LCP == 0 and selected_LCP == top_LCP) continue;
+                last_min_LCP = @max(top_LCP, last_min_LCP);
+
+                prev_down.* = @intCast(node_index_int, list.items.len);
+                prev_down = blk: {
+                    const slot: *CompletionTrie.CompletionTrieNode = try list.addOne(allocator);
+                    slot.* = CompletionTrie.CompletionTrieNode{
+                        .term_start = root_term_start + last_min_LCP,
+                        .term_len = @intCast(term_len_int, selected_LCP - last_min_LCP),
+                        .score = score,
+                        .next = prev_selected_i, // This is from the old tree, we fix it up in the recursive call
+                    };
+                    // std.debug.print("key: {s}, next: {s}\n", .{ slot.term(chars), nodes[prev_selected_i].term(chars) });
+                    break :blk &slot.down;
+                };
+
+                if (selected_i == NULL) break;
+            }
+
+            {
+                const list_end_len = list.items.len;
+                var i = list_start_index;
+
+                while (i < list_end_len) : (i += 1) {
+                    try makeCompletionTrieRecursive(self, allocator, list, &list.items[i].next, list.items[i].term_start - root.term_start);
+                }
+            }
+        }
+
+        pub fn makeCompletionTrie(self: *const SlicedDynSDT, allocator: Allocator) !CompletionTrie {
+            var completion_trie = CompletionTrie{
+                .roots = self.roots,
+                .str_buffer = self.str_buffer,
+                .node_list = blk: {
+                    const new_memory = try allocator.alignedAlloc(CompletionTrie.CompletionTrieNode, null, self.nodes.len);
+                    break :blk .{ .items = new_memory[0..0], .capacity = new_memory.len };
+                },
+            };
+            errdefer completion_trie.node_list.deinit(allocator);
+
+            (try completion_trie.node_list.addOne(allocator)).* = .{ .term_start = 0, .term_len = 0, .score = std.math.minInt(score_int) };
+            (try completion_trie.node_list.addOne(allocator)).* = .{ .term_start = 0, .term_len = 0, .score = std.math.maxInt(score_int) };
+            for (&completion_trie.roots) |*slot| try makeCompletionTrieRecursive(self, allocator, &completion_trie.node_list, slot, 0);
+            return completion_trie;
+        }
+
+        fn makeArrayDynSDTRecursive(self: SlicedDynSDT, array_nodes: []ArrayDynSDT.ArrayNode, cur_array_node_ptr: *node_index_int, root: node_index_int) ArrayDynSDT.BranchPointPtr {
+            const nodes = self.nodes;
+            const scores = self.scores;
+
+            var num_children: term_len_int = 0;
+            var cur_i = nodes[root].next;
+            while (cur_i != NULL) : (cur_i = nodes[cur_i].down) num_children += 1;
+
+            cur_i = nodes[root].next;
+            var bp: ArrayDynSDT.BranchPointPtr = undefined;
+            bp.ptr = cur_array_node_ptr.*;
+            cur_array_node_ptr.* += num_children;
+            bp.end_ptr = cur_array_node_ptr.*;
+
+            for (array_nodes[bp.ptr..][0..num_children]) |*node| {
+                node.* = ArrayDynSDT.ArrayNode{
+                    .score = scores[cur_i],
+                    .LCP = nodes[cur_i].LCP,
+                    .term_start = nodes[cur_i].term_start,
+                    .branch_points = self.makeArrayDynSDTRecursive(array_nodes, cur_array_node_ptr, cur_i),
+                };
+                cur_i = nodes[cur_i].down;
+            }
+
+            return bp;
+        }
+
+        pub fn makeArrayDynSDT(self: SlicedDynSDT, allocator: Allocator) !ArrayDynSDT {
+            const array_nodes = try allocator.alloc(ArrayDynSDT.ArrayNode, self.nodes.len);
+            var cur_array_node_ptr: node_index_int = 0;
+            var roots = std.mem.zeroes([256]ArrayDynSDT.ArrayNode);
+
+            for (self.roots, 0..) |root, c| {
+                if (root != NULL) {
+                    roots[c] = ArrayDynSDT.ArrayNode{
+                        .score = self.scores[root],
+                        .LCP = 1,
+                        .term_start = self.nodes[root].term_start,
+                        .branch_points = self.makeArrayDynSDTRecursive(array_nodes, &cur_array_node_ptr, root),
+                    };
+                }
+            }
+
+            return ArrayDynSDT{ .roots = roots, .array_nodes = array_nodes, .str_buffer = self.str_buffer };
+        }
 
         // inline fn getLocusIndexForPrefix(self: *const SlicedDynSDT, noalias prefix: string_t) if (BITWISE) struct { node_index_int, term_len_int } else node_index_int {
         //     return @call(.always_inline, getLocusIndexForPrefixGivenPrevious, .{ self, self.roots[prefix[0]], 1, prefix });
@@ -754,7 +1143,7 @@ const DynSDT = struct {
             std.debug.print(" }}\n\n", .{});
         }
 
-        fn insert_cur_i(nodes: []const Node, scores: []const score_int, depq_len_: u8, str_buffer: string, parent_i: node_index_int, results: *[10][*:0]const u8, LCP: term_len_int, depq: *[4 + 1]node_index_int, depq_1_indexed: *[5 + 1]node_index_int, k: u8, comptime half_topK: comptime_int) u8 {
+        fn insert_cur_i(nodes: []const Node, scores: []const score_int, depq_len_: u8, str_buffer: string, parent_i: node_index_int, results: *[10][*:0]const u8, LCP: term_len_int, depq: *[4 + 1]node_index_int, depq_1_indexed: *[5 + 1]node_index_int, k: u8) u8 {
 
             // printDEPQ(self.nodes.items, self.scores.items, depq, depq_len_, str_buffer, results, k, "insert_cur_i");
             const cur_i = verticalSuccessor(nodes, LCP, parent_i);
@@ -775,10 +1164,10 @@ const DynSDT = struct {
                 if (SHOULD_PRINT) std.debug.print("{{ {:0>7}, {:0>7}, {:0>7}, {:0>7}, {:0>7}, {:0>7} }} \n", .{ depq_1_indexed[0], depq_1_indexed[1], depq_1_indexed[2], depq_1_indexed[3], depq_1_indexed[4], depq_1_indexed[5] });
             }
 
-            return insert_next_i(nodes, scores, depq_len_ - 1, str_buffer, results, LCP, depq, depq_1_indexed, k, half_topK);
+            return insert_next_i(nodes, scores, depq_len_ - 1, str_buffer, results, LCP, depq, depq_1_indexed, k);
         }
 
-        fn insert_next_i(nodes: []const Node, scores: []const score_int, depq_len: u8, str_buffer: string, results: *[10][*:0]const u8, LCP: term_len_int, depq: *[4 + 1]node_index_int, depq_1_indexed: *[5 + 1]node_index_int, k: u8, comptime half_topK: comptime_int) u8 {
+        fn insert_next_i(nodes: []const Node, scores: []const score_int, depq_len: u8, str_buffer: string, results: *[10][*:0]const u8, LCP: term_len_int, depq: *[4 + 1]node_index_int, depq_1_indexed: *[5 + 1]node_index_int, k: u8) u8 {
             // printDEPQ(self.nodes.items, self.scores.items, depq, depq_len, str_buffer, results, k, "insert_next_i");
 
             var cur_i = depq[depq_len];
@@ -811,7 +1200,7 @@ const DynSDT = struct {
                 // if (SHOULD_PRINT) printFinalState(depq_len, depq, next_i, k);
             }
 
-            return insert_cur_i(nodes, scores, depq_len, str_buffer, cur_i, results, LCP, depq, depq_1_indexed, l, half_topK);
+            return insert_cur_i(nodes, scores, depq_len, str_buffer, cur_i, results, LCP, depq, depq_1_indexed, l);
         }
 
         pub fn topKCompletionsToPrefix(self: *const SlicedDynSDT, noalias prefix: string_t, noalias results: *[10][*:0]const u8) u8 {
@@ -888,7 +1277,7 @@ const DynSDT = struct {
                     printDEPQ(nodes, scores, depq, depq_len, str_buffer, results, k, "main2");
                     // std.debug.print("depq_len: {}, k: {}, i: {}\n", .{ depq_len, k, i });
                     if (depq_len == (if (K_DEC) k else 10 - k))
-                        return insert_cur_i(nodes, scores, depq_len, str_buffer, cur_i, results, LCP, depq, &depq_1_indexed, k, half_topK);
+                        return insert_cur_i(nodes, scores, depq_len, str_buffer, cur_i, results, LCP, depq, &depq_1_indexed, k);
                 }
 
                 cur_i = verticalSuccessor(nodes, LCP, cur_i);
@@ -908,7 +1297,7 @@ const DynSDT = struct {
                     // std.debug.assert(depq_len <= 10 - k);
                     printDEPQ(nodes, scores, depq, depq_len + 1, str_buffer, results, k, "main1");
                     if (depq_len + 1 == (if (K_DEC) k else 10 - k))
-                        return insert_next_i(nodes, scores, depq_len, str_buffer, results, LCP, depq, &depq_1_indexed, k, half_topK);
+                        return insert_next_i(nodes, scores, depq_len, str_buffer, results, LCP, depq, &depq_1_indexed, k);
                 } else {
                     depq_len = std.math.sub(@TypeOf(depq_len), depq_len, 1) catch return if (K_DEC) 10 - k else k;
                 }
@@ -1430,15 +1819,17 @@ const DynSDT = struct {
 
                         switch (state) {
                             .str => {
-                                // const slice_len = std.math.cast(term_len_int, slice.len) orelse
-                                //     return error.@"String length could not fit in term_len_int";
+                                const slice_len = std.math.cast(term_len_int, sliced.len) orelse
+                                    return error.@"String length could not fit in term_len_int";
+
                                 nodes.ptr -= 1;
-                                nodes[0] = Node.init(chars_i);
+                                nodes[0] = Node.init(chars_i, slice_len);
                                 nodes.len -= 1;
 
-                                const first_char_ptr: *u8 = &chars[chars_i];
+                                var old_chars_i = chars_i;
                                 memcpy_chunk(chars, sliced, &chars_i);
-                                const first_char = first_char_ptr.*;
+                                const first_char = chars[old_chars_i];
+
                                 if (first_char != prev_first_char) {
                                     previous_relative_score = std.math.maxInt(score_int);
                                     are_scores_in_relative_order = are_scores_in_relative_order and ((starting_char_mask >> first_char) & 1) == 0;
@@ -1516,6 +1907,9 @@ const DynSDT = struct {
         // The sentinels point to this byte, and this guarantees that they will be at the very front of the `nodes` array
         // after we do a multilist sort. Note that this is guaranteed not to overwrite any real data because we overallocated
         chars[chars.len - 1] = 0;
+
+        for (score_list[2..], 0..) |*score, i|
+            score.* = @intCast(score_int, i);
 
         std.debug.print("        Read terms in {} ms. (", .{std.time.milliTimestamp() - start_time});
         printCommifiedNumber(@as(usize, buffer_requirements.num_term_pairs) - NUM_SENTINELS); // don't count sentinels
@@ -1963,7 +2357,7 @@ const DynSDT = struct {
                     // printDEPQ(nodes, scores, depq, depq_len + 1, str_buffer, results, k, "main2");
                     // std.debug.print("depq_len: {}, k: {}, i: {}\n", .{ depq_len, k, i });
                     if (depq_len == (if (K_DEC) k else 10 - k))
-                        return insert_cur_i(nodes, depq_len, str_buffer, cur, results, LCP, depq, &depq_1_indexed, k, half_topK);
+                        return insert_cur_i(nodes, depq_len, str_buffer, cur, results, LCP, depq, &depq_1_indexed, k);
                 }
 
                 while (true) { // finds vertical successor
@@ -1989,7 +2383,7 @@ const DynSDT = struct {
                         // std.debug.assert(depq_len <= 10 - k);
                         // printDEPQ(nodes, scores, depq, depq_len, str_buffer, results, k, "main1");
                         if (depq_len + 1 == (if (K_DEC) k else 10 - k))
-                            return insert_next_i(nodes, depq_len, str_buffer, results, LCP, depq, &depq_1_indexed, k, half_topK);
+                            return insert_next_i(nodes, depq_len, str_buffer, results, LCP, depq, &depq_1_indexed, k);
 
                         break;
                     }
@@ -2008,7 +2402,7 @@ const DynSDT = struct {
             }
         }
 
-        fn insert_cur_i(nodes: []const ArrayNode, depq_len_: u8, str_buffer: string, parent: BranchPointPtr, results: *[10][*:0]const u8, LCP: term_len_int, depq: *[4 + 1]DEPQBranchPointPtr, depq_1_indexed: *[5 + 1]DEPQBranchPointPtr, k: u8, comptime half_topK: comptime_int) u8 {
+        fn insert_cur_i(nodes: []const ArrayNode, depq_len_: u8, str_buffer: string, parent: BranchPointPtr, results: *[10][*:0]const u8, LCP: term_len_int, depq: *[4 + 1]DEPQBranchPointPtr, depq_1_indexed: *[5 + 1]DEPQBranchPointPtr, k: u8) u8 {
             outer: {
                 var cur = parent;
                 while (true) {
@@ -2029,10 +2423,10 @@ const DynSDT = struct {
                 depq_1_indexed[i] = ArrayDynSDT.DEPQBranchPointPtr{ .bp = cur, .score = cur_score };
             }
 
-            return insert_next_i(nodes, depq_len_ - 1, str_buffer, results, LCP, depq, depq_1_indexed, k, half_topK);
+            return insert_next_i(nodes, depq_len_ - 1, str_buffer, results, LCP, depq, depq_1_indexed, k);
         }
 
-        fn insert_next_i(nodes: []const ArrayNode, depq_len: u8, str_buffer: string, results: *[10][*:0]const u8, LCP: term_len_int, depq: *[4 + 1]DEPQBranchPointPtr, depq_1_indexed: *[5 + 1]DEPQBranchPointPtr, k: u8, comptime half_topK: comptime_int) u8 {
+        fn insert_next_i(nodes: []const ArrayNode, depq_len: u8, str_buffer: string, results: *[10][*:0]const u8, LCP: term_len_int, depq: *[4 + 1]DEPQBranchPointPtr, depq_1_indexed: *[5 + 1]DEPQBranchPointPtr, k: u8) u8 {
             var cur = depq[depq_len].bp;
 
             // If the DEPQ is full but only because we already have so many completions. E.g. if we found
@@ -2058,56 +2452,9 @@ const DynSDT = struct {
                 depq_1_indexed[i] = ArrayDynSDT.DEPQBranchPointPtr{ .bp = next, .score = next_score };
             }
 
-            return insert_cur_i(nodes, depq_len, str_buffer, cur, results, LCP, depq, depq_1_indexed, l, half_topK);
+            return insert_cur_i(nodes, depq_len, str_buffer, cur, results, LCP, depq, depq_1_indexed, l);
         }
     };
-
-    fn makeSubArrayDynSDT(sliced: SlicedDynSDT, array_nodes: []ArrayDynSDT.ArrayNode, cur_array_node_ptr: *node_index_int, root: node_index_int) ArrayDynSDT.BranchPointPtr {
-        const nodes = sliced.nodes;
-        const scores = sliced.scores;
-
-        var num_children: term_len_int = 0;
-        var cur_i = nodes[root].next;
-        while (cur_i != NULL) : (cur_i = nodes[cur_i].down) num_children += 1;
-
-        cur_i = nodes[root].next;
-        var bp: ArrayDynSDT.BranchPointPtr = undefined;
-        bp.ptr = cur_array_node_ptr.*;
-        cur_array_node_ptr.* += num_children;
-        bp.end_ptr = cur_array_node_ptr.*;
-
-        for (array_nodes[bp.ptr..][0..num_children]) |*node| {
-            node.* = ArrayDynSDT.ArrayNode{
-                .score = scores[cur_i],
-                .LCP = nodes[cur_i].LCP,
-                .term_start = nodes[cur_i].term_start,
-                .branch_points = makeSubArrayDynSDT(sliced, array_nodes, cur_array_node_ptr, cur_i),
-            };
-            cur_i = nodes[cur_i].down;
-        }
-
-        return bp;
-    }
-
-    pub fn makeArrayDynSDT(self: DynSDT, allocator: Allocator) !ArrayDynSDT {
-        const sliced = self.slice();
-        const array_nodes = try allocator.alloc(ArrayDynSDT.ArrayNode, sliced.nodes.len);
-        var cur_array_node_ptr: node_index_int = 0;
-        var roots = std.mem.zeroes([256]ArrayDynSDT.ArrayNode);
-
-        for (self.roots, 0..) |root, c| {
-            if (root != NULL) {
-                roots[c] = ArrayDynSDT.ArrayNode{
-                    .score = sliced.scores[root],
-                    .LCP = 1,
-                    .term_start = sliced.nodes[root].term_start,
-                    .branch_points = makeSubArrayDynSDT(sliced, array_nodes, &cur_array_node_ptr, root),
-                };
-            }
-        }
-
-        return ArrayDynSDT{ .roots = roots, .array_nodes = array_nodes, .str_buffer = sliced.str_buffer };
-    }
 
     // pub fn increaseScore(term: string, n: score_int) void {
     //     const nodes: []Node = self.nodes.items;
@@ -2257,89 +2604,13 @@ fn printInt(arr: u64) void {
     printArr(@bitCast([8]u8, arr));
 }
 
-pub fn main() !void {
-    var general_purpose_allocator: std.heap.GeneralPurposeAllocator(.{ .safety = true, .never_unmap = true, .retain_metadata = true }) = .{};
-    const allocator = general_purpose_allocator.allocator();
-
-    var trie = try DynSDT.initFromFile(allocator, "./terms_unsorted.txt"); // 95.6 MB in 224ms, that's ~427MB/s
-    defer trie.deinit(allocator);
-
-    const dynSDT = trie.slice();
-
-    const arr_trie: DynSDT.ArrayDynSDT = blk: {
-        const time_1 = std.time.nanoTimestamp();
-        const arr_trie = try trie.makeArrayDynSDT(allocator);
-        const time_2 = std.time.nanoTimestamp();
-
-        std.debug.print("Made array structure in {}\n", .{std.fmt.fmtDurationSigned(@intCast(i64, time_2 - time_1))});
-        break :blk arr_trie;
-    };
-
-    /////////////////////////////////////////////////////////////////////////////
-
-    const t1 = std.time.milliTimestamp();
-    const queries_buffer = try readFileIntoAlignedBuffer(allocator, "./queries.txt", 0, VEC_SIZE_FOR_POPCOUNT);
-    defer allocator.free(queries_buffer);
-
-    const queries = try splitAlignedBufferByChar(allocator, queries_buffer, '\n', VEC_SIZE_FOR_POPCOUNT);
-    defer allocator.free(queries);
-
-    std.debug.print("Read in ", .{});
-    printCommifiedNumber(queries.len);
-    std.debug.print(" query strings in {}ms.\n", .{std.time.milliTimestamp() - t1});
-
-    if (PREFIX_SAVE > 0) try trie.makeIndexOverQueries(allocator, queries);
-    // try trie.makeIndexOverQueries2(allocator, queries);
-
-    {
-        var results: [10][*:0]const u8 = undefined;
-        try std.testing.expect(10 == dynSDT.topKCompletionsToPrefix("dag ", &results));
-        for (
-            [_]struct { query: string_t, ans: [10]string }{
-                .{ .query = "s", .ans = [10]string{ "station", "school", "season", "song", "state", "south", "st", "series", "states", "summer" } },
-                .{ .query = "a", .ans = [10]string{ "and", "album", "at", "at the", "american", "a", "al", "airport", "athletics", "association" } },
-                .{ .query = "m", .ans = [10]string{ "men", "michael", "m", "museum", "music", "martin", "mary", "my", "mount", "mark" } },
-                .{ .query = "c", .ans = [10]string{ "county", "c", "championships", "cup", "church", "championship", "college", "charles", "city", "council" } },
-                .{ .query = "b", .ans = [10]string{ "basketball", "band", "born", "by", "battle", "b", "battle of", "british", "bridge", "baseball" } },
-                .{ .query = "p", .ans = [10]string{ "park", "politician", "paul", "peter", "party", "pennsylvania", "people", "p", "public", "power" } },
-                .{ .query = "t", .ans = [10]string{ "the", "team", "thomas", "township", "tv", "to", "tv series", "texas", "tour", "the united" } },
-                .{ .query = "d", .ans = [10]string{ "disambiguation", "de", "district", "david", "division", "d", "doubles", "daniel", "day", "del" } },
-                .{ .query = "r", .ans = [10]string{ "river", "railway", "railway station", "robert", "richard", "road", "route", "rugby", "r", "red" } },
-                .{ .query = "h", .ans = [10]string{ "house", "high", "high school", "henry", "historic", "hill", "hall", "hockey", "h", "history" } },
-                .{ .query = "l", .ans = [10]string{ "list", "list of", "league", "la", "lake", "love", "language", "l", "lee", "louis" } },
-                .{ .query = "g", .ans = [10]string{ "george", "games", "group", "game", "general", "grand", "green", "g", "great", "georgia" } },
-                .{ .query = "k", .ans = [10]string{ "king", "k", "kentucky", "kingdom", "kansas", "khan", "kevin", "kim", "karl", "kong" } },
-                .{ .query = "e", .ans = [10]string{ "election", "e", "european", "edward", "east", "el", "electoral", "elections", "earl", "episodes" } },
-                .{ .query = "f", .ans = [10]string{ "film", "football", "footballer", "for", "f", "football team", "f c", "footballer born", "frank", "fc" } },
-                .{ .query = "j", .ans = [10]string{ "john", "james", "j", "joseph", "jean", "jose", "jack", "jr", "jones", "joe" } },
-                .{ .query = "n", .ans = [10]string{ "national", "new", "north", "new york", "no", "novel", "new zealand", "n", "number", "northern" } },
-                .{ .query = "ma", .ans = [10]string{ "martin", "mary", "mark", "maria", "man", "magazine", "marie", "maryland", "management", "massachusetts" } },
-                .{ .query = "o", .ans = [10]string{ "of", "of the", "open", "olympics", "on", "ohio", "one", "old", "o", "on the" } },
-                .{ .query = "w", .ans = [10]string{ "wikipedia", "world", "women", "william", "west", "w", "white", "washington", "war", "wisconsin" } },
-                .{ .query = "i", .ans = [10]string{ "in", "in the", "i", "international", "island", "ii", "institute", "ice", "illinois", "indiana" } },
-                .{ .query = "v", .ans = [10]string{ "virginia", "voivodeship", "v", "van", "valley", "video", "von", "video game", "victoria", "village" } },
-                .{ .query = "appl", .ans = [10]string{ "apple", "applied", "application", "applications", "appleton", "applied sciences", "appleby", "apples", "appliance", "applegate" } },
-                .{ .query = "s ", .ans = [10]string{ "s route", "s tv", "s c", "s k", "s a", "s national", "s s", "s d", "s virgin", "s open" } },
-            },
-        ) |s| {
-            try std.testing.expect(10 == dynSDT.topKCompletionsToPrefix(s.query, &results));
-            for (s.ans, 0..) |str, i| try std.testing.expectEqualStrings(str, results[i][0..str.len]);
-            try std.testing.expect(10 == arr_trie.topKCompletionsToPrefix(s.query, &results));
-            for (s.ans, 0..) |str, i| try std.testing.expectEqualStrings(str, results[i][0..str.len]);
-        }
-    }
-
-    std.debug.print("Tests passed!\n", .{});
-
-    const TRY_PRECOMPUTING_LOCUS_NODES = false;
-
+inline fn speedTest(trie: anytype, queries: anytype) void {
     var results: [10][*:0]const u8 = undefined;
-
-    if (1 == 1) {
+    {
         var i: u32 = 0;
         // var num_queries: u32 = 1;
         var mask: u32 = 1;
-        for (0..5) |_|
+        for (0..0) |_|
             mask |= mask << 1;
         while (i < 21) : (i += 1) {
             const end_time = std.time.nanoTimestamp() + 1000000000;
@@ -2348,7 +2619,7 @@ pub fn main() !void {
             // while (true) {
             while (true) {
                 // const t1 = std.time.nanoTimestamp();
-                _ = dynSDT.topKCompletionsToPrefix(queries[k], &results);
+                _ = trie.topKCompletionsToPrefix(queries[k], &results);
                 // const t2 = std.time.nanoTimestamp();
                 // std.debug.print("Got answer in {}ns: ", .{t2 - t1});
 
@@ -2376,19 +2647,138 @@ pub fn main() !void {
     }
     // if (1 == 1) return;
 
-    if (1 == 1) {
+    {
         var NUM_QUERIES: u64 = 100000;
 
         while (NUM_QUERIES <= 1000000) : (NUM_QUERIES += 100000) {
             const start_time = std.time.milliTimestamp();
             var i: u32 = 0;
             while (i < NUM_QUERIES) : (i += 1) {
-                _ = dynSDT.topKCompletionsToPrefix(queries[i], &results);
+                _ = trie.topKCompletionsToPrefix(queries[i], &results);
             }
             const total_time = std.time.milliTimestamp() - start_time;
             std.debug.print("Performed {} queries in {}ms\n", .{ NUM_QUERIES, total_time });
         }
     }
+}
+
+pub fn main() !void {
+    var general_purpose_allocator: std.heap.GeneralPurposeAllocator(.{ .safety = true, .never_unmap = true, .retain_metadata = true }) = .{};
+    const allocator = general_purpose_allocator.allocator();
+
+    var trie = try DynSDT.initFromFile(allocator, "./terms_sorted2.txt"); // 95.6 MB in 224ms, that's ~427MB/s
+    defer trie.deinit(allocator);
+
+    const dynSDT = trie.slice();
+
+    const completion_trie: DynSDT.SlicedDynSDT.CompletionTrie = blk: {
+        const time_1 = std.time.nanoTimestamp();
+        const completion_trie = try dynSDT.makeCompletionTrie(allocator);
+        const time_2 = std.time.nanoTimestamp();
+        std.debug.print("Made Completion Trie in {}\n", .{std.fmt.fmtDurationSigned(@intCast(i64, time_2 - time_1))});
+        if (SHOULD_PRINT) {
+            var results: [10][*:0]const u8 = undefined;
+            std.debug.print("{}\n", .{completion_trie.topKCompletionsToPrefix("int", &results)});
+        }
+        break :blk completion_trie;
+    };
+
+    const arr_trie: DynSDT.ArrayDynSDT = blk: {
+        const time_1 = std.time.nanoTimestamp();
+        const arr_trie = try dynSDT.makeArrayDynSDT(allocator);
+        const time_2 = std.time.nanoTimestamp();
+        std.debug.print("Made array structure in {}\n", .{std.fmt.fmtDurationSigned(@intCast(i64, time_2 - time_1))});
+        break :blk arr_trie;
+    };
+
+    /////////////////////////////////////////////////////////////////////////////
+
+    const t1 = std.time.milliTimestamp();
+    const queries_buffer = try readFileIntoAlignedBuffer(allocator, "./queries.txt", 0, VEC_SIZE_FOR_POPCOUNT);
+    defer allocator.free(queries_buffer);
+
+    const queries = try splitAlignedBufferByChar(allocator, queries_buffer, '\n', VEC_SIZE_FOR_POPCOUNT);
+    defer allocator.free(queries);
+
+    std.debug.print("Read in ", .{});
+    printCommifiedNumber(queries.len);
+    std.debug.print(" query strings in {}ms.\n", .{std.time.milliTimestamp() - t1});
+
+    if (PREFIX_SAVE > 0) try trie.makeIndexOverQueries(allocator, queries);
+    // try trie.makeIndexOverQueries2(allocator, queries);
+
+    {
+        var results: [10][*:0]const u8 = undefined;
+        try std.testing.expect(10 == dynSDT.topKCompletionsToPrefix("dag ", &results));
+        for (
+            [_]struct { query: string_t, ans: [10]string }{
+                .{ .query = "w", .ans = [10]string{ "wikipedia", "world", "women", "william", "west", "w", "white", "washington", "war", "wisconsin" } },
+                .{ .query = "s", .ans = [10]string{ "station", "school", "season", "song", "state", "south", "st", "series", "states", "summer" } },
+                .{ .query = "a", .ans = [10]string{ "and", "album", "at", "at the", "american", "a", "al", "airport", "athletics", "association" } },
+                .{ .query = "m", .ans = [10]string{ "men", "michael", "m", "museum", "music", "martin", "mary", "my", "mount", "mark" } },
+                .{ .query = "c", .ans = [10]string{ "county", "c", "championships", "cup", "church", "championship", "college", "charles", "city", "council" } },
+                .{ .query = "b", .ans = [10]string{ "basketball", "band", "born", "by", "battle", "b", "battle of", "british", "bridge", "baseball" } },
+                .{ .query = "p", .ans = [10]string{ "park", "politician", "paul", "peter", "party", "pennsylvania", "people", "p", "public", "power" } },
+                .{ .query = "t", .ans = [10]string{ "the", "team", "thomas", "township", "tv", "to", "tv series", "texas", "tour", "the united" } },
+                .{ .query = "d", .ans = [10]string{ "disambiguation", "de", "district", "david", "division", "d", "doubles", "daniel", "day", "del" } },
+                .{ .query = "r", .ans = [10]string{ "river", "railway", "railway station", "robert", "richard", "road", "route", "rugby", "r", "red" } },
+                .{ .query = "h", .ans = [10]string{ "house", "high", "high school", "henry", "historic", "hill", "hall", "hockey", "h", "history" } },
+                .{ .query = "l", .ans = [10]string{ "list", "list of", "league", "la", "lake", "love", "language", "l", "lee", "louis" } },
+                .{ .query = "g", .ans = [10]string{ "george", "games", "group", "game", "general", "grand", "green", "g", "great", "georgia" } },
+                .{ .query = "k", .ans = [10]string{ "king", "k", "kentucky", "kingdom", "kansas", "khan", "kevin", "kim", "karl", "kong" } },
+                .{ .query = "e", .ans = [10]string{ "election", "e", "european", "edward", "east", "el", "electoral", "elections", "earl", "episodes" } },
+                .{ .query = "f", .ans = [10]string{ "film", "football", "footballer", "for", "f", "football team", "f c", "footballer born", "frank", "fc" } },
+                .{ .query = "j", .ans = [10]string{ "john", "james", "j", "joseph", "jean", "jose", "jack", "jr", "jones", "joe" } },
+                .{ .query = "n", .ans = [10]string{ "national", "new", "north", "new york", "no", "novel", "new zealand", "n", "number", "northern" } },
+                .{ .query = "ma", .ans = [10]string{ "martin", "mary", "mark", "maria", "man", "magazine", "marie", "maryland", "management", "massachusetts" } },
+                .{ .query = "o", .ans = [10]string{ "of", "of the", "open", "olympics", "on", "ohio", "one", "old", "o", "on the" } },
+                .{ .query = "i", .ans = [10]string{ "in", "in the", "i", "international", "island", "ii", "institute", "ice", "illinois", "indiana" } },
+                .{ .query = "v", .ans = [10]string{ "virginia", "voivodeship", "v", "van", "valley", "video", "von", "video game", "victoria", "village" } },
+                .{ .query = "appl", .ans = [10]string{ "apple", "applied", "application", "applications", "appleton", "applied sciences", "appleby", "apples", "appliance", "applegate" } },
+                .{ .query = "s ", .ans = [10]string{ "s route", "s tv", "s c", "s k", "s a", "s national", "s s", "s d", "s virgin", "s open" } },
+            },
+        ) |s| {
+            try std.testing.expect(10 == dynSDT.topKCompletionsToPrefix(s.query, &results));
+            for (s.ans, 0..) |str, i| try std.testing.expectEqualStrings(str, results[i][0..str.len]);
+            try std.testing.expect(10 == arr_trie.topKCompletionsToPrefix(s.query, &results));
+            for (s.ans, 0..) |str, i| try std.testing.expectEqualStrings(str, results[i][0..str.len]);
+            try std.testing.expect(10 == completion_trie.topKCompletionsToPrefix(s.query, &results));
+            for (s.ans, 0..) |str, i| try std.testing.expectEqualStrings(str, results[i][0..str.len]);
+        }
+    }
+
+    std.debug.print("Tests passed!\n", .{});
+
+    // for (queries) |query| {
+    //     var expected_results: [10][*:0]const u8 = undefined;
+    //     const expected_amt = dynSDT.topKCompletionsToPrefix(query, &expected_results);
+
+    //     var results: [10][*:0]const u8 = undefined;
+    //     try std.testing.expect(expected_amt == arr_trie.topKCompletionsToPrefix(query, &results));
+    //     for (expected_results[0..expected_amt], results[0..expected_amt]) |str1, str2| {
+    //         const len = std.mem.len(str1);
+    //         try std.testing.expectEqualStrings(str1[0..len :0], str2[0..len :0]);
+    //     }
+
+    //     try std.testing.expect(expected_amt == completion_trie.topKCompletionsToPrefix(query, &results));
+    //     for (expected_results[0..expected_amt], results[0..expected_amt]) |str1, str2| {
+    //         const len = std.mem.len(str1);
+    //         try std.testing.expectEqualStrings(str1[0..len :0], str2[0..len :0]);
+    //     }
+    // }
+
+    // std.debug.print("All queries returned the same results!!\n", .{});
+
+    const TRY_PRECOMPUTING_LOCUS_NODES = false;
+    const TEST_ARR_VERSIONS = false;
+    const SPEED_TEST_DEFAULT_IMPL = true;
+    _ = SPEED_TEST_DEFAULT_IMPL;
+
+    speedTest(&dynSDT, queries);
+    speedTest(&completion_trie, queries);
+    speedTest(&arr_trie, queries);
+
+    var results: [10][*:0]const u8 = undefined;
 
     if (TRY_PRECOMPUTING_LOCUS_NODES) {
         // precompute the locus nodes of all queries
@@ -2458,7 +2848,7 @@ pub fn main() !void {
         }
     }
 
-    {
+    if (TEST_ARR_VERSIONS) {
         var i: u32 = 0;
         // var num_queries: u32 = 1;
         var mask: u32 = 1;
@@ -2497,9 +2887,8 @@ pub fn main() !void {
             // num_queries *= 10;
         }
     }
-    // if (1 == 1) return;
 
-    {
+    if (TEST_ARR_VERSIONS) {
         var NUM_QUERIES: u64 = 100000;
 
         while (NUM_QUERIES <= 1000000) : (NUM_QUERIES += 100000) {
