@@ -2609,12 +2609,24 @@ inline fn speedTest(allocator: Allocator, trie: anytype, queries: anytype, compt
     const loci = blk: {
         if (precompute_locus) {
             const locus_t1 = std.time.nanoTimestamp();
-            const loci = try allocator.alloc(struct { node_index_int, term_len_int }, queries.len);
+            const loci = try allocator.alloc(struct { switch (@TypeOf(trie)) {
+                *const DynSDT.ArrayDynSDT, *DynSDT.ArrayDynSDT, DynSDT.ArrayDynSDT => *const DynSDT.ArrayDynSDT.ArrayNode,
+                else => node_index_int,
+            }, term_len_int }, queries.len);
             for (queries, loci) |query, *locus| {
-                const ret = trie.getLocusIndexForPrefix(query);
                 switch (@TypeOf(trie)) {
-                    *const DynSDT.SlicedDynSDT.CompletionTrie, *DynSDT.SlicedDynSDT.CompletionTrie, DynSDT.SlicedDynSDT.CompletionTrie => locus.* = .{ ret.index, ret.char_depth },
-                    else => locus.* = .{ ret, @intCast(term_len_int, query.len) },
+                    *const DynSDT.ArrayDynSDT, *DynSDT.ArrayDynSDT, DynSDT.ArrayDynSDT => {
+                        const ret = trie.getLocusNodeForPrefix(query);
+                        locus.* = .{ ret, @intCast(term_len_int, query.len) };
+                    },
+                    *const DynSDT.SlicedDynSDT.CompletionTrie, *DynSDT.SlicedDynSDT.CompletionTrie, DynSDT.SlicedDynSDT.CompletionTrie => {
+                        const ret = trie.getLocusIndexForPrefix(query);
+                        locus.* = .{ ret.index, ret.char_depth };
+                    },
+                    else => {
+                        const ret = trie.getLocusIndexForPrefix(query);
+                        locus.* = .{ ret, @intCast(term_len_int, query.len) };
+                    },
                 }
             }
             // DynSDT.SlicedDynSDT.CompletionTrie
@@ -2800,7 +2812,7 @@ pub fn main() !void {
 
     try speedTest(allocator, &dynSDT, queries, true);
     try speedTest(allocator, &completion_trie, queries, true);
-    // try speedTest(allocator, &arr_trie, queries, true);
+    try speedTest(allocator, &arr_trie, queries, true);
     // for (results) |result| std.debug.print("{s}\n", .{result});
 
     // std.debug.print("{} {}\n", .{ trie.locus_finding_time, trie.topk_search_time });
