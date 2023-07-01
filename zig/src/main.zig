@@ -24,8 +24,8 @@
 // I suppose one *could* dream up a similar scheme with the LCRS linked-lists, but that would be pretty crazy.
 
 const std = @import("std");
-// const MultiArrayList = std.MultiArrayList;
-const MultiArrayList = @import("MultiArrayList.zig").MultiArrayList;
+const MultiArrayList = std.MultiArrayList;
+// const MultiArrayList = @import("MultiArrayList.zig").MultiArrayList;
 const builtin = @import("builtin");
 const testing = std.testing;
 const Allocator = std.mem.Allocator;
@@ -135,9 +135,9 @@ fn memcpy(noalias dest: anytype, noalias source: anytype) void {
 /// Given a bitmask, will return a mask where the bits are filled in between.
 /// On modern x86 and aarch64 CPU's, it should have a latency of 3 and a throughput of 1.
 fn prefix_xor(bitmask: anytype) @TypeOf(bitmask) {
-    comptime std.debug.assert(std.math.isPowerOfTwo(@typeInfo(@TypeOf(bitmask)).Int.bits));
+    comptime std.debug.assert(std.math.isPowerOfTwo(@bitSizeOf(@TypeOf(bitmask))));
 
-    const has_native_carryless_multiply = switch (builtin.cpu.arch) {
+    const has_native_carryless_multiply = @bitSizeOf(@TypeOf(bitmask)) <= 64 and switch (builtin.cpu.arch) {
         // There should be no such thing with a processor supporting avx but not clmul.
         .x86_64 => std.Target.x86.featureSetHas(builtin.cpu.features, .pclmul) and
             std.Target.x86.featureSetHas(builtin.cpu.features, .avx2),
@@ -147,33 +147,33 @@ fn prefix_xor(bitmask: anytype) @TypeOf(bitmask) {
 
     if (@inComptime() or !has_native_carryless_multiply) {
         var x = bitmask;
-        inline for (0..(@typeInfo(std.math.Log2Int(@TypeOf(bitmask))).Int.bits)) |i|
+        inline for (0..(@bitSizeOf(std.math.Log2Int(@TypeOf(bitmask))))) |i|
             x ^= x << comptime (1 << i);
         return x;
     }
 
     // do a carryless multiply by all 1's,
     // adapted from zig/lib/std/crypto/ghash_polyval.zig
-    const x = @bitCast(u128, [2]u64{ @as(u64, bitmask), 0 });
-    const y = @bitCast(u128, @splat(16, @as(u8, 0xff)));
+    const x = @as(u128, @bitCast([2]u64{ @as(u64, bitmask), 0 }));
+    const y = @as(u128, @bitCast(@splat(16, @as(u8, 0xff))));
 
-    return @truncate(@TypeOf(bitmask), switch (builtin.cpu.arch) {
+    return @as(@TypeOf(bitmask), @truncate(switch (builtin.cpu.arch) {
         .x86_64 => asm (
             \\ vpclmulqdq $0x00, %[x], %[y], %[out]
             : [out] "=x" (-> @Vector(2, u64)),
-            : [x] "x" (@bitCast(@Vector(2, u64), x)),
-              [y] "x" (@bitCast(@Vector(2, u64), y)),
+            : [x] "x" (@as(@Vector(2, u64), @bitCast(x))),
+              [y] "x" (@as(@Vector(2, u64), @bitCast(y))),
         ),
 
         .aarch64 => asm (
             \\ pmull %[out].1q, %[x].1d, %[y].1d
             : [out] "=w" (-> @Vector(2, u64)),
-            : [x] "w" (@bitCast(@Vector(2, u64), x)),
-              [y] "w" (@bitCast(@Vector(2, u64), y)),
+            : [x] "w" (@as(@Vector(2, u64), @bitCast(x))),
+              [y] "w" (@as(@Vector(2, u64), @bitCast(y))),
         ),
 
         else => unreachable,
-    }[0]);
+    }[0]));
 }
 
 // fn longestCommonPrefixASM(str1: @Vector(16, u8), str2: @Vector(16, u8)) u32 {
@@ -191,6 +191,11 @@ inline fn pdep(src: u64, mask: u64) u64 {
         : [src] "r" (src),
           [mask] "r" (mask),
     );
+}
+
+inline fn maskEvenBits(bitstring: u64) u64 {
+    return bitstring & ~prefix_xor(bitstring);
+    // return pdep(0xaaaaaaaaaaaaaaaa, bitstring);
 }
 
 // inline fn pext(src: u64, mask: u64) u64 {
@@ -227,16 +232,11 @@ inline fn pdep(src: u64, mask: u64) u64 {
 //     return result;
 // }
 
-inline fn maskEvenBits(bitstring: u64) u64 {
-    return bitstring & ~prefix_xor(bitstring);
-    // return pdep(0xaaaaaaaaaaaaaaaa, bitstring);
-}
-
 /// Shifts and sign-extends the most significant bit.
 /// Returns an integer with all 1's or all 0's depending on the most significant bit.
 inline fn signExtend(x: anytype) @TypeOf(x) {
     const bits = @typeInfo(@TypeOf(x)).Int.bits;
-    return @bitCast(@TypeOf(x), @bitCast(std.meta.Int(.signed, bits), x) >> (bits - 1));
+    return @as(@TypeOf(x), @bitCast(@as(std.meta.Int(.signed, bits), @bitCast(x)) >> (bits - 1)));
 }
 
 pub const PackedCompareStringFlags = packed struct(u8) {
@@ -252,7 +252,7 @@ pub const PackedCompareStringFlags = packed struct(u8) {
 };
 
 pub inline fn _mm_cmpistri(str1: @Vector(16, u8), str2: @Vector(16, u8), comptime flags: PackedCompareStringFlags) u32 {
-    return asm (std.fmt.comptimePrint("pcmpistri ${d}, %[b], %[a]", .{@bitCast(u8, flags)})
+    return asm (std.fmt.comptimePrint("pcmpistri ${d}, %[b], %[a]", .{@as(u8, @bitCast(flags))})
         : [ret] "={ecx}" (-> u32),
         : [a] "x" (str1),
           [b] "x" (str2),
@@ -267,14 +267,14 @@ fn longestCommonPrefixASM(LCP_: term_len_int, noalias str1: string, noalias str2
     while (true) {
         const first_difference = _mm_cmpistri(str1[LCP..][0..16].*, str2[LCP..][0..16].*, PackedCompareStringFlags.LongestCommonPrefix);
         LCP += first_difference;
-        if (first_difference != 16) return @intCast(term_len_int, LCP);
+        if (first_difference != 16) return @as(term_len_int, @intCast(LCP));
     }
 }
 
 /// Calculates Longest Common Prefix between `term1` and `term2`, must not alias
 fn longestCommonPrefix(LCP: term_len_int, noalias term1: string, noalias term2: string) term_len_int {
     @setCold(STORE_4_TERM_BYTES_IN_NODE);
-    const len = @intCast(term_len_int, @min(term1.len, term2.len));
+    const len = @as(term_len_int, @intCast(@min(term1.len, term2.len)));
     var lcp = LCP;
     var str1_: string = term1;
     var str2_: string = term2;
@@ -287,7 +287,7 @@ fn longestCommonPrefix(LCP: term_len_int, noalias term1: string, noalias term2: 
         str2_ = str2_[first..];
         const vec1: @Vector(VEC_SIZE_TO_FIND_LCP, u8) = str1_[0..VEC_SIZE_TO_FIND_LCP].*;
         const vec2: @Vector(VEC_SIZE_TO_FIND_LCP, u8) = str2_[0..VEC_SIZE_TO_FIND_LCP].*;
-        const bitmask = @bitCast(std.meta.Int(.unsigned, VEC_SIZE_TO_FIND_LCP), vec1 != vec2);
+        const bitmask = @as(std.meta.Int(.unsigned, VEC_SIZE_TO_FIND_LCP), @bitCast(vec1 != vec2));
         first = @ctz(bitmask);
         lcp += first;
         if (first != VEC_SIZE_TO_FIND_LCP) break;
@@ -383,7 +383,7 @@ const DynSDT = struct {
 
                 if (is_last_iteration) {
                     if (consumable_characters == 0) break;
-                    const consumable_characters_aligned = std.mem.alignForward(consumable_characters, VEC_SIZE_FOR_POPCOUNT);
+                    const consumable_characters_aligned = std.mem.alignForward(usize, consumable_characters, VEC_SIZE_FOR_POPCOUNT);
                     strings_length -%= consumable_characters_aligned - consumable_characters;
                     @memset(file_buf[consumable_characters..][0..VEC_SIZE_FOR_POPCOUNT], '\x00');
                     consumable_characters = consumable_characters_aligned;
@@ -393,8 +393,8 @@ const DynSDT = struct {
                     const vec: @Vector(VEC_SIZE_FOR_POPCOUNT, u8) = file_buf[i * VEC_SIZE_FOR_POPCOUNT ..][0..VEC_SIZE_FOR_POPCOUNT].*;
 
                     // Note: we cannot just match digit characters because those characters can also appear in the string section.
-                    const tab_mask = @bitCast(uint, vec == @splat(VEC_SIZE_FOR_POPCOUNT, @as(u8, '\t')));
-                    const newline_mask = @bitCast(uint, vec == @splat(VEC_SIZE_FOR_POPCOUNT, @as(u8, '\n')));
+                    const tab_mask = @as(uint, @bitCast(vec == @splat(VEC_SIZE_FOR_POPCOUNT, @as(u8, '\t'))));
+                    const newline_mask = @as(uint, @bitCast(vec == @splat(VEC_SIZE_FOR_POPCOUNT, @as(u8, '\n'))));
                     const newline_tab_mask = tab_mask | newline_mask;
 
                     // (',' is our stand-in for \n, ' ' is our stand-in for \t)
@@ -549,7 +549,7 @@ const DynSDT = struct {
         next4chars: if (STORE_4_TERM_BYTES_IN_NODE) u32 else void,
 
         pub fn term(self: Node, buffer: string) [*:0]const u8 {
-            return @ptrCast([*:0]const u8, buffer[self.term_start..].ptr);
+            return @as([*:0]const u8, @ptrCast(buffer[self.term_start..].ptr));
             // return buffer[self.term_start..][0..self.term_len :0].ptr;
         }
 
@@ -565,7 +565,7 @@ const DynSDT = struct {
 
         pub fn initSentinel(term_start: usize) Node { // FIXME: probably make the parameter a `str_buf_int`
             return Node{
-                .term_start = @intCast(str_buf_int, term_start),
+                .term_start = @as(str_buf_int, @intCast(term_start)),
                 .term_len = 0,
                 // .@"down/term_len" = @"down/term_len"{ .term_len = 0 },
                 // .@"next/LCP" = .{ .LCP = std.math.maxInt(term_len_int) },
@@ -817,8 +817,8 @@ const DynSDT = struct {
                                     i = j;
                                 }
                             }
-                            depq_1_indexed[i + @boolToInt(has_empty_slots)] = .{ .index = next_i, .char_depth = char_depth };
-                            depq_len += @boolToInt(has_empty_slots);
+                            depq_1_indexed[i + @intFromBool(has_empty_slots)] = .{ .index = next_i, .char_depth = char_depth };
+                            depq_len += @intFromBool(has_empty_slots);
                             self.printDEPQ(nodes, depq, depq_len, results, if (K_DEC) 10 - k else k);
                         }
                         if (nodes[cur_i].down == NULL) break;
@@ -901,12 +901,12 @@ const DynSDT = struct {
                 if (last_min_LCP == 0 and selected_LCP == top_LCP) continue;
                 last_min_LCP = @max(top_LCP, last_min_LCP);
 
-                prev_down.* = @intCast(node_index_int, list.items.len);
+                prev_down.* = @as(node_index_int, @intCast(list.items.len));
                 prev_down = blk: {
                     const slot: *CompletionTrie.CompletionTrieNode = try list.addOne(allocator);
                     slot.* = CompletionTrie.CompletionTrieNode{
                         .term_start = root_term_start + last_min_LCP,
-                        .term_len = @intCast(term_len_int, selected_LCP - last_min_LCP),
+                        .term_len = @as(term_len_int, @intCast(selected_LCP - last_min_LCP)),
                         .score = score,
                         .next = prev_selected_i, // This is from the old tree, we fix it up in the recursive call
                     };
@@ -1007,7 +1007,7 @@ const DynSDT = struct {
             while (true) {
                 outer: {
                     const first = if (STORE_4_TERM_BYTES_IN_NODE)
-                        @intCast(u16, bits_in_common2(std.mem.readIntLittle(u32, term1.ptr[0..4]), nodes[cur_i].next4chars) / if (BITWISE) 1 else 8);
+                        @as(u16, @intCast(bits_in_common2(std.mem.readIntLittle(u32, term1.ptr[0..4]), nodes[cur_i].next4chars) / if (BITWISE) 1 else 8));
 
                     if (STORE_4_TERM_BYTES_IN_NODE) {
                         LCP += first;
@@ -1032,7 +1032,7 @@ const DynSDT = struct {
                             const a = std.mem.readIntLittle(std.meta.Int(.unsigned, bit_chunk_size), term1.ptr[0..8]);
                             const b = std.mem.readIntLittle(std.meta.Int(.unsigned, bit_chunk_size), term2[0..8]);
                             const lcp = bits_in_common2(a, b);
-                            LCP += @intCast(u16, lcp);
+                            LCP += @as(u16, @intCast(lcp));
                             term1 = term1[lcp / 8 ..];
                             if (0 == if (USE_NULL_TERMINATED_STRINGS) term1[0] else term1.len) return if (BITWISE) .{ cur_i, LCP } else cur_i;
                             if (bit_chunk_size != lcp) break;
@@ -1206,7 +1206,7 @@ const DynSDT = struct {
         pub fn topKCompletionsToPrefix(self: *const SlicedDynSDT, noalias prefix: string_t, noalias results: *[10][*:0]const u8) u8 {
             const locus_and_LCP = @call(.always_inline, getLocusIndexForPrefix, .{ self, prefix });
             const locus: node_index_int = if (BITWISE) locus_and_LCP[0] else locus_and_LCP;
-            const LCP: term_len_int = if (BITWISE) locus_and_LCP[1] else @intCast(term_len_int, prefix.len);
+            const LCP: term_len_int = if (BITWISE) locus_and_LCP[1] else @as(term_len_int, @intCast(prefix.len));
             return @call(.always_inline, topKCompletionsToLocus, .{ self, locus, LCP, results });
         }
 
@@ -1257,7 +1257,7 @@ const DynSDT = struct {
                 k = if (K_DEC) 10 - 3 else 3;
                 const loser_i = get_loser_i(next_i, old_i, cur_i);
                 if (loser_i != NULL) depq[0] = loser_i;
-                depq_len += @boolToInt(loser_i != NULL);
+                depq_len += @intFromBool(loser_i != NULL);
             }
 
             while (true) { // TODO: Maybe try inserting unconditionally? Insert both simultaneously?
@@ -1332,7 +1332,7 @@ const DynSDT = struct {
         var roots: [256]node_index_int = undefined;
 
         for (&roots) |*root| root.* = NULL;
-        var i = @intCast(node_index_int, nodes.len);
+        var i = @as(node_index_int, @intCast(nodes.len));
 
         NEXT_NODE: while (true) {
             i -= 1;
@@ -1358,7 +1358,7 @@ const DynSDT = struct {
             while (true) {
                 if (0 != if (USE_NULL_TERMINATED_STRINGS) term[0] else term.len) outer: {
                     const first = if (STORE_4_TERM_BYTES_IN_NODE)
-                        @intCast(u16, bits_in_common2(std.mem.readIntLittle(u32, term[0..4]), nodes[cur_i].next4chars) / if (BITWISE) 1 else 8);
+                        @as(u16, @intCast(bits_in_common2(std.mem.readIntLittle(u32, term[0..4]), nodes[cur_i].next4chars) / if (BITWISE) 1 else 8));
 
                     if (STORE_4_TERM_BYTES_IN_NODE) {
                         LCP += first;
@@ -1434,16 +1434,16 @@ const DynSDT = struct {
             var current_term_len: u8 = 0;
 
             while (true) {
-                const current_term_start_ptr = @ptrToInt(string_buffer.ptr);
+                const current_term_start_ptr = @intFromPtr(string_buffer.ptr);
 
                 while (buf[0] != '\t') : (buf = buf[1..]) {
                     string_buffer[0] = buf[0];
                     string_buffer = string_buffer[1..];
                 }
 
-                current_term_len = try std.math.add(u8, current_term_len, std.math.cast(u8, @ptrToInt(string_buffer.ptr) - current_term_start_ptr) orelse return error.Overflow);
+                current_term_len = try std.math.add(u8, current_term_len, std.math.cast(u8, @intFromPtr(string_buffer.ptr) - current_term_start_ptr) orelse return error.Overflow);
 
-                if (@ptrToInt(buf.ptr) >= @ptrToInt(sentinel.ptr)) {
+                if (@intFromPtr(buf.ptr) >= @intFromPtr(sentinel.ptr)) {
                     // if (@ptrToInt(sentinel.ptr) != @ptrToInt(&file_buf[MAIN_BUF_LEN])) {
                     // std.debug.print("[0] buf.len: {}, bytes_to_consume: {}\n", .{ buf.len, bytes_to_consume });
                     // std.debug.print("[0] bytes_to_consume: {}\nnode_list_i: {}\nbuf:{s}:\nptr1: {}\nptr2: {}\n", .{ bytes_to_consume, node_list_i, file_buf, @ptrToInt(buf.ptr), @ptrToInt(&file_buf[bytes_to_consume]) });
@@ -1459,7 +1459,7 @@ const DynSDT = struct {
                     continue;
                 }
 
-                const current_term_start = std.math.cast(str_buf_int, @ptrToInt(string_buffer.ptr) - string_buffer_start_ptr - current_term_len) orelse return error.tooManyCharactersInBuffer;
+                const current_term_start = std.math.cast(str_buf_int, @intFromPtr(string_buffer.ptr) - string_buffer_start_ptr - current_term_len) orelse return error.tooManyCharactersInBuffer;
                 string_buffer[0] = 0;
                 string_buffer = string_buffer[1..];
 
@@ -1488,7 +1488,7 @@ const DynSDT = struct {
                     }
                 }
 
-                if (@ptrToInt(buf.ptr) >= @ptrToInt(sentinel.ptr)) {
+                if (@intFromPtr(buf.ptr) >= @intFromPtr(sentinel.ptr)) {
                     // if (@ptrToInt(sentinel.ptr) != @ptrToInt(&file_buf[MAIN_BUF_LEN])) {
                     // if (bytes_to_consume != MAIN_BUF_LEN) {
                     // std.debug.print("[0] buf.len: {}, bytes_to_consume: {}\n", .{ buf.len, bytes_to_consume });
@@ -1569,7 +1569,7 @@ const DynSDT = struct {
             chunk.ptr += MEMCPY_STEP;
         }
 
-        chars_i.* += @intCast(@TypeOf(chars_i.*), chunk.len);
+        chars_i.* += @as(@TypeOf(chars_i.*), @intCast(chunk.len));
     }
 
     const MatchingState = enum(u1) {
@@ -1577,11 +1577,11 @@ const DynSDT = struct {
         int = 1,
 
         pub fn flip(self: *@This()) void {
-            self.* = @intToEnum(@This(), @enumToInt(self.*) ^ 1);
+            self.* = @as(@This(), @enumFromInt(@intFromEnum(self.*) ^ 1));
         }
 
         pub fn other(self: @This()) @This() {
-            return @intToEnum(@This(), @enumToInt(self) ^ 1);
+            return @as(@This(), @enumFromInt(@intFromEnum(self) ^ 1));
         }
     };
 
@@ -1607,16 +1607,16 @@ const DynSDT = struct {
 
         // slice.ptr = file_buf_main.ptr + prev_int_start
         file_slice.ptr = if (prev_int_start < 0)
-            file_buf_main.ptr - @intCast(usize, -prev_int_start)
+            file_buf_main.ptr - @as(usize, @intCast(-prev_int_start))
         else
-            file_buf_main.ptr + @intCast(usize, prev_int_start);
+            file_buf_main.ptr + @as(usize, @intCast(prev_int_start));
 
-        file_slice.len = @intCast(usize, int_end - prev_int_start);
+        file_slice.len = @as(usize, @intCast(int_end - prev_int_start));
         int_start.* = int_end + 1;
 
         switch (state) {
             .str => {
-                _ = @intCast(term_len_int, (chars_i_.* + file_slice.len) - term_start.*);
+                _ = @as(term_len_int, @intCast((chars_i_.* + file_slice.len) - term_start.*));
                 nodes.*[0] = Node.init(
                     std.math.cast(str_buf_int, term_start.*) orelse return error.@"The number of characters exceeded what can be stored in str_buf_int",
                     std.math.cast(term_len_int, (chars_i_.* + file_slice.len) - term_start.*) orelse return error.@"String length could not fit in term_len_int",
@@ -1653,7 +1653,7 @@ const DynSDT = struct {
                 if (new_score > std.math.maxInt(score_int) or file_slice.len == 0 or file_slice.len > SCORE_LEN)
                     return error.@"Number too long in file.";
 
-                scores.*[0] = @intCast(score_int, new_score);
+                scores.*[0] = @as(score_int, @intCast(new_score));
                 scores.* = scores.*[1..];
                 return @call(.always_tail, readHelper2, .{ file_buf_main, masks, int_start, term_start, nodes, scores, chars, chars_i_, k, state_global, state.other() });
             },
@@ -1669,7 +1669,7 @@ const DynSDT = struct {
     // we want to copy 543 to the beginning of the buffer, before the area where the data will be filled.
     // That way, we have the entire integer contiguously in the buffer which can be parsed all at once.
     const PRE_BUF_LEN = if (USE_SIMD_FOR_INIT)
-        @max(@boolToInt(SHOULD_ALIGN_BUFFER) + @as(term_len_int, std.math.maxInt(term_len_int)), MEMCPY_STEP, SCORE_VEC_SIZE * 2)
+        @max(@intFromBool(SHOULD_ALIGN_BUFFER) + @as(term_len_int, std.math.maxInt(term_len_int)), MEMCPY_STEP, SCORE_VEC_SIZE * 2)
     else
         0;
     const POST_BUF_LEN = if (USE_SIMD_FOR_INIT) VEC_SIZE_FOR_POPCOUNT else 2; // used to memset by `VEC_SIZE_FOR_POPCOUNT`-sized chunks
@@ -1727,7 +1727,7 @@ const DynSDT = struct {
             file_buf[MAIN_BUF_LEN] = '\t';
             file_buf[MAIN_BUF_LEN + 1] = '\n';
             var bytes_to_consume = try file.read(file_buf_main);
-            try readHelper1(&file, &file_buf, file_buf[bytes_to_consume..], &file_buf, chars, nodes, scores, @ptrToInt(chars.ptr), '\t');
+            try readHelper1(&file, &file_buf, file_buf[bytes_to_consume..], &file_buf, chars, nodes, scores, @intFromPtr(chars.ptr), '\t');
         }
 
         const ALLOW_ABSOLUTE_ORDER = false;
@@ -1754,7 +1754,7 @@ const DynSDT = struct {
 
                 if (is_last_iteration) {
                     if (consumable_characters == 0) break;
-                    const consumable_characters_aligned = std.mem.alignForwardGeneric(@TypeOf(consumable_characters), consumable_characters, VEC_SIZE);
+                    const consumable_characters_aligned = std.mem.alignForward(@TypeOf(consumable_characters), consumable_characters, VEC_SIZE);
                     @memset(file_buf_main[consumable_characters..][0..VEC_SIZE], '\x00');
                     consumable_characters = consumable_characters_aligned;
                 }
@@ -1765,8 +1765,8 @@ const DynSDT = struct {
 
                     for (file_buf_main_masks[0..chunks]) |*p| {
                         const vec: @Vector(VEC_SIZE, u8) = buf[0..VEC_SIZE].*;
-                        const tab_mask = @bitCast(uint, vec == @splat(VEC_SIZE, @as(u8, '\t')));
-                        const newline_mask = @bitCast(uint, vec == @splat(VEC_SIZE, @as(u8, '\n')));
+                        const tab_mask = @as(uint, @bitCast(vec == @splat(VEC_SIZE, @as(u8, '\t'))));
+                        const newline_mask = @as(uint, @bitCast(vec == @splat(VEC_SIZE, @as(u8, '\n'))));
                         const newline_tab_mask = tab_mask | newline_mask;
                         p.* = newline_tab_mask;
 
@@ -1788,7 +1788,7 @@ const DynSDT = struct {
                             std.debug.assert(term_mask == (term_newline_mask & ~newline_mask));
 
                             // TODO: Using VPCOMPRESSB, we could copy all strings directly into chars without needing
-                            const packed_vector = @select(u8, @bitCast(@Vector(VEC_SIZE, bool), term_mask), vec, vec);
+                            const packed_vector = @select(u8, @as(@Vector(VEC_SIZE, bool), @bitCast(term_mask)), vec, vec);
                             chars[chars_i..][0..VEC_SIZE].* = packed_vector;
                             chars_i += @popCount(term_mask);
                             // _mm512_mask_compress_epi8(vec, term_mask, chars.ptr + chars_i);
@@ -1805,17 +1805,17 @@ const DynSDT = struct {
                         bitmask &= bitmask - 1;
                         state.flip();
                     }) {
-                        const int_end = @intCast(isize, k * VEC_SIZE | @ctz(bitmask));
+                        const int_end = @as(isize, @intCast(k * VEC_SIZE | @ctz(bitmask)));
                         const prev_int_start = int_start;
                         int_start = int_end + 1;
                         var sliced: []u8 = undefined;
 
                         sliced.ptr = if (prev_int_start < 0)
-                            file_buf_main.ptr - @intCast(usize, -prev_int_start)
+                            file_buf_main.ptr - @as(usize, @intCast(-prev_int_start))
                         else
-                            file_buf_main.ptr + @intCast(usize, prev_int_start);
+                            file_buf_main.ptr + @as(usize, @intCast(prev_int_start));
 
-                        sliced.len = @intCast(usize, int_end - prev_int_start);
+                        sliced.len = @as(usize, @intCast(int_end - prev_int_start));
 
                         switch (state) {
                             .str => {
@@ -1844,7 +1844,7 @@ const DynSDT = struct {
                             },
 
                             .int => {
-                                sliced.len -= @boolToInt(sliced[sliced.len - 1] == '\r');
+                                sliced.len -= @intFromBool(sliced[sliced.len - 1] == '\r');
                                 if (sliced.len == 0 or sliced.len > SCORE_LEN) return error.@"Number too long in file.";
 
                                 var score: std.meta.Int(.unsigned, @typeInfo(score_int).Int.bits * 2) = 0;
@@ -1889,9 +1889,9 @@ const DynSDT = struct {
                 // This is kinda a compromise that works fine for both the scores and nodes.
                 // (Scores technically only need to copy a 16 byte chunk, and nodes could technically copy directly into chars)
                 // However, this strategy makes the hot loops simpler and as a consequence a lil' faster too.
-                var int_leftovers = file_buf_main[@intCast(usize, int_start)..];
+                var int_leftovers = file_buf_main[@as(usize, @intCast(int_start))..];
                 if (int_leftovers.len > PRE_BUF_LEN) return error.@"The number of overflow characters could not fit in term_len_int";
-                int_start = -@intCast(isize, int_leftovers.len);
+                int_start = -@as(isize, @intCast(int_leftovers.len));
 
                 // Should be rare to copy more than MEMCPY_STEP over.
                 // This requires us to have `std.math.maxInt(term_len_int)` padding at the front of our buffer
@@ -1909,7 +1909,7 @@ const DynSDT = struct {
         chars[chars.len - 1] = 0;
 
         for (score_list[2..], 0..) |*score, i|
-            score.* = @intCast(score_int, i);
+            score.* = @as(score_int, @intCast(i));
 
         std.debug.print("        Read terms in {} ms. (", .{std.time.milliTimestamp() - start_time});
         printCommifiedNumber(@as(usize, buffer_requirements.num_term_pairs) - NUM_SENTINELS); // don't count sentinels
@@ -1932,7 +1932,7 @@ const DynSDT = struct {
         std.debug.print("        Linked structure in {} ms. ({}.{:0>2} MB)\n        The total time was {} ms.\n", .{
             elapsed,
             MB_used,
-            new_bytes.len / 100000 - MB_used * 10 + @boolToInt(new_bytes.len % 100000 >= 50000),
+            new_bytes.len / 100000 - MB_used * 10 + @intFromBool(new_bytes.len % 100000 >= 50000),
             finish_time - start_time,
         });
 
@@ -2043,7 +2043,7 @@ const DynSDT = struct {
         errdefer map.deinit(allocator);
 
         var count: usize = 0;
-        for (queries) |query| count += @boolToInt(query.len <= PREFIX_SAVE);
+        for (queries) |query| count += @intFromBool(query.len <= PREFIX_SAVE);
 
         try map.ensureTotalCapacity(allocator, std.math.cast(u32, count *| 16) orelse return error.TooManyQueries);
         std.debug.print("count: {}\n", .{count});
@@ -2079,7 +2079,7 @@ const DynSDT = struct {
         //
 
         var count: usize = 0;
-        for (queries) |query| count += @boolToInt(query.len <= PREFIX_SAVE);
+        for (queries) |query| count += @intFromBool(query.len <= PREFIX_SAVE);
 
         const slices = self.data.multilist.slice();
         const nodes: []const Node = slices.items(.node);
@@ -2210,7 +2210,7 @@ const DynSDT = struct {
             }
 
             pub fn term(self: ArrayNode, buffer: string) [*:0]const u8 {
-                return @ptrCast([*:0]const u8, buffer[self.term_start..].ptr);
+                return @as([*:0]const u8, @ptrCast(buffer[self.term_start..].ptr));
             }
 
             pub fn is_empty(self: *const ArrayNode) bool {
@@ -2244,7 +2244,7 @@ const DynSDT = struct {
                         const a = std.mem.readIntLittle(std.meta.Int(.unsigned, bit_chunk_size), term1.ptr[0..8]);
                         const b = std.mem.readIntLittle(std.meta.Int(.unsigned, bit_chunk_size), term2[0..8]);
                         const lcp = bits_in_common2(a, b);
-                        LCP += @intCast(u16, lcp);
+                        LCP += @as(u16, @intCast(lcp));
                         term1 = term1[lcp / 8 ..];
                         if (0 == if (USE_NULL_TERMINATED_STRINGS) term1[0] else term1.len) return if (BITWISE) .{ cur_node, LCP } else cur_node;
                         if (bit_chunk_size != lcp) break;
@@ -2270,7 +2270,7 @@ const DynSDT = struct {
         pub fn topKCompletionsToPrefix(self: *const ArrayDynSDT, noalias prefix: string_t, noalias results: *[10][*:0]const u8) u8 {
             const locus_and_LCP = @call(.always_inline, getLocusNodeForPrefix, .{ self, prefix });
             const locus = if (BITWISE) locus_and_LCP[0] else locus_and_LCP;
-            const LCP = if (BITWISE) locus_and_LCP[1] else @intCast(term_len_int, prefix.len);
+            const LCP = if (BITWISE) locus_and_LCP[1] else @as(term_len_int, @intCast(prefix.len));
             return @call(.always_inline, topKCompletionsToLocus, .{ self, locus, LCP, results });
         }
 
@@ -2495,7 +2495,7 @@ fn readFileIntoAlignedBuffer(allocator: Allocator, file_path: string, comptime o
 
     const bytes_to_allocate = try file.getEndPos();
     const overaligned_size = try std.math.add(u64, bytes_to_allocate, @as(u64, over_alloc) + (alignment - 1));
-    const buffer = try allocator.alloc(u8, std.mem.alignBackwardGeneric(u64, overaligned_size, alignment));
+    const buffer = try allocator.alloc(u8, std.mem.alignBackward(u64, overaligned_size, alignment));
 
     var cur = buffer[0..bytes_to_allocate];
     while (true) {
@@ -2511,9 +2511,9 @@ fn countCharInAlignedBuffer(buffer: string, comptime char: u8, comptime alignmen
     var i: usize = 0;
 
     if (alignment == 1) {
-        while (i < buffer.len) : (i += 1) count += @boolToInt(buffer[i] == char);
+        while (i < buffer.len) : (i += 1) count += @intFromBool(buffer[i] == char);
     } else while (i < buffer.len) : (i += alignment)
-        count += @popCount(@bitCast(std.meta.Int(.unsigned, alignment), @as(@Vector(alignment, u8), buffer[i..][0..alignment].*) == @splat(alignment, char)));
+        count += @popCount(@as(std.meta.Int(.unsigned, alignment), @bitCast(@as(@Vector(alignment, u8), buffer[i..][0..alignment].*) == @splat(alignment, char))));
 
     return count;
 }
@@ -2540,7 +2540,7 @@ fn splitAlignedBufferByChar(allocator: Allocator, buffer: []u8, comptime char: u
         }
     } else while (i < buffer.len) : (i += VEC_SIZE) {
         const vec: @Vector(VEC_SIZE, u8) = buffer[i..][0..VEC_SIZE].*;
-        var delimiters = @bitCast(std.meta.Int(.unsigned, VEC_SIZE), vec == @splat(VEC_SIZE, char));
+        var delimiters = @as(std.meta.Int(.unsigned, VEC_SIZE), @bitCast(vec == @splat(VEC_SIZE, char)));
 
         // this iterates through each `char` in the vector by unsetting the lowest set bit after each iteration
         while (delimiters != 0) : (delimiters &= delimiters - 1) { // translates to the `blsr` instruction on x86
@@ -2557,7 +2557,7 @@ fn splitAlignedBufferByChar(allocator: Allocator, buffer: []u8, comptime char: u
 
 fn has_zero_byte(v: anytype) @TypeOf(v) {
     const num_bits = switch (@typeInfo(@TypeOf(v))) {
-        .Int => |i| i.bits + @boolToInt(i.bits == 0),
+        .Int => |i| i.bits + @intFromBool(i.bits == 0),
         else => 1,
     };
     if (num_bits % 8 != 0) @compileError("has_zero_byte must be called with an integer argument with a number of bits divisible by 8");
@@ -2593,7 +2593,7 @@ fn bits_in_common2(x: anytype, y: @TypeOf(x)) @TypeOf(x) {
 }
 
 fn printArr(arr: [8]u8) void {
-    for (@bitCast([8]u8, @byteSwap(@bitCast(u64, arr))), 0..) |c, i| {
+    for (@as([8]u8, @bitCast(@byteSwap(@as(u64, @bitCast(arr))))), 0..) |c, i| {
         if (i != 0) std.debug.print("_", .{});
         std.debug.print("{b:0>8}", .{c});
     }
@@ -2601,7 +2601,7 @@ fn printArr(arr: [8]u8) void {
 }
 
 fn printInt(arr: u64) void {
-    printArr(@bitCast([8]u8, arr));
+    printArr(@as([8]u8, @bitCast(arr)));
 }
 
 inline fn speedTest(allocator: Allocator, trie: anytype, queries: anytype, comptime precompute_locus: bool) !void {
@@ -2617,7 +2617,7 @@ inline fn speedTest(allocator: Allocator, trie: anytype, queries: anytype, compt
                 switch (@TypeOf(trie)) {
                     *const DynSDT.ArrayDynSDT, *DynSDT.ArrayDynSDT, DynSDT.ArrayDynSDT => {
                         const ret = trie.getLocusNodeForPrefix(query);
-                        locus.* = .{ ret, @intCast(term_len_int, query.len) };
+                        locus.* = .{ ret, @as(term_len_int, @intCast(query.len)) };
                     },
                     *const DynSDT.SlicedDynSDT.CompletionTrie, *DynSDT.SlicedDynSDT.CompletionTrie, DynSDT.SlicedDynSDT.CompletionTrie => {
                         const ret = trie.getLocusIndexForPrefix(query);
@@ -2625,13 +2625,13 @@ inline fn speedTest(allocator: Allocator, trie: anytype, queries: anytype, compt
                     },
                     else => {
                         const ret = trie.getLocusIndexForPrefix(query);
-                        locus.* = .{ ret, @intCast(term_len_int, query.len) };
+                        locus.* = .{ ret, @as(term_len_int, @intCast(query.len)) };
                     },
                 }
             }
             // DynSDT.SlicedDynSDT.CompletionTrie
             const locus_t2 = std.time.nanoTimestamp();
-            std.debug.print("Found the locus node for all queries in {}\n", .{std.fmt.fmtDurationSigned(@intCast(i64, locus_t2 - locus_t1))});
+            std.debug.print("Found the locus node for all queries in {}\n", .{std.fmt.fmtDurationSigned(@as(i64, @intCast(locus_t2 - locus_t1)))});
 
             break :blk loci;
         }
@@ -2716,7 +2716,7 @@ pub fn main() !void {
         const time_1 = std.time.nanoTimestamp();
         const completion_trie = try dynSDT.makeCompletionTrie(allocator);
         const time_2 = std.time.nanoTimestamp();
-        std.debug.print("Made Completion Trie in {}\n", .{std.fmt.fmtDurationSigned(@intCast(i64, time_2 - time_1))});
+        std.debug.print("Made Completion Trie in {}\n", .{std.fmt.fmtDurationSigned(@as(i64, @intCast(time_2 - time_1)))});
         if (SHOULD_PRINT) {
             var results: [10][*:0]const u8 = undefined;
             std.debug.print("{}\n", .{completion_trie.topKCompletionsToPrefix("int", &results)});
@@ -2728,7 +2728,7 @@ pub fn main() !void {
         const time_1 = std.time.nanoTimestamp();
         const arr_trie = try dynSDT.makeArrayDynSDT(allocator);
         const time_2 = std.time.nanoTimestamp();
-        std.debug.print("Made array structure in {}\n", .{std.fmt.fmtDurationSigned(@intCast(i64, time_2 - time_1))});
+        std.debug.print("Made array structure in {}\n", .{std.fmt.fmtDurationSigned(@as(i64, @intCast(time_2 - time_1)))});
         break :blk arr_trie;
     };
 
@@ -2744,6 +2744,8 @@ pub fn main() !void {
     std.debug.print("Read in ", .{});
     printCommifiedNumber(queries.len);
     std.debug.print(" query strings in {}ms.\n", .{std.time.milliTimestamp() - t1});
+
+    std.debug.print("prefix_xor: {b:0>64}\n", .{prefix_xor(@as(u64, 0b0010100000010000100000000100010000001000000100000010000001000000))});
 
     if (PREFIX_SAVE > 0) try trie.makeIndexOverQueries(allocator, queries);
     // try trie.makeIndexOverQueries2(allocator, queries);
