@@ -903,6 +903,26 @@ function createButton(className, onClick)
 	return button
 }
 
+function createMinimize(onClick)
+{
+	const button = document.createElement("button")
+	button.className = "minimize"
+	button.type = "button"
+	button.addEventListener('click', onClick)
+
+	button.innerHTML = `<svg height="24" width="24" viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg"><g><path d="M30,60H6A6,6,0,0,0,6,72H24V90a6,6,0,0,0,12,0V66A5.9966,5.9966,0,0,0,30,60Z"/><path d="M90,60H66a5.9966,5.9966,0,0,0-6,6V90a6,6,0,0,0,12,0V72H90a6,6,0,0,0,0-12Z"/><path d="M66,36H90a6,6,0,0,0,0-12H72V6A6,6,0,0,0,60,6V30A5.9966,5.9966,0,0,0,66,36Z"/><path d="M30,0a5.9966,5.9966,0,0,0-6,6V24H6A6,6,0,0,0,6,36H30a5.9966,5.9966,0,0,0,6-6V6A5.9966,5.9966,0,0,0,30,0Z"/></g></svg>`
+
+	// const svg = document.createElement("svg")
+	// svg.height = "24"
+	// svg.width = "24"
+	// svg.viewBox = "0 0 96 96"
+	// svg.xmlns = "http://www.w3.org/2000/svg";
+
+	// svg.innerHTML = `<g><path d="M30,60H6A6,6,0,0,0,6,72H24V90a6,6,0,0,0,12,0V66A5.9966,5.9966,0,0,0,30,60Z"/><path d="M90,60H66a5.9966,5.9966,0,0,0-6,6V90a6,6,0,0,0,12,0V72H90a6,6,0,0,0,0-12Z"/><path d="M66,36H90a6,6,0,0,0,0-12H72V6A6,6,0,0,0,60,6V30A5.9966,5.9966,0,0,0,66,36Z"/><path d="M30,0a5.9966,5.9966,0,0,0-6,6V24H6A6,6,0,0,0,6,36H30a5.9966,5.9966,0,0,0,6-6V6A5.9966,5.9966,0,0,0,30,0Z"/></g>`
+
+	return button
+}
+
 function resetGraph(context)
 {
 	for (const node of context.nodes)
@@ -1957,6 +1977,7 @@ for (let i = 0, last = controlPanes.length - 1; i <= last; i++)
 	if (i !== 0)
 		controlPanes[i].insertAdjacentElement("beforeend", createButton("left", previousPane))
 
+
 	if (i !== last)
 	{
 		state_transitions[i + 1] ||= function() {}
@@ -1966,6 +1987,16 @@ for (let i = 0, last = controlPanes.length - 1; i <= last; i++)
 		if (START_STATE > i)
 			nextPane()
 	}
+
+	controlPanes[i].insertAdjacentElement("beforeend", createMinimize(() => {
+		for (let j = 0; j < controlPanes.length; j++) {
+			if (controlPanes[j].classList.contains("minimized-control-pane")) {
+				controlPanes[j].classList.remove("minimized-control-pane")
+			} else {
+				controlPanes[j].classList.add("minimized-control-pane")
+			}
+		}
+	}));
 }
 window.addEventListener("keydown", function (event) {
 	if (event.defaultPrevented) {

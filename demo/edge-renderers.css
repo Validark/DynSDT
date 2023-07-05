@@ -2,7 +2,7 @@
 	font-size: 1.1em !important;
 } */
 
-div > i {
+div>i {
 	font-size: 13pt;
 }
 
@@ -49,12 +49,33 @@ span.complexity {
 	line-height: 1.25;
 }
 
-@media (max-width: 17in) {
-	/* only for screens that aren't as wide */
-	.control-pane { left: auto; right: 10px; }
+.minimize {
+	background-color: transparent;
+	border-color: transparent;
+	bottom: 4px;
+	right: 100px;
+	position: absolute;
 }
 
-.control-pane > div {
+.minimized-control-pane {
+	width: 140px;
+	height: 50px;
+}
+
+.minimized-control-pane>:not(button) {
+	opacity: 0;
+}
+
+@media (max-width: 17in) {
+
+	/* only for screens that aren't as wide */
+	.control-pane {
+		left: auto;
+		right: 10px;
+	}
+}
+
+.control-pane>div {
 	margin: 10px;
 	overflow-x: hidden;
 }
@@ -137,7 +158,8 @@ h2.underline {
 	list-style: none;
 }
 
-button.right, button.left {
+button.right,
+button.left {
 	color: var(--TEXT_COLOR);
 	bottom: -5px;
 	right: 10px;
@@ -149,9 +171,11 @@ button.right, button.left {
 	background-color: rgb(0, 0, 0, 0);
 }
 
-button.left { right: 52px; }
+button.left {
+	right: 52px;
+}
 
-div#container > div#intro > button.right {
+div#container>div#intro>button.right {
 	font-size: 6em;
 	height: initial;
 	width: initial;
@@ -159,15 +183,22 @@ div#container > div#intro > button.right {
 }
 
 .textual-content {
-	padding: 0px 12px; margin-left: 10px; margin-right: 10px;
+	padding: 0px 12px;
+	margin-left: 10px;
+	margin-right: 10px;
 }
 
 a.link {
 	color: inherit
 }
 
-button.left:before { content: '⇦' }
-button.right:before { content: '⇨' }
+button.left:before {
+	content: '⇦'
+}
+
+button.right:before {
+	content: '⇨'
+}
 
 p.indented {
 	margin-right: 1em;
