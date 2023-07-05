@@ -60,6 +60,7 @@ span.complexity {
 .minimized-control-pane {
 	width: 140px;
 	height: 50px;
+	bottom: 10px;
 }
 
 .minimized-control-pane>:not(button) {

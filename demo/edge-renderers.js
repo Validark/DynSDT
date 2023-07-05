@@ -1809,7 +1809,6 @@ state_transitions.push(function() {
 	list_node.size = NODE_SIZE
 
 	s.refresh()
-
 })
 
 {
@@ -1988,15 +1987,17 @@ for (let i = 0, last = controlPanes.length - 1; i <= last; i++)
 			nextPane()
 	}
 
-	controlPanes[i].insertAdjacentElement("beforeend", createMinimize(() => {
-		for (let j = 0; j < controlPanes.length; j++) {
-			if (controlPanes[j].classList.contains("minimized-control-pane")) {
-				controlPanes[j].classList.remove("minimized-control-pane")
-			} else {
-				controlPanes[j].classList.add("minimized-control-pane")
+	if (i !== 0) {
+		controlPanes[i].insertAdjacentElement("beforeend", createMinimize(() => {
+			for (let j = 0; j < controlPanes.length; j++) {
+				if (controlPanes[j].classList.contains("minimized-control-pane")) {
+					controlPanes[j].classList.remove("minimized-control-pane")
+				} else {
+					controlPanes[j].classList.add("minimized-control-pane")
+				}
 			}
-		}
-	}));
+		}));
+	}
 }
 window.addEventListener("keydown", function (event) {
 	if (event.defaultPrevented) {
