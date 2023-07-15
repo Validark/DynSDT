@@ -71,7 +71,7 @@
 
     context.save();
 
-    
+
     if (edge.active) {
       context.font = [
         settings('activeFontStyle'),

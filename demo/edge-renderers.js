@@ -11,25 +11,24 @@ let WAIT_TIME = 0
 // Don't look at this code. It is not polished or maintainable... hahaha
 
 let decomposed_id = 0;
-{
-	function reverseDecompose(str)
-	{
-		if ("wikipedia$".startsWith(str))
-			return "wikipedia$"
-		if ("list$".startsWith(str))
-			return "list$"
-		if ("list of$".startsWith(str))
-			return "list of$"
-		if ("of$".startsWith(str))
-			return "of$"
-		if ("the$".startsWith(str))
-			return "the$"
-		if ("in$".startsWith(str))
-			return "in$"
-	}
+function reverseDecompose(str) {
+	if ("wikipedia$".startsWith(str))
+		return "wikipedia$"
+	if ("list$".startsWith(str))
+		return "list$"
+	if ("list of$".startsWith(str))
+		return "list of$"
+	if ("of$".startsWith(str))
+		return "of$"
+	if ("the$".startsWith(str))
+		return "the$"
+	if ("in$".startsWith(str))
+		return "in$"
+}
 
-	function isUndecomposableNode(node)
-	{
+
+{
+	function isUndecomposableNode(node) {
 		return !reverseDecompose(node.id)
 	}
 
@@ -655,6 +654,42 @@ filter
 	.edgesBy(isUnsortedEdge, "unsortedEdges")
 	.nodesBy(isNonDecomposedNode, "nonDecomposedNodes")
 	.apply()
+
+
+{
+	const map = new Map();
+	const ids = ["list ", "w", "l", "o", "t", "i"];
+
+	for (const node of nonDecomposedNodes) {
+		if (ids.includes(node.id))
+			map.set(node.id, node.LCRS_y);
+	}
+
+	for (const node of nonDecomposedNodes) {
+		let id = node.id;
+		if (id === "[ROOT]") {
+			id = "wikipedia$";
+			console.log(node)
+		} else if (id === "w") {
+			id = "lis"
+		}
+
+		if ("wikipedia$".startsWith(id) || "list$".startsWith(id) || "of$".startsWith(id) || "the$".startsWith(id) || "in$".startsWith(id)) {
+			node.decomposed_intermediate_y = map.get(id[0]);
+		} else if ("list of$".startsWith(id)) {
+			node.decomposed_intermediate_y = map.get("list ");
+		} else {
+			node.decomposed_intermediate_y = node.LCRS_y;
+		}
+
+		if ("wikipediocracy" === node.id) {
+			node.decomposed_intermediate_x = nonDecomposedNodes.find(n => n.id === "wikipro").LCRS_x;
+		} else {
+			node.decomposed_intermediate_x = node.LCRS_x;
+		}
+	}
+}
+
 
 // console.log(decomposedEdges)
 
@@ -1448,16 +1483,14 @@ state_transitions.push(function(wentBackwards)
 	s.refresh()
 })
 
-state_transitions.push(function() {})
+state_transitions.push(function() {
+	highlightTreeForSources(new Set(path), sortedContext, "the$")
+	s.refresh()
+})
+
 state_transitions.push(function(wentBackwards) {
 	// Further Improvement
-
-	// for (const node of decomposedNodes) // we set these because it affects auto-zoom
-	// {
-	// 	node.x = node.decomposed_x
-	// 	node.y = node.decomposed_y
-	// }
-
+	highlightTreeForSources(new Set(path), sortedContext, "the$")
 	if (wentBackwards)
 	{
 		for (const node of nonDecomposedNodes) {
@@ -1465,7 +1498,6 @@ state_transitions.push(function(wentBackwards) {
 			node.y = node.LCRS_y
 		}
 
-		highlightTreeForSources(new Set(path), sortedContext, "the$")
 		filter
 			.undo("decomposedEdges")
 			.edgesBy(isSortedEdge, "sortedEdges")
@@ -1479,10 +1511,30 @@ state_transitions.push(function(wentBackwards) {
 	s.refresh()
 })
 
-state_transitions.push(function(wentBackwards)
-{ //The Dynamic Decomposed Trie
-	if (!wentBackwards)
+const dashed_arrows = sortedContext.edges.filter(edge => edge.type === "dashedArrow")
+const reversed_decomposed_edges =  dashed_arrows.filter(edge => reverseDecompose(edge.source));
+
+// for (const edge of sortedContext.edges) {
+// 	edge.targetLabel = 2;
+// }
+
+let completed = false;
+
+const onComplete = function(wentBackwards) {
+	if (completed) return;
+	completed = true;
 	{
+		for (const node of sortedContext.nodes) {
+			node.x = node.decomposed_intermediate_x;
+			node.y = node.decomposed_intermediate_y;
+		}
+		for (const edge of reversed_decomposed_edges) {
+			edge.label = edge.label_backup;
+		}
+
+		for (const edge of dashed_arrows)
+			edge.type = edge.backup_type;
+
 		for (const node of s.graph.nodes())
 			node.color = ORIGINAL_COLOR
 
@@ -1537,6 +1589,42 @@ state_transitions.push(function(wentBackwards)
 				// onComplete: function() {}
 			}
 		);
+	}
+
+	s.refresh();
+}
+
+state_transitions.push(function(wentBackwards) {
+	// The Dynamic Decomposed Trie
+	// for (const node of decomposedNodes) // we set these because it affects auto-zoom
+	// {
+	// 	node.x = node.decomposed_x
+	// 	node.y = node.decomposed_y
+	// }
+
+	for (const node of sortedContext.nodes) {
+		node.color = ORIGINAL_COLOR;
+		node.forceLabel = 0;
+	}
+
+	for (const edge of sortedContext.edges) {
+		edge.active_color = ORIGINAL_COLOR;
+	}
+
+	if (wentBackwards) {
+		sigma.plugins.animate(
+			s,
+			{
+				x: "LCRS_x",
+				y: "LCRS_y",
+			},
+			{
+				nodes: decomposedNodes,
+				// easing: 'cubicInOut',
+				duration: wentBackwards ? undefined : 1,
+				// onComplete: function() {}
+			}
+		);
 
 		setTimeout(function()
 		{
@@ -1554,11 +1642,122 @@ state_transitions.push(function(wentBackwards)
 				}
 			);
 		}, WAIT_TIME)
+	} else {
+		for (const edge of dashed_arrows) {
+			edge.backup_type = edge.type;
+			edge.type = "arcArrow";
+		}
+
+		for (const edge of reversed_decomposed_edges) {
+			edge.label_backup = edge.label;
+			edge.label = null;
+		}
+
+
+		setTimeout(function()
+		{
+			completed = false;
+			sigma.plugins.animate(
+				s,
+				{
+					x: "decomposed_intermediate_x",
+					y: "decomposed_intermediate_y",
+					// size: prefix + 'size',
+					// color: prefix + 'color'
+				},
+				{
+					nodes: sortedContext.nodes,
+					// easing: 'cubicInOut',
+					// duration: 500,
+					onComplete
+				}
+			);
+		}, WAIT_TIME)
 	}
+	s.refresh()
 })
+
+// state_transitions.push(function(wentBackwards)
+// { //The Dynamic Decomposed Trie
+// 	if (!wentBackwards)
+// 	{
+// 		for (const node of s.graph.nodes())
+// 			node.color = ORIGINAL_COLOR
+
+// 		resetGraph(sortedContext)
+// 		filter
+// 			.undo("sortedEdges")
+// 			.edgesBy(isDecomposedEdge, "decomposedEdges")
+// 			.undo("nonDecomposedNodes")
+// 			.nodesBy(isDecomposedNode, "decomposedNodes")
+// 			.apply()
+
+
+// 		for (const node of decomposedNodes)
+// 		{
+// 			// node.x = node.LCRS_x
+// 			// node.forceLabel = 9
+// 			node.color = ORIGINAL_COLOR
+// 		}
+
+// 		for (const edge of decomposedEdges)
+// 		{
+// 			edge.doNotBack = edge.source !== "d_[ROOT]$"
+// 			edge.active_color = SELECTED_COLOR
+// 		}
+
+// 		defaultEdgeLabelSize -= 3
+// 		resize()
+
+// 		for (const node of recomposedNodes)
+// 		{
+// 			node.color = ORIGINAL_COLOR
+// 		}
+
+// 		for (const edge of recomposedEdges)
+// 		{
+// 			edge.active = true
+// 			edge.active_color = ORIGINAL_COLOR
+// 		}
+// 	}
+// 	// else
+// 	{
+// 		sigma.plugins.animate(
+// 			s,
+// 			{
+// 				x: "LCRS_x",
+// 				y: "LCRS_y",
+// 			},
+// 			{
+// 				nodes: decomposedNodes,
+// 				// easing: 'cubicInOut',
+// 				duration: wentBackwards ? undefined : 1,
+// 				// onComplete: function() {}
+// 			}
+// 		);
+
+// 		setTimeout(function()
+// 		{
+// 			sigma.plugins.animate(
+// 				s,
+// 				{
+// 					x: "LCRS_x",
+// 					y: "LCRS_y",
+// 				},
+// 				{
+// 					nodes: decomposedNodes,
+// 					// easing: 'cubicInOut',
+// 					duration: wentBackwards ? undefined : 1,
+// 					// onComplete: function() {}
+// 				}
+// 			);
+// 		}, WAIT_TIME)
+// 	}
+// })
 
 state_transitions.push(function(wentBackwards)
 { //Sorting The Dynamic Decomposed Trie vertically
+	if (!wentBackwards) onComplete();
 	if (wentBackwards)
 	{
 		filter
@@ -1588,8 +1787,6 @@ state_transitions.push(function(wentBackwards)
 					// onComplete: function() {}
 				}
 			);
-
-
 		}, WAIT_TIME)
 	}
 

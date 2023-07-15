@@ -100,8 +100,6 @@
 	let label = '   ' + edge.label + ' ';
 	// (edge.targetLabel === 2 ? " " : "")
 
-
-
 	if (edge.targetLabel === 6) {
 		const node = target
 		const nodeSize = node[prefix + 'size'];
