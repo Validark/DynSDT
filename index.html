@@ -27,12 +27,12 @@ Written in 2022.
 	<article typeof="schema:ScholarlyArticle" resource="#" style="display: block">
 		<h1 style="padding-top: 0 !important; margin-top: 0 !important">Heap-like Dynamic Score-Decomposed Tries for Top-<var>k</var> Autocomplete</h1>
 		<div class="author-info" style="font-size: 1.5em; margin-bottom: 4em">
-			<a class="uncolored" property="schema:author" href="https://github.com/Validark" typeof="schema:Person" target="_blank" rel="noopener noreferrer">
+			<a class="uncolored" property="schema:author" href="https://github.com/Validark" typeof="schema:Person" target="_blank" rel="noopener noreferrer" title="author's GitHub">
 				<span property="schema:givenName">Niles</span>
 				<span property="schema:familyName">Salter</span>
 			</a>
 			<div property="sa:roleContactPoint" typeof="schema:ContactPoint">
-				<a class="uncolored" property="schema:email" href="mailto:Validark@pm.me" title="corresponding author" style="font-size: smaller; vertical-align: top;">Validark@pm.me</a>
+				<a class="uncolored" property="schema:email" href="mailto:Niles.Salter@pm.me" title="author's email" style="font-size: smaller; vertical-align: top;">Niles.Salter@pm.me</a>
 			</div>
 		</div>
 		<section typeof="sa:Abstract" id="abstract">
@@ -94,13 +94,13 @@ Written in 2022.
 				Basically, tries can be <em>succinctly</em> encoded by traversing the tree and encoding its shape in a bitmap with roughly 2<var>n</var> bits [<a class="citation" href="#SuccinctPractice">20</a>].
 				One technique is to perform a depth-first traversal and encode a 1 each time the algorithm descends and a 0 each time it ascends [<a class="citation" href="#SuccinctPractice">20</a>].
 				All traversal operations over the original structure can then be simulated on the resulting bitmap, so long as the data held in each succinct “node” can be mapped to by some auxiliary structure(s).
-				
+
 				The main advantage of succinct data structures is in their space efficiency, with the <i>Score-Decomposed Trie</i> achieving space competitive with gzip on massive datasets [<a class="citation" href="#COMPLETION">22</a>].
-				
+
 <!-- 				had about half the throughput of their <i>Completion Trie</i> (on older hardware), however, -->
 
 				The downside is that succinct data structures are typically (but not always [<a class="citation" href="#DynPDT">17</a>]) static, generally rendering them unsuitable for highly dynamic settings.
-				
+
 				Despite bearing a similar name, the structure presented in this paper is not succinct and has a stricter invariant
 <!-- 				and thus is not merely the non-succinct equivalent of -->
 				than the <i>Score-Decomposed Trie</i>.

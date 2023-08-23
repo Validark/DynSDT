@@ -2,7 +2,7 @@
 	font-family: KaTeX_AMS;
 	font-style: normal;
 	font-weight: 400;
-	src: url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_AMS-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_AMS-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_AMS-Regular.ttf) format("truetype");
+	src: url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_AMS-Regular.woff2) format("woff2"), url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_AMS-Regular.woff) format("woff"), url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_AMS-Regular.ttf) format("truetype");
 	font-display: swap;
 }
 
@@ -10,7 +10,7 @@
 	font-family: KaTeX_Caligraphic;
 	font-style: normal;
 	font-weight: 700;
-	src: url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Caligraphic-Bold.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Caligraphic-Bold.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Caligraphic-Bold.ttf) format("truetype");
+	src: url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Caligraphic-Bold.woff2) format("woff2"), url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Caligraphic-Bold.woff) format("woff"), url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Caligraphic-Bold.ttf) format("truetype");
 	font-display: swap;
 }
 
@@ -18,7 +18,7 @@
 	font-family: KaTeX_Caligraphic;
 	font-style: normal;
 	font-weight: 400;
-	src: url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Caligraphic-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Caligraphic-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Caligraphic-Regular.ttf) format("truetype");
+	src: url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Caligraphic-Regular.woff2) format("woff2"), url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Caligraphic-Regular.woff) format("woff"), url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Caligraphic-Regular.ttf) format("truetype");
 	font-display: swap;
 }
 
@@ -26,7 +26,7 @@
 	font-family: KaTeX_Fraktur;
 	font-style: normal;
 	font-weight: 700;
-	src: url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Fraktur-Bold.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Fraktur-Bold.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Fraktur-Bold.ttf) format("truetype");
+	src: url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Fraktur-Bold.woff2) format("woff2"), url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Fraktur-Bold.woff) format("woff"), url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Fraktur-Bold.ttf) format("truetype");
 	font-display: swap;
 }
 
@@ -34,7 +34,7 @@
 	font-family: KaTeX_Fraktur;
 	font-style: normal;
 	font-weight: 400;
-	src: url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Fraktur-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Fraktur-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Fraktur-Regular.ttf) format("truetype");
+	src: url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Fraktur-Regular.woff2) format("woff2"), url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Fraktur-Regular.woff) format("woff"), url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Fraktur-Regular.ttf) format("truetype");
 	font-display: swap;
 }
 
@@ -42,7 +42,7 @@
 	font-family: KaTeX_Main;
 	font-style: normal;
 	font-weight: 700;
-	src: url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Main-Bold.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Main-Bold.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Main-Bold.ttf) format("truetype");
+	src: url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Main-Bold.woff2) format("woff2"), url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Main-Bold.woff) format("woff"), url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Main-Bold.ttf) format("truetype");
 	font-display: block;
 }
 
@@ -50,7 +50,7 @@
 	font-family: KaTeX_Main;
 	font-style: italic;
 	font-weight: 700;
-	src: url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Main-BoldItalic.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Main-BoldItalic.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Main-BoldItalic.ttf) format("truetype");
+	src: url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Main-BoldItalic.woff2) format("woff2"), url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Main-BoldItalic.woff) format("woff"), url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Main-BoldItalic.ttf) format("truetype");
 	font-display: swap;
 }
 
@@ -58,7 +58,7 @@
 	font-family: KaTeX_Main;
 	font-style: italic;
 	font-weight: 400;
-	src: url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Main-Italic.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Main-Italic.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Main-Italic.ttf) format("truetype");
+	src: url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Main-Italic.woff2) format("woff2"), url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Main-Italic.woff) format("woff"), url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Main-Italic.ttf) format("truetype");
 	font-display: swap;
 }
 
@@ -66,7 +66,7 @@
 	font-family: KaTeX_Main;
 	font-style: normal;
 	font-weight: 400;
-	src: url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Main-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Main-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Main-Regular.ttf) format("truetype");
+	src: url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Main-Regular.woff2) format("woff2"), url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Main-Regular.woff) format("woff"), url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Main-Regular.ttf) format("truetype");
 	font-display: block;
 }
 
@@ -74,7 +74,7 @@
 	font-family: KaTeX_Math;
 	font-style: italic;
 	font-weight: 700;
-	src: url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Math-BoldItalic.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Math-BoldItalic.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Math-BoldItalic.ttf) format("truetype");
+	src: url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Math-BoldItalic.woff2) format("woff2"), url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Math-BoldItalic.woff) format("woff"), url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Math-BoldItalic.ttf) format("truetype");
 	font-display: swap;
 }
 
@@ -82,7 +82,7 @@
 	font-family: KaTeX_Math;
 	font-style: italic;
 	font-weight: 400;
-	src: url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Math-Italic.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Math-Italic.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Math-Italic.ttf) format("truetype");
+	src: url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Math-Italic.woff2) format("woff2"), url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Math-Italic.woff) format("woff"), url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Math-Italic.ttf) format("truetype");
 	font-display: swap;
 }
 
@@ -90,7 +90,7 @@
 	font-family: "KaTeX_SansSerif";
 	font-style: normal;
 	font-weight: 700;
-	src: url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_SansSerif-Bold.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_SansSerif-Bold.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_SansSerif-Bold.ttf) format("truetype");
+	src: url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_SansSerif-Bold.woff2) format("woff2"), url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_SansSerif-Bold.woff) format("woff"), url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_SansSerif-Bold.ttf) format("truetype");
 	font-display: swap;
 }
 
@@ -98,7 +98,7 @@
 	font-family: "KaTeX_SansSerif";
 	font-style: italic;
 	font-weight: 400;
-	src: url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_SansSerif-Italic.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_SansSerif-Italic.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_SansSerif-Italic.ttf) format("truetype");
+	src: url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_SansSerif-Italic.woff2) format("woff2"), url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_SansSerif-Italic.woff) format("woff"), url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_SansSerif-Italic.ttf) format("truetype");
 	font-display: swap;
 }
 
@@ -106,7 +106,7 @@
 	font-family: "KaTeX_SansSerif";
 	font-style: normal;
 	font-weight: 400;
-	src: url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_SansSerif-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_SansSerif-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_SansSerif-Regular.ttf) format("truetype");
+	src: url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_SansSerif-Regular.woff2) format("woff2"), url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_SansSerif-Regular.woff) format("woff"), url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_SansSerif-Regular.ttf) format("truetype");
 	font-display: swap;
 }
 
@@ -114,7 +114,7 @@
 	font-family: KaTeX_Script;
 	font-style: normal;
 	font-weight: 400;
-	src: url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Script-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Script-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Script-Regular.ttf) format("truetype");
+	src: url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Script-Regular.woff2) format("woff2"), url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Script-Regular.woff) format("woff"), url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Script-Regular.ttf) format("truetype");
 	font-display: swap;
 }
 
@@ -122,7 +122,7 @@
 	font-family: KaTeX_Size1;
 	font-style: normal;
 	font-weight: 400;
-	src: url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Size1-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Size1-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Size1-Regular.ttf) format("truetype");
+	src: url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Size1-Regular.woff2) format("woff2"), url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Size1-Regular.woff) format("woff"), url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Size1-Regular.ttf) format("truetype");
 	font-display: swap;
 }
 
@@ -130,7 +130,7 @@
 	font-family: KaTeX_Size2;
 	font-style: normal;
 	font-weight: 400;
-	src: url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Size2-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Size2-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Size2-Regular.ttf) format("truetype");
+	src: url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Size2-Regular.woff2) format("woff2"), url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Size2-Regular.woff) format("woff"), url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Size2-Regular.ttf) format("truetype");
 	font-display: swap;
 }
 
@@ -138,7 +138,7 @@
 	font-family: KaTeX_Size3;
 	font-style: normal;
 	font-weight: 400;
-	src: url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Size3-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Size3-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Size3-Regular.ttf) format("truetype");
+	src: url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Size3-Regular.woff2) format("woff2"), url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Size3-Regular.woff) format("woff"), url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Size3-Regular.ttf) format("truetype");
 	font-display: swap;
 }
 
@@ -146,7 +146,7 @@
 	font-family: KaTeX_Size4;
 	font-style: normal;
 	font-weight: 400;
-	src: url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Size4-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Size4-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Size4-Regular.ttf) format("truetype");
+	src: url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Size4-Regular.woff2) format("woff2"), url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Size4-Regular.woff) format("woff"), url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Size4-Regular.ttf) format("truetype");
 	font-display: swap;
 }
 
@@ -154,7 +154,7 @@
 	font-family: KaTeX_Typewriter;
 	font-style: normal;
 	font-weight: 400;
-	src: url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Typewriter-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Typewriter-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Typewriter-Regular.ttf) format("truetype");
+	src: url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Typewriter-Regular.woff2) format("woff2"), url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Typewriter-Regular.woff) format("woff"), url(https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/fonts/KaTeX_Typewriter-Regular.ttf) format("truetype");
 	font-display: swap;
 }
 
@@ -300,7 +300,8 @@ html {
 	font-size: 12pt;
 }
 
-.bb-axis-x-label, .bb-axis-y-label {
+.bb-axis-x-label,
+.bb-axis-y-label {
 	font-family: KaTeX_Main, Times, 'Times New Roman', serif !important;
 	letter-spacing: -1px;
 	word-spacing: 2px;
@@ -330,7 +331,13 @@ body svg {
 	letter-spacing: 0px;
 }
 
-[style*="font-style: italic"], em, i, dfn:not(.funcname), cite, .it, caption {
+[style*="font-style: italic"],
+em,
+i,
+dfn:not(.funcname),
+cite,
+.it,
+caption {
 	letter-spacing: -0.75px;
 	letter-spacing: -1px;
 	/* margin-left: 0.75px; */
@@ -360,29 +367,22 @@ div.pseudocode i {
 } */
 
 @media (min-width: 1100px) {
-	article { transform: scale(1.125) translateY(14in); }
-	header { transform: scale(1.125) }
+	article {
+		transform: scale(1.125) translateY(14in);
+	}
+
+	header {
+		transform: scale(1.125)
+	}
 }
 
 @media (min-width: 1200px) {
-	article { transform: scale(1.333333333333333333333333333333333) translateY(31.25in); }
-	header { transform: scale(1.333333333333333333333333333333333) }
-}
-
-@media print {
 	article {
-		/* zoom: initial; */
-		/* -moz-transform: initial; */
-		transform: initial;
+		transform: scale(1.333333333333333333333333333333333) translateY(31.25in);
 	}
 
-	/* I don't know good ways to tell the PDF renderer how to figure this out for itself, so just hardcode */
-	#eliminating_log, #string_compression, #numeric_compression, #introduction, #preliminaries, #top-k_enumeration, #structural-properties, #score_placement, #Algorithm_6, #Deletion {
-		page-break-before: always;
-	}
-
-	.ps_header, .pseudocode {
-		break-inside: avoid-page;
+	header {
+		transform: scale(1.333333333333333333333333333333333)
 	}
 }
 
@@ -553,39 +553,38 @@ span.ThickSpace:after {
 }
 
 span.accent:after {
-    content: 'ˊ';
+	content: 'ˊ';
 }
 
 span.umlaut:after,
 span.naive_i_umlaut:after {
-    content: '¨';
+	content: '¨';
 }
 
 span.naive_i:after {
-    content: 'ı';
+	content: 'ı';
 }
 
 span.accent,
 span.umlaut,
 span.naive_i,
 span.naive_i_umlaut {
-    display: inline-block;
-    width: 0;
-    position: relative;
+	display: inline-block;
+	width: 0;
+	position: relative;
 }
 
 span.accent,
-span.umlaut
-{
-    left: -0.5em;
+span.umlaut {
+	left: -0.5em;
 }
 
 span.naive_i {
-    left: -3.18125em;
+	left: -3.18125em;
 }
 
 span.naive_i_umlaut {
-    left: -3.3em;
+	left: -3.3em;
 }
 
 em {
@@ -593,10 +592,10 @@ em {
 	font-style: italic;
 }
 
-div.pseudocode i {
-}
+div.pseudocode i {}
 
-var, .var {
+var,
+.var {
 	/* margin-right: 0.025em;
     margin-left: 0.025em; */
 	/* 0.833333333333em; */
@@ -681,7 +680,7 @@ table {
 
 td,
 th {
-  padding: 0;
+	padding: 0;
 }
 
 
@@ -714,7 +713,14 @@ var.threshold {
 	vertical-align: 0.08em;
 }
 
-span.l\00007C, span.r\00007C, span.\00005B, span.\00005D, span.\000028, span.\000029, span.\00230A, span.\00230B {
+span.l\00007C,
+span.r\00007C,
+span.\00005B,
+span.\00005D,
+span.\000028,
+span.\000029,
+span.\00230A,
+span.\00230B {
 	font-family: KaTeX_Math;
 	font-size: 1.1em;
 	margin-left: 0.025em;
@@ -821,7 +827,8 @@ div.ps-root {
 	font-size: 0.9em;
 }
 
-span.mrel, span.ps_arrow {
+span.mrel,
+span.ps_arrow {
 	opacity: 1;
 	font-weight: 600;
 	font-size: 0.8em;
@@ -877,16 +884,24 @@ section {
 	margin-top: 6em;
 }
 
-article>section:first-of-type {
-	/* margin: 0; */
-	margin-top: 1em;
-}
+/* article>section:first-of-type { */
+/* margin: 0; */
+/* margin-top: 1cm; */
+/* } */
 
 section>p {
 	text-align: justify;
 	margin-top: 2em;
 	margin-bottom: 2em;
 }
+
+section>p:first-of-type {
+	margin-top: 1em;
+}
+
+/* section>h2+p {
+	margin-top: 1em !important;
+} */
 
 aside>p {
 	text-align: justify;
@@ -1016,6 +1031,7 @@ a:hover {
 .libre {
 	font-size: 0.9em;
 }
+
 /* .libre {
 	font-family: "Libre Baskerville", serif;
 	font-size: smaller;
@@ -1063,11 +1079,11 @@ a[property="schema:citation"] {
 	hyphens: none;
 }
 
-section#references > p > a:hover {
+section#references>p>a:hover {
 	text-decoration: none;
 }
 
-section#references > p > a:hover > b.libre {
+section#references>p>a:hover>b.libre {
 	text-decoration: underline;
 }
 
@@ -1411,12 +1427,38 @@ article {
   }
 } */
 
-/*
-DUDE I can not get this paper to print properly!!!
-Figure 2 aka #decomposed_trie keeps pushing its figcaption away!
 
-*/
 @media print {
+	article {
+		/* zoom: initial; */
+		/* -moz-transform: initial; */
+		transform: initial;
+	}
+
+	/* I don't know good ways to tell the PDF renderer how to figure this out for itself, so just hardcode */
+	#eliminating_log,
+	#string_compression,
+	#numeric_compression,
+	#introduction,
+	#preliminaries,
+	#top-k_enumeration,
+	/* #structural-properties, */
+	#score_placement,
+	#Algorithm_6,
+	#Deletion {
+		page-break-before: always;
+		margin-top: 0 !important;
+	}
+
+	.ps_header,
+	.pseudocode {
+		break-inside: avoid-page;
+	}
+
+	/* section#Non-succinct_DynPDT {
+		padding-top: 2cm;
+	} */
+
 	header {
 		display: none;
 	}
@@ -1434,10 +1476,6 @@ Figure 2 aka #decomposed_trie keeps pushing its figcaption away!
 		color: inherit;
 	}
 
-	section {
-		margin-top: 0 !important;
-	}
-
 	figcaption {
 		margin: 0 !important;
 		padding: 1.25em 0 0em 0 !important;
@@ -1448,11 +1486,14 @@ Figure 2 aka #decomposed_trie keeps pushing its figcaption away!
 		page-break-inside: avoid !important;
 	}
 
-
 	figure svg {
 		page-break-after: avoid !important;
 		margin-bottom: 0 !important;
 		padding-bottom: 0 !important;
+	}
+
+	section {
+		margin-top: 1em;
 	}
 }
 
@@ -1541,7 +1582,9 @@ span.div {
 	line-height: 0;
 }
 
-span.ps_minus, span.ps_plus, span.plus {
+span.ps_minus,
+span.ps_plus,
+span.plus {
 	font-family: KaTeX_Typewriter;
 	line-height: 0;
 }
@@ -1552,7 +1595,8 @@ div.ps_header {
 	font-family: KaTeX_Main;
 }
 
-div.pseudocode, div.ps_header>div {
+div.pseudocode,
+div.ps_header>div {
 	counter-reset: ruler;
 	font-size: 12pt;
 	border-top: 1px solid black;
@@ -1560,13 +1604,15 @@ div.pseudocode, div.ps_header>div {
 	border-bottom: 1px solid black;
 }
 
-div.pseudocode>div.non-lines, div.ps_header>div>div.non-lines {
+div.pseudocode>div.non-lines,
+div.ps_header>div>div.non-lines {
 	line-height: 1.15;
 	margin-top: 0.1em;
 	margin-bottom: 0.1em;
 }
 
-div.pseudocode>div:not(.non-lines), div.ps_header>div>div:not(.non-lines) {
+div.pseudocode>div:not(.non-lines),
+div.ps_header>div>div:not(.non-lines) {
 	line-height: 1.15;
 	word-spacing: 0.2em;
 }
@@ -1617,7 +1663,8 @@ figcaption span.cmp {
 	vertical-align: 0.05em;
 } */
 
-g.bb-legend-item.bb-legend-item-DynSDT, tr.bb-tooltip-name-DynSDT > td.name {
+g.bb-legend-item.bb-legend-item-DynSDT,
+tr.bb-tooltip-name-DynSDT>td.name {
 	visibility: hidden;
 	display: none;
 }
@@ -1640,6 +1687,7 @@ header {
 		background-color: #000 !important;
 		border-color: #333 !important;
 	}
+
 	/*
 	<div class="bb-tooltip-container" style="position: absolute; pointer-events: none; top: 49.4271px; left: 259.5px; display: none; visibility: hidden;"><table class="bb-tooltip"><tbody><tr><th colspan="2">9956</th></tr><tr class="bb-tooltip-name-DynSDT"><td class="name"><span style="background-color:#1f77b4"></span>DynSDT</td><td class="value"><b>Mid:</b> 6.89515ms <b>High:</b> 7.1549ms <b>Low:</b> 6.2458ms</td></tr></tbody></table></div>
 	*/
@@ -1649,7 +1697,7 @@ header {
 		color: #282828;
 	}
 
-	div.bb-tooltip-container > table > tbody > tr:first-of-type > th {
+	div.bb-tooltip-container>table>tbody>tr:first-of-type>th {
 		color: #000;
 	}
 
@@ -1657,7 +1705,8 @@ header {
 		filter: invert(1);
 	}
 
-	article, header {
+	article,
+	header {
 		background: rgb(41, 41, 41);
 	}
 
@@ -1680,7 +1729,9 @@ header {
 		background: #061825;
 	}
 
-	span.mrel, span.cmp, span.ps_arrow {
+	span.mrel,
+	span.cmp,
+	span.ps_arrow {
 		color: #fff;
 	}
 
@@ -1688,7 +1739,9 @@ header {
 		color: #a1a1a1;
 	}
 
-	div.ps_header, div.pseudocode, div.ps_header>div {
+	div.ps_header,
+	div.pseudocode,
+	div.ps_header>div {
 		border-color: rgba(255, 255, 255, 0.9);
 	}
 }
