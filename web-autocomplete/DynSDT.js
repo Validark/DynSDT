@@ -27,23 +27,28 @@ function sortContactsIfUnsorted(contacts) {
 }
 function deserializeContacts(text) {
     const objects = text.split(',');
-    const length = objects.length >> 2;
+    const { length } = objects;
     const contacts = new Array(length);
-    let j = 0;
-    for (let i = 0; i < length; i++, j += 4) {
-        contacts[i] = {
-            first_name: objects[j],
-            last_name: objects[j + 1],
-            email: objects[j + 2],
-            timestamp: +objects[j + 3],
+    for (let j = 0, i = 0; j < length;) {
+        contacts[i++] = {
+            first_name: objects[j++],
+            last_name: objects[j++],
+            email: objects[j++],
+            timestamp: +objects[j++],
         };
     }
     return contacts;
 }
 function serializeContacts(contacts) {
-    return contacts
-        .map(e => `${e.first_name},${e.last_name},${e.email},${e.timestamp}`)
-        .join();
+    const substrs = new Array(contacts.length * 4);
+    let i = 0;
+    for (const contact of contacts) {
+        substrs[i++] = contact.first_name;
+        substrs[i++] = contact.last_name;
+        substrs[i++] = contact.email;
+        substrs[i++] = "" + contact.timestamp;
+    }
+    return substrs.join();
 }
 class DynSDT {
     constructor(contacts) {
