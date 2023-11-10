@@ -26,15 +26,15 @@ function sortContactsIfUnsorted(contacts) {
     return contacts;
 }
 function deserializeContacts(text) {
-    const objects = text.split(',');
-    const { length } = objects;
-    const contacts = new Array(length);
+    const item_data = text.split(',');
+    const { length } = item_data;
+    const contacts = new Array(length / 4);
     for (let j = 0, i = 0; j < length;) {
         contacts[i++] = {
-            first_name: objects[j++],
-            last_name: objects[j++],
-            email: objects[j++],
-            timestamp: +objects[j++],
+            first_name: item_data[j++],
+            last_name: item_data[j++],
+            email: item_data[j++],
+            timestamp: +item_data[j++],
         };
     }
     return contacts;
@@ -51,41 +51,6 @@ function serializeContacts(contacts) {
     return substrs.join();
 }
 class DynSDT {
-    constructor(contacts) {
-        this.root = 0;
-        this.availableSlots = DynSDT.OVER_ALLOCATE_BY;
-        if (typeof contacts === "string")
-            contacts = deserializeContacts(contacts);
-        this.contacts = sortContactsIfUnsorted(contacts);
-        const terms = this.terms = generateTerms(contacts);
-        this.nodes = new Uint16Array(3 * (terms.length + this.availableSlots));
-        for (let j = 0, { length } = terms; j < length; j++) {
-            this.setDown(j, NULL);
-            this.setNext(j, NULL);
-            if (j === 0)
-                continue;
-            const term = terms[j];
-            let LCP = 0;
-            let node = 0;
-            DESCEND_DEEPER: while (true) {
-                for ( // Calculate Longest Common Prefix between `node.term` and `term`
-                let key = terms[node], len = Math.min(term.length, key.length); LCP < len && term[LCP] === key[LCP]; LCP++)
-                    ;
-                if (this.getNext(node) === NULL) {
-                    this.setLCP(j, LCP);
-                    this.setNext(node, j);
-                    break DESCEND_DEEPER;
-                }
-                for (node = this.getNext(node); this.getLCP(node) !== LCP; node = this.getDown(node)) {
-                    if (this.getDown(node) === NULL) {
-                        this.setLCP(j, LCP);
-                        this.setDown(node, j);
-                        break DESCEND_DEEPER;
-                    }
-                }
-            }
-        }
-    }
     async saveToCache(cacheName) {
         return caches.open(cacheName)
             .then(cache => Promise.all([
@@ -181,6 +146,41 @@ class DynSDT {
             down: this.getDown(node) !== NULL && this.getNodeData(this.getDown(node)),
             next: this.getNext(node) !== NULL && this.getNodeData(this.getNext(node))
         };
+    }
+    constructor(contacts) {
+        this.root = 0;
+        this.availableSlots = DynSDT.OVER_ALLOCATE_BY;
+        if (typeof contacts === "string")
+            contacts = deserializeContacts(contacts);
+        this.contacts = sortContactsIfUnsorted(contacts);
+        const terms = this.terms = generateTerms(contacts);
+        this.nodes = new Uint16Array(3 * (terms.length + this.availableSlots));
+        for (let j = 0, { length } = terms; j < length; j++) {
+            this.setDown(j, NULL);
+            this.setNext(j, NULL);
+            if (j === 0)
+                continue;
+            const term = terms[j];
+            let LCP = 0;
+            let node = 0;
+            DESCEND_DEEPER: while (true) {
+                for ( // Calculate Longest Common Prefix between `node.term` and `term`
+                let key = terms[node], len = Math.min(term.length, key.length); LCP < len && term[LCP] === key[LCP]; LCP++)
+                    ;
+                if (this.getNext(node) === NULL) {
+                    this.setLCP(j, LCP);
+                    this.setNext(node, j);
+                    break DESCEND_DEEPER;
+                }
+                for (node = this.getNext(node); this.getLCP(node) !== LCP; node = this.getDown(node)) {
+                    if (this.getDown(node) === NULL) {
+                        this.setLCP(j, LCP);
+                        this.setDown(node, j);
+                        break DESCEND_DEEPER;
+                    }
+                }
+            }
+        }
     }
     GetLocusForPrefix(prefix, node = this.root, LCP = 0) {
         const prefixLength = prefix.length;

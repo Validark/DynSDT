@@ -58,16 +58,16 @@ function sortContactsIfUnsorted(contacts: Array<Contact>) { // verify that conta
 }
 
 function deserializeContacts(text: string) {
-	const objects: Array<string> = text.split(',');
-	const { length } = objects;
-	const contacts = new Array<Contact>(length);
+	const item_data: Array<string> = text.split(',');
+	const { length } = item_data;
+	const contacts = new Array<Contact>(length / 4);
 
 	for (let j = 0, i = 0; j < length; ) {
 		contacts[i++] = {
-			first_name: objects[j++]!,
-			last_name: objects[j++]!,
-			email: objects[j++]!,
-			timestamp: +objects[j++]!,
+			first_name: item_data[j++]!,
+			last_name: item_data[j++]!,
+			email: item_data[j++]!,
+			timestamp: +item_data[j++]!,
 		};
 	}
 	return contacts;
