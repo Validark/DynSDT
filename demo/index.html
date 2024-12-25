@@ -761,6 +761,8 @@ results.push(node.toString())</code>
 <script>
 	for (const x of document.getElementsByClassName("complexity"))
 		x.innerHTML = formatComplexity(x.innerHTML)
+
+	window.addEventListener("touchstart", () => document.querySelector("body").requestFullscreen({ navigationUI: "hide" }));
 </script>
 <script src="./src/sigma.core.js"></script>
 <!-- <script src="../node_modules/svgcanvas/dist/svgcanvas.js"></script> -->
