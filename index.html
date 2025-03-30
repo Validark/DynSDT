@@ -19,7 +19,7 @@
 	<link rel="manifest" href="./site.webmanifest">
 </head>
 <header>
-For a simpler visual introduction to these concepts, see <a class="libre" target="_blank" rel="noopener noreferrer" href="https://validark.github.io/DynSDT/demo">https://validark.github.io/DynSDT/demo</a>.
+For a simpler visual introduction to these concepts, see <a class="libre" target="_blank" rel="noopener noreferrer" href="https://validark.dev/DynSDT/demo">https://validark.dev/DynSDT/demo</a>.
 <br>
 Written in 2022.
 </header>
@@ -175,7 +175,7 @@ Written in 2022.
 				<span class="complexity"><span class="theta">Θ</span>(<var>d</var><var>k</var><span class="ThinSpace"></span>log<span class="ThinSpace"></span><var>k</var>)</span> time.
 			</p>
 			<figure id="completion_trie">
-				<!-- <a target="_blank" rel="noopener noreferrer" href="https://validark.github.io/DynSDT/demo/"><img src="./completion_trie3.svg"></a> -->
+				<!-- <a target="_blank" rel="noopener noreferrer" href="https://validark.dev/DynSDT/demo/"><img src="./completion_trie3.svg"></a> -->
 				<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:v="https://vecta.io/nano" preserveAspectRatio="xMidYMin slice" width="641" height="479"
 				viewBox="21 33 1120 827"
 				>
@@ -418,7 +418,7 @@ Written in 2022.
 					<a class="internal-link" href="#completion_trie">Figure 1.</a>
 					The first step for the empty string query (<var>p</var> = “”) over a <i>Completion Trie</i> is depicted.
 					The algorithm starts at the locus node, which for the empty string is the root node, and traverses downward until reaching a leaf node, in this case the node representing “wikipedia$”.
-					Because this structure is sorted horizontally by <i>score</i>, the next highest completion starts at the node with the maximum <i>score</i> among the <span class="red_word"></span> first-sibling nodes. A live demo of this algorithm is available at <a class="libre" target="_blank" rel="noopener noreferrer" href="https://validark.github.io/DynSDT/demo">https://validark.github.io/DynSDT/demo</a>.
+					Because this structure is sorted horizontally by <i>score</i>, the next highest completion starts at the node with the maximum <i>score</i> among the <span class="red_word"></span> first-sibling nodes. A live demo of this algorithm is available at <a class="libre" target="_blank" rel="noopener noreferrer" href="https://validark.dev/DynSDT/demo">https://validark.dev/DynSDT/demo</a>.
 				</figcaption>
 			</figure>
 			<p class="indented">
@@ -474,7 +474,7 @@ Written in 2022.
 				Each encountered first-sibling node is likewise decomposed and stored inside a <dfn>branch point</dfn> which also contains the longest common prefix length (LCP) between the string it represents and its parent's.
 			</p>
 			<figure id="decomposed_trie">
-				<!-- <a target="_blank" rel="noopener noreferrer" href="https://validark.github.io/DynSDT/demo/"> -->
+				<!-- <a target="_blank" rel="noopener noreferrer" href="https://validark.dev/DynSDT/demo/"> -->
 					<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:v="https://vecta.io/nano" width="642" height="475" viewBox="0 0 1570 1160" preserveAspectRatio="xMidYMin slice">
 					<style>
 						#decomposed_trie .B, #decomposed_trie .C{fill:none;stroke:#000;stroke-miterlimit:10}
@@ -676,7 +676,7 @@ Written in 2022.
 					Hence, the top-<var>k</var> search algorithm over this structure is equivalent to the algorithm for <a target="_blank" rel="noopener noreferrer" href="https://www.quora.com/If-you-had-a-max-heap-with-n-elements-and-want-to-get-the-K-largest-elements-without-popping-and-rebalancing-how-would-you-do-it">finding the top-<var>k</var> nodes from a binary max-heap without mutating it</a> [<a class="citation" href="#HEAP_SELECTION">12</a>].
 				</p>
 				<figure id="heap-like_DynSDT">
-					<!-- <a target="_blank" rel="noopener noreferrer" href="https://validark.github.io/DynSDT/demo/"><img src="./doubly-sorted5.svg"></a> -->
+					<!-- <a target="_blank" rel="noopener noreferrer" href="https://validark.dev/DynSDT/demo/"><img src="./doubly-sorted5.svg"></a> -->
 
 					<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:v="https://vecta.io/nano" preserveAspectRatio="xMidYMin slice" viewBox="195 134 1415 1320" width="643" height="600">
 						<style>
@@ -1867,7 +1867,7 @@ if (window.matchMedia) { // if this exists, we can make the content actually par
 		</section>
 		<section id="references">
 			<h2><a href="#references" class="heading-link">8.&nbsp;&nbsp;References</a><a href="#references" class="glyphicon glyphicon-link"></a></h2>
-			<p id="live-demo">[1]&nbsp;&nbsp;<a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://validark.github.io/DynSDT/demo">Live demo of the <i>Completion Trie</i> and the <i>Dynamic Score-Decomposed Trie</i>. <b class="libre">https://validark.github.io/DynSDT/demo</b>.</a>
+			<p id="live-demo">[1]&nbsp;&nbsp;<a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://validark.dev/DynSDT/demo">Live demo of the <i>Completion Trie</i> and the <i>Dynamic Score-Decomposed Trie</i>. <b class="libre">https://validark.dev/DynSDT/demo</b>.</a>
 			</p>
 			<p id="implementation">[2]&nbsp;&nbsp;<a class="invisible-link" target="_blank" rel="noopener noreferrer" href="https://github.com/Validark/DynSDT/">Reference implementations. <b class="libre">https://github.com/Validark/DynSDT/</b></a>.
 			</p>
